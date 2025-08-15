@@ -2782,7 +2782,14 @@ updateAnimationSpeed();
 // Initialize bomb conversion button state
 updateBombConversionButtonState();
 
-
+// GitHub Pages redirect fix - if we're on the wrong page, redirect to the game
+(function() {
+  // Check if we're on the right page by looking for game elements
+  if (!document.getElementById('game')) {
+    // We're probably on the README page, redirect to the game
+    window.location.href = window.location.href;
+  }
+})();
 
 </script>
 </body>
