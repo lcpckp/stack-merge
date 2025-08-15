@@ -194,6 +194,17 @@
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
+  
+  /* Trash button pulse animation */
+  .trash-btn.pulse {
+    animation: trashBtnPulse 0.3s ease-out;
+  }
+  
+  @keyframes trashBtnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
 
   /* AI button styling to match score-value and interface */
   .ai-btn {
@@ -447,6 +458,86 @@
   }
   
   .bomb-cost-text .cost {
+    color: #FCD34D;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  
+  /* Trash button styling */
+  .trash-button-container {
+    position: absolute;
+    left: calc(100% + 20px);
+    top: 80px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .trash-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 2px solid #DC2626;
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family);
+    pointer-events: auto;
+  }
+  
+  .trash-btn:hover {
+    border: 3px solid #0ea5e9;
+    background: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(107, 114, 128, 0.3);
+  }
+  
+  .trash-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(107, 114, 128, 0.25);
+  }
+  
+  .trash-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.2);
+  }
+  
+  .trash-btn.affordable {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .trash-btn.affordable:hover {
+    border: 3px solid #0ea5e9;
+    background: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(14, 165, 233, 0.3);
+  }
+  
+  .trash-btn .emoji {
+    font-size: 32px;
+    line-height: 1;
+  }
+  
+  .trash-cost-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-family);
+  }
+  
+  .trash-cost-text .emoji {
+    font-size: 24px;
+  }
+  
+  .trash-cost-text .cost {
     color: #FCD34D;
     font-weight: 700;
     font-size: 20px;
@@ -1028,6 +1119,24 @@
     margin-bottom: 0;
   }
   
+  /* Position trash button for mobile */
+  .trash-button-container {
+    position: static;
+    order: 5;
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+  
+  /* Consistent button sizing for mobile */
+  .bomb-conversion-btn, .trash-btn {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .bomb-conversion-btn .emoji, .trash-btn .emoji {
+    font-size: 28px;
+  }
+  
   /* Adjust game grid for mobile */
   .game {
     gap: 16px;
@@ -1065,6 +1174,14 @@
   }
   
   .bomb-cost-text .cost {
+    font-size: 16px;
+  }
+  
+  .trash-cost-text .emoji {
+    font-size: 20px;
+  }
+  
+  .trash-cost-text .cost {
     font-size: 16px;
   }
   
@@ -1175,6 +1292,24 @@
     font-size: 20px;
   }
   
+  .trash-btn {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .trash-btn .emoji {
+    font-size: 20px;
+  }
+  
+  /* Consistent cost text sizing for extra small mobile */
+  .bomb-cost-text .emoji, .trash-cost-text .emoji {
+    font-size: 18px;
+  }
+  
+  .bomb-cost-text .cost, .trash-cost-text .cost {
+    font-size: 14px;
+  }
+  
   /* Hide next stage display on extra small mobile too */
   .next-stage-container {
     display: none;
@@ -1193,6 +1328,15 @@
     position: absolute;
     left: calc(100% + 10px);
     top: 0;
+    order: unset;
+    margin: 0;
+  }
+  
+  /* Position trash button for landscape mobile */
+  .trash-button-container {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 60px;
     order: unset;
     margin: 0;
   }
@@ -1256,6 +1400,17 @@
       <div class="bomb-cost-text">
         <span class="emoji">💰</span>
         <span class="cost" id="bombCost">50</span>
+      </div>
+    </div>
+    
+    <!-- Trash button positioned below bomb button -->
+    <div class="trash-button-container">
+      <button id="trashButton" class="trash-btn" title="Remove next block from queue">
+        <span class="emoji">🗑️</span>
+      </button>
+      <div class="trash-cost-text">
+        <span class="emoji">💰</span>
+        <span class="cost" id="trashCost">25</span>
       </div>
     </div>
   </div>
@@ -1323,7 +1478,7 @@
             <p>• Each merge gives you gold based on the merge number</p>
             <p>• Gold earnings multiply as you progress through stages</p>
             <p>• Use gold to convert blocks into bombs</p>
-            <p>• Higher stage = more gold per merge!</p>
+            <p>• Stage 1: 1x gold, Stage 2+: 10x gold per merge!</p>
           </div>
         </div>
 
@@ -1465,7 +1620,7 @@ function updateGoldDisplay() {
   }
 }
 const MAX_HEIGHT = 10;
-const BOMB_CHANCE = 0.02; // 2% chance for bombs
+const BOMB_CHANCE = 0.01; // 1% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
 
@@ -1502,8 +1657,13 @@ let currentStackCapacity = MAX_HEIGHT; // Current maximum height for each stack 
 let currentStage = 1; // Current stage (1 = starting, 2 = after first stack unlock, etc.)
 
 // Bomb conversion button state
-let bombConversionCost = 50; // Starting cost
+let bombConversionCost = 50;
 let bombConversionPresses = 0; // Number of times button has been pressed
+let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
+
+// Trash button state
+let trashButtonCost = 25;
+let trashButtonPresses = 0; // Number of times button has been pressed
 
 // Set up initial probability distribution for the starting block sizes (1 and 2)
 updateProbabilityDistribution();
@@ -1533,13 +1693,24 @@ document.addEventListener('keydown', (e) => {
 
 function checkForNewStack() {
   // Stage progression without adding new stacks
+  // IMPORTANT: This function should NEVER modify the poles array
+  // Poles should remain at exactly 4 permanently
+  
+  // Safety check: ensure we still have exactly 4 poles
+  if (poles.length !== 4) {
+    console.error(`CRITICAL ERROR: checkForNewStack found ${poles.length} poles instead of 4! Resetting to 4 poles.`);
+    poles = [[],[],[],[]];
+  }
+  
   // Increment stage counter for gold multiplier
   currentStage++;
   // Double the target block size for the next unlock
   currentTargetBlockSize *= 2;
   // Update the range of valid pieces to include the next incremental block
   updateBlockRange();
-  console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${currentStage}`);
+  const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
+  console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${stageMultiplier}x`);
+  console.log(`Poles count remains at ${poles.length} (should always be 4)`);
 }
 
 function checkForNewBlockSize(mergedSize) {
@@ -1557,8 +1728,8 @@ function checkForNewBlockSize(mergedSize) {
 }
 
 function updateProbabilityDistribution() {
-  // Create a probability distribution with gentler decay for higher value blocks
-  // Blocks 1, 2, and 4 should have equal probabilities, then gentle decay for higher values
+  // Create a probability distribution with faster decay for higher value blocks
+  // Blocks 1, 2, and 4 should have equal probabilities, then faster decay for higher values
   
   const numBlocks = weights.length;
   
@@ -1574,7 +1745,7 @@ function updateProbabilityDistribution() {
           } else {
         // For block sizes 8 and above, use exponential decay
         // Start from the same level as the first three, then decrease
-        const decayFactor = 0.7; // Gentler decay - higher values appear more frequently than before
+        const decayFactor = 0.65; // Moderate decay - higher values appear less frequently than before
         const probability = 0.15 * Math.pow(decayFactor, i - 2);
         baseProbabilities.push(probability);
       }
@@ -1585,7 +1756,7 @@ function updateProbabilityDistribution() {
   probabilities = baseProbabilities.map(p => p / totalProbability);
   
   console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
-  console.log('Expected distribution: 1,2,4 should be equal, then gentle decay for higher values');
+  console.log('Expected distribution: 1,2,4 should be equal, then faster decay for higher values');
   console.log('Current weights array:', weights);
   console.log('Current probabilities array:', probabilities);
 }
@@ -1683,7 +1854,6 @@ function handleBombConversion() {
     renderNext();
     
     // Increment press count and double the cost
-    bombConversionPresses++;
     bombConversionCost *= 2;
     
     // Update button cost display
@@ -1691,24 +1861,119 @@ function handleBombConversion() {
       bombCostEl.textContent = bombConversionCost;
     }
     
-    // Update button state
+    // Update button state (cost changed, so force update)
     updateBombConversionButtonState();
   }
 }
 
+function handleTrashButton() {
+  // Check if player has enough gold
+  if (gold < trashButtonCost) {
+    // Show feedback that they don't have enough gold
+    trashButton.classList.add('pulse');
+    setTimeout(() => trashButton.classList.remove('pulse'), 300);
+    return;
+  }
+  
+  // Check if there's a next block to remove
+  if (nextQueue.length === 0) {
+    return;
+  }
+  
+  // Deduct gold
+  gold -= trashButtonCost;
+  
+  // Remove the current next block from the queue
+  const removedBlock = nextQueue.shift();
+  console.log(`Removed block ${removedBlock.w} from queue for ${trashButtonCost} gold`);
+  
+  // Add a new random block to the end of the queue to maintain 3 blocks
+  nextQueue.push(getRandomPiece());
+  
+  // Update gold display
+  updateGoldDisplay();
+  const goldDisplay = document.querySelector('.gold-value');
+  if (goldDisplay) {
+    goldDisplay.classList.add('pulse');
+    setTimeout(() => {
+      goldDisplay.classList.remove('pulse');
+    }, 300);
+  }
+  
+  // Play the same animation as placing a block, but don't place it
+  animateNextQueueAdvance();
+  
+  // Increment press count and double the cost
+  trashButtonCost *= 2;
+  
+  // Update button cost display
+  const trashCostEl = document.getElementById('trashCost');
+  if (trashCostEl) {
+    trashCostEl.textContent = trashButtonCost;
+  }
+  
+  // Update button state (cost changed, so force update)
+  updateTrashButtonState();
+}
+
 function updateBombConversionButtonState() {
-  // Disable button if not enough gold and update visual state
+  // Always update when called since we call this strategically
   if (bombConversionBtn) {
     const hasEnoughGold = gold >= bombConversionCost;
     bombConversionBtn.disabled = !hasEnoughGold;
     
     // Update visual styling based on affordability
+    // Red border (default): when gold < cost (disabled)
+    // White border (affordable): when gold >= cost (enabled)
     if (hasEnoughGold) {
       bombConversionBtn.classList.add('affordable');
     } else {
       bombConversionBtn.classList.remove('affordable');
     }
+    
+    // Update the tracked gold amount
+    lastGoldAmount = gold;
   }
+}
+
+function updateTrashButtonState() {
+  // Always update when called since we call this strategically
+  console.log(`updateTrashButtonState called - gold: ${gold}, trashButtonCost: ${trashButtonCost}, lastGoldAmount: ${lastGoldAmount}`);
+  console.log(`trashButton element:`, trashButton);
+  if (trashButton) {
+    const hasEnoughGold = gold >= trashButtonCost;
+    console.log(`Trash button - hasEnoughGold: ${hasEnoughGold}, will disable: ${!hasEnoughGold}`);
+    trashButton.disabled = !hasEnoughGold;
+    
+    // Update visual styling based on affordability
+    // Red border (default): when gold < cost (disabled)
+    // White border (affordable): when gold >= cost (enabled)
+    if (hasEnoughGold) {
+      trashButton.classList.add('affordable');
+      console.log('Trash button: Added affordable class');
+    } else {
+      trashButton.classList.remove('affordable');
+      console.log('Trash button: Removed affordable class');
+    }
+    
+    // Update the tracked gold amount
+    lastGoldAmount = gold;
+    console.log(`Updated lastGoldAmount to: ${lastGoldAmount}`);
+  } else {
+    console.log('Trash button element not found');
+  }
+}
+
+// More targeted update function for when we know gold has changed
+// Use this instead of updateBombConversionButtonState() when gold changes during gameplay
+function updateBombButtonIfGoldChanged() {
+  updateBombConversionButtonState();
+}
+
+// More targeted update function for trash button when we know gold has changed
+function updateTrashButtonIfGoldChanged() {
+  console.log(`updateTrashButtonIfGoldChanged called - gold: ${gold}, lastGoldAmount: ${lastGoldAmount}`);
+  updateTrashButtonState();
 }
 
 // AI state
@@ -1750,6 +2015,10 @@ const helpClose = document.getElementById('helpClose');
 const bombConversionBtn = document.getElementById('bombConversionBtn');
 const bombCostEl = document.getElementById('bombCost');
 
+// Trash button DOM refs
+const trashButton = document.getElementById('trashButton');
+const trashCostEl = document.getElementById('trashCost');
+
 // Debug pane DOM refs
 debugPane = document.getElementById('debugPane');
 debugClose = document.getElementById('debugClose');
@@ -1783,6 +2052,13 @@ window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal
 
 // Bomb conversion button event listener
 bombConversionBtn.addEventListener('click', handleBombConversion);
+
+// Trash button event listener
+trashButton.addEventListener('click', handleTrashButton);
+
+// Initialize button states
+updateBombConversionButtonState();
+updateTrashButtonState();
 
 // Debug button wiring
 debugBtn.addEventListener('click', openDebugPane);
@@ -1986,7 +2262,9 @@ grantGoldBtn.addEventListener('click', () => {
   // Update gold display
   updateGoldDisplay();
   // Update bomb conversion button state
-  updateBombConversionButtonState();
+  updateBombButtonIfGoldChanged();
+  // Update trash button state
+  updateTrashButtonIfGoldChanged();
   console.log(`Granted 1000 gold. New balance: ${gold}`);
 });
 
@@ -2056,6 +2334,15 @@ function getTextColorFor(w){
 function render(){
   // build poles
   gameDiv.innerHTML = '';
+  
+  // Safety check: ensure we only have exactly 4 poles
+  if (poles.length !== 4) {
+    console.warn(`Warning: Expected 4 poles but found ${poles.length}. Resetting to 4 poles.`);
+    poles = [[],[],[],[]];
+  }
+  
+  console.log(`Rendering ${poles.length} poles:`, poles.map(p => p.length));
+  
   poles.forEach((pole, idx) => {
     const poleDiv = document.createElement('div');
     const isAtCapacity = pole.length >= currentStackCapacity;
@@ -2149,6 +2436,19 @@ function render(){
     // Apply current animation speed to the new pole
     poleDiv.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
   });
+  
+  // Final safety check: verify we only have 4 pole elements
+  const renderedPoles = gameDiv.querySelectorAll('.pole');
+  if (renderedPoles.length !== 4) {
+    console.error(`Error: Rendered ${renderedPoles.length} pole elements instead of 4! Clearing and re-rendering...`);
+    gameDiv.innerHTML = '';
+    // Force a single re-render
+    setTimeout(() => render(), 0);
+    return;
+  }
+  
+  console.log(`Successfully rendered ${renderedPoles.length} poles`);
+  
   // update score display in game info
   updateScoreDisplay();
   
@@ -2156,7 +2456,9 @@ function render(){
   updateGoldDisplay();
   
   // Update bomb conversion button state
-  updateBombConversionButtonState();
+  updateBombButtonIfGoldChanged();
+  // Update trash button state
+  updateTrashButtonIfGoldChanged();
   
   // update next stage display in bottom actions
   const targetBlockEl = document.getElementById('targetBlock');
@@ -2165,13 +2467,9 @@ function render(){
     targetBlockEl.textContent = currentTargetBlockSize * 2;
   }
   
-
-  
   updateDebugPane();
   
   renderNext();
-  
-
 }
 
 function renderNext(){
@@ -2500,16 +2798,20 @@ async function animateMergeCascade(index){
     // Earn gold for this merge (increases by 1 for each merge in the cascade, multiplied by current stage)
     mergeCount++;
     const baseGoldEarned = mergeCount;
-    const goldEarned = baseGoldEarned * currentStage;
+    // Stage 1: 1x multiplier, Stage 2+: 10x multiplier
+    const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
+    const goldEarned = baseGoldEarned * stageMultiplier;
     gold += goldEarned;
     updateGoldDisplay();
-    console.log(`Merge ${mergeCount}: Earned ${goldEarned} gold (${baseGoldEarned} × Stage ${currentStage}) (Total: ${gold})`);
+    console.log(`Merge ${mergeCount}: Earned ${goldEarned} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${gold})`);
     
     // Show gold earned animation
     showGoldEarned(goldEarned);
     
     // Update bomb conversion button state
-    updateBombConversionButtonState();
+    updateBombButtonIfGoldChanged();
+    // Update trash button state
+    updateTrashButtonIfGoldChanged();
 
     if (isBombMerge){
       // Bomb merge - clear the entire stack
@@ -2554,7 +2856,11 @@ async function animateMergeCascade(index){
     console.log('Merge iteration completed, checking for more merges...');
     
     // Re-render to ensure DOM is up to date before next iteration
-    render();
+    // Note: This render call is now conditional to prevent excessive rendering
+    if (gameDiv.children.length !== 4) {
+      console.warn('Pole count mismatch detected, re-rendering...');
+      render();
+    }
   }
   
   console.log('Merge cascade completed for pole:', index);
@@ -2594,6 +2900,11 @@ function resetGame(){
   // Reset bomb conversion button state
   bombConversionCost = 50;
   bombConversionPresses = 0;
+  lastGoldAmount = 0; // Reset tracked gold amount to force button state update
+  
+  // Reset trash button state
+  trashButtonCost = 25;
+  trashButtonPresses = 0;
   
   // Reset weights and probabilities to initial state
   weights = [1, 2];
@@ -2667,6 +2978,10 @@ async function animateNextQueueAdvance(){
   nextQueue.shift();
   nextQueue.push(getRandomPiece());
   renderNext();
+  
+  // Update button states since queue changed
+  updateBombButtonIfGoldChanged();
+  updateTrashButtonIfGoldChanged();
 }
 
 function getElementPageRect(el){
@@ -2688,8 +3003,6 @@ async function animateStageProgression(index, mergedIndex, weight){
     return;
   }
 
-
-
   // Let the new block behave like a normal merge result first
   mergedEl.classList.add('merge-in');
   await waitForAnimation(mergedEl);
@@ -2705,7 +3018,12 @@ async function animateStageProgression(index, mergedIndex, weight){
   await Promise.all(blocksToClear.map(d => waitForAnimation(d)));
 
   // Re-render to show the cleared stack with only the merged block
-  render();
+  // Only render if we still have exactly 4 poles
+  if (gameDiv.children.length === 4) {
+    render();
+  } else {
+    console.warn('Pole count mismatch in stage progression, skipping render');
+  }
 }
 
 async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
@@ -2723,15 +3041,17 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   // Calculate gold reward for bomb clear based on number of blocks cleared and current stage
   const blocksCleared = discs.length;
   // Gold increases by 1 for each block cleared (like cascade merges), multiplied by current stage
-  const totalGoldEarned = (blocksCleared * (blocksCleared + 1) / 2) * currentStage;
+  // Stage 1: 1x multiplier, Stage 2+: 10x multiplier
+  const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
+  const totalGoldEarned = (blocksCleared * (blocksCleared + 1) / 2) * stageMultiplier;
   
   // Add total gold to player's balance
   gold += totalGoldEarned;
-  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${totalGoldEarned} gold (sum of 1 to ${blocksCleared} × Stage ${currentStage}) (Total: ${gold})`);
+  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${totalGoldEarned} gold (sum of 1 to ${blocksCleared} × ${stageMultiplier}x multiplier) (Total: ${gold})`);
   
   // Show individual gold animations for each block cleared (like cascade merges)
   for (let i = 0; i < blocksCleared; i++) {
-    const blockGoldEarned = (i + 1) * currentStage; // Gold increases by 1 for each block, multiplied by current stage
+    const blockGoldEarned = (i + 1) * stageMultiplier; // Gold increases by 1 for each block, multiplied by current stage
     setTimeout(() => {
       showGoldEarned(blockGoldEarned);
     }, i * 100); // Stagger each animation by 100ms for visual effect
@@ -2741,7 +3061,9 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   updateGoldDisplay();
   
   // Update bomb conversion button state
-  updateBombConversionButtonState();
+  updateBombButtonIfGoldChanged();
+  // Update trash button state
+  updateTrashButtonIfGoldChanged();
 
 
 
@@ -3045,6 +3367,9 @@ updateStackHeight();
 updateScoreDisplay();
 updateGoldDisplay();
 
+// Safety check: ensure we start with exactly 4 poles
+ensureCorrectPoleCount();
+
 // Initialize debug pane - Block grid interface
 document.addEventListener('DOMContentLoaded', () => {
   // Set initial selection to block 1
@@ -3086,6 +3411,25 @@ window.addEventListener('resize', () => {
     window.location.href = window.location.href;
   }
 })();
+
+// Global safety check to ensure we always have exactly 4 poles
+function ensureCorrectPoleCount() {
+  if (poles.length !== 4) {
+    console.error(`CRITICAL ERROR: Global pole count check found ${poles.length} poles instead of 4! Resetting to 4 poles.`);
+    poles = [[],[],[],[]];
+    // Force a re-render to fix the display
+    render();
+  }
+  
+  // Also check the DOM to ensure we have exactly 4 pole elements
+  if (gameDiv && gameDiv.children.length !== 4) {
+    console.error(`CRITICAL ERROR: DOM contains ${gameDiv.children.length} pole elements instead of 4! Re-rendering...`);
+    render();
+  }
+}
+
+// Run safety check every 5 seconds
+setInterval(ensureCorrectPoleCount, 5000);
 
 </script>
 </body>
