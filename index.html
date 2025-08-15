@@ -928,6 +928,258 @@
   color: var(--text);
   width: 55%;
 }
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  /* Adjust topbar for mobile */
+  .topbar {
+    padding: 16px 12px 8px;
+    gap: 16px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  /* Adjust game info layout for mobile */
+  .game-info {
+    flex-direction: row;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .score-display, .gold-display {
+    gap: 8px;
+  }
+  
+  .next {
+    order: 2;
+    width: 100%;
+    margin-top: 16px;
+  }
+  
+  .score-label, .next .label, .gold-label {
+    font-size: 16px;
+  }
+  
+  .score-value, .gold-value {
+    font-size: 20px;
+    padding: 8px 16px;
+    min-width: 60px;
+  }
+  
+  .next-disc {
+    width: 80px;
+    height: 35px;
+    font-size: 18px;
+  }
+  
+  /* Fix next blocks animation for mobile */
+  .next-disc.shift-left {
+    transform: translateX(-96px); /* Adjusted for mobile next-disc width + gap */
+  }
+  
+  .next-disc.consume-out {
+    animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
+  }
+  
+  /* Adjust game container for mobile */
+  .game-container {
+    margin-top: 20px;
+    padding-bottom: 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    display: flex;
+  }
+  
+  .game {
+    order: 1;
+  }
+  
+  /* Position next stage and bomb conversion for mobile */
+  .next-stage-container {
+    display: none; /* Hide next stage display on mobile */
+  }
+  
+  .bomb-conversion-container {
+    position: static;
+    order: 4;
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+  
+  /* Adjust game grid for mobile */
+  .game {
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  /* Make poles smaller for mobile */
+  .pole {
+    width: 100px;
+    height: 350px;
+    padding: 12px;
+  }
+  
+  /* Adjust discs for smaller poles */
+  .disc {
+    width: 76px;
+    height: 30px;
+    font-size: 18px;
+    margin-top: 6px;
+  }
+  
+  /* Adjust bomb conversion button for mobile */
+  .bomb-conversion-btn {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .bomb-conversion-btn .emoji {
+    font-size: 24px;
+  }
+  
+  .bomb-cost-text .emoji {
+    font-size: 20px;
+  }
+  
+  .bomb-cost-text .cost {
+    font-size: 16px;
+  }
+  
+  /* Adjust bottom actions for mobile */
+  .bottom-actions {
+    margin-top: 16px;
+    gap: 12px;
+    order: 5;
+  }
+  
+  .ai-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  /* Adjust help modal for mobile */
+  .help-modal {
+    width: 95vw;
+    padding: 20px;
+  }
+  
+  .help-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  /* Adjust debug pane for mobile */
+  .debug-pane {
+    width: 95vw;
+    right: 0;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  .topbar {
+    padding: 12px 8px 6px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  .game-info {
+    gap: 16px;
+    margin-top: 16px;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .next {
+    order: 2;
+    width: 100%;
+    margin-top: 12px;
+  }
+  
+  .pole {
+    width: 80px;
+    height: 280px;
+    padding: 8px;
+  }
+  
+  .disc {
+    width: 64px;
+    height: 26px;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+  
+  .next-disc {
+    width: 70px;
+    height: 30px;
+    font-size: 16px;
+  }
+  
+  /* Fix next blocks animation for extra small mobile */
+  .next-disc.shift-left {
+    transform: translateX(-84px); /* Adjusted for extra small mobile next-disc width + gap */
+  }
+  
+  .next-disc.consume-out {
+    animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
+  }
+  
+  .game {
+    gap: 12px;
+  }
+  
+  .bomb-conversion-btn {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .bomb-conversion-btn .emoji {
+    font-size: 20px;
+  }
+  
+  /* Hide next stage display on extra small mobile too */
+  .next-stage-container {
+    display: none;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-container {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .next-stage-container {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 0;
+    order: unset;
+    margin: 0;
+  }
+  
+  .bomb-conversion-container {
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 0;
+    order: unset;
+    margin: 0;
+  }
+  
+  .pole {
+    height: 250px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1682,8 +1934,15 @@ function updateAnimationSpeed() {
 
 function updateStackHeight() {
   // Stack height is now fixed at MAX_HEIGHT (10) - no more dynamic reduction
-  // Keep the base height of 525px for all stages (scaled up from 350px)
-  const baseHeight = 525;
+  // Base height varies by screen size for mobile responsiveness
+  let baseHeight = 525; // Default desktop height
+  
+  // Check if we're on mobile and adjust height accordingly
+  if (window.innerWidth <= 480) {
+    baseHeight = 280; // Extra small mobile
+  } else if (window.innerWidth <= 768) {
+    baseHeight = 350; // Regular mobile
+  }
   
   // Update CSS custom property for stack height
   document.documentElement.style.setProperty('--stack-height', baseHeight + 'px');
@@ -2781,6 +3040,11 @@ updateAnimationSpeed();
 
 // Initialize bomb conversion button state
 updateBombConversionButtonState();
+
+// Handle window resize for mobile responsiveness
+window.addEventListener('resize', () => {
+  updateStackHeight();
+});
 
 // GitHub Pages redirect fix - if we're on the wrong page, redirect to the game
 (function() {
