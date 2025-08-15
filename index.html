@@ -1112,6 +1112,22 @@
     display: none; /* Hide next stage display on mobile */
   }
   
+  /* Create a mobile button row for bomb and trash buttons */
+  .mobile-button-row {
+    display: none;
+    order: 4;
+    margin-top: 16px;
+    margin-bottom: 0;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+  }
+  
   .bomb-conversion-container {
     position: static;
     order: 4;
@@ -1125,6 +1141,16 @@
     order: 5;
     margin-top: 16px;
     margin-bottom: 0;
+  }
+  
+  /* Show mobile button row and hide individual containers on mobile */
+  .mobile-button-row {
+    display: flex;
+  }
+  
+  .bomb-conversion-container,
+  .trash-button-container {
+    display: none;
   }
   
   /* Consistent button sizing for mobile */
@@ -1159,6 +1185,17 @@
     margin-top: 6px;
   }
   
+  /* Adjust bomb blocks for mobile to match disc sizing */
+  .disc .bomb-emoji {
+    font-size: 30px;
+    top: -2px;
+    left: -15px;
+  }
+  
+  .disc .bomb-text {
+    font-size: 18px;
+  }
+  
   /* Adjust bomb conversion button for mobile */
   .bomb-conversion-btn {
     width: 50px;
@@ -1183,6 +1220,140 @@
   
   .trash-cost-text .cost {
     font-size: 16px;
+  }
+  
+  /* Mobile button row styling */
+  .mobile-button-row .mobile-bomb-container,
+  .mobile-button-row .mobile-trash-container {
+    display: flex;
+    position: static;
+    margin: 0;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .mobile-button-row .bomb-conversion-btn,
+  .mobile-button-row .trash-btn {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+  }
+  
+  .mobile-button-row .bomb-conversion-btn .emoji,
+  .mobile-button-row .trash-btn .emoji {
+    font-size: 28px;
+  }
+  
+  .mobile-button-row .bomb-cost-text .emoji,
+  .mobile-button-row .trash-cost-text .emoji {
+    font-size: 20px;
+  }
+  
+  .mobile-button-row .bomb-cost-text .cost,
+  .mobile-button-row .trash-cost-text .cost {
+    font-size: 16px;
+  }
+  
+  /* Ensure mobile containers don't shrink */
+  .mobile-button-row .mobile-bomb-container,
+  .mobile-button-row .mobile-trash-container {
+    flex-shrink: 0;
+    min-width: 0;
+  }
+  
+  /* Mobile button hover and active states */
+  .mobile-button-row .bomb-conversion-btn:hover,
+  .mobile-button-row .trash-btn:hover {
+    transform: translateY(-1px);
+  }
+  
+  .mobile-button-row .bomb-conversion-btn:active,
+  .mobile-button-row .trash-btn:active {
+    transform: translateY(0);
+  }
+  
+  /* Responsive adjustments for very small mobile screens */
+  @media (max-width: 480px) {
+    .mobile-button-row {
+      gap: 16px;
+      padding: 0 16px;
+    }
+    
+    .mobile-button-row .bomb-conversion-btn,
+    .mobile-button-row .trash-btn {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .mobile-button-row .bomb-conversion-btn .emoji,
+    .mobile-button-row .trash-btn .emoji {
+      font-size: 24px;
+    }
+    
+    /* Further adjust bomb blocks for very small mobile */
+    .disc .bomb-emoji {
+      font-size: 26px;
+      top: -1px;
+      left: -13px;
+    }
+    
+    .disc .bomb-text {
+      font-size: 16px;
+    }
+  }
+  
+  /* Pulse animation for mobile buttons */
+  .mobile-button-row .bomb-conversion-btn.pulse,
+  .mobile-button-row .trash-btn.pulse {
+    animation: buttonPulse 0.3s ease;
+  }
+  
+  /* Desktop overrides - hide mobile buttons and show desktop buttons */
+  @media (min-width: 769px) {
+    .game-container .mobile-button-row {
+      display: none !important;
+    }
+    
+    .game-container .bomb-conversion-container,
+    .game-container .trash-button-container {
+      display: flex !important;
+      position: absolute !important;
+      left: calc(100% + 20px) !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+    
+    .game-container .bomb-conversion-container {
+      top: 0 !important;
+    }
+    
+    .game-container .trash-button-container {
+      top: 80px !important;
+    }
+    
+    /* Ensure desktop buttons have proper sizing */
+    .game-container .bomb-conversion-btn,
+    .game-container .trash-btn {
+      width: 60px !important;
+      height: 60px !important;
+    }
+    
+    .game-container .bomb-conversion-btn .emoji,
+    .game-container .trash-btn .emoji {
+      font-size: 32px !important;
+    }
+    
+    .game-container .bomb-cost-text .emoji,
+    .game-container .trash-cost-text .emoji {
+      font-size: 24px !important;
+    }
+    
+    .game-container .bomb-cost-text .cost,
+    .game-container .trash-cost-text .cost {
+      font-size: 20px !important;
+    }
   }
   
   /* Adjust bottom actions for mobile */
@@ -1250,6 +1421,17 @@
     height: 26px;
     font-size: 16px;
     margin-top: 4px;
+  }
+  
+  /* Adjust bomb blocks for extra small mobile */
+  .disc .bomb-emoji {
+    font-size: 22px;
+    top: -1px;
+    left: -11px;
+  }
+  
+  .disc .bomb-text {
+    font-size: 16px;
   }
   
   .next-disc {
@@ -1352,6 +1534,41 @@
   .pole {
     height: 250px;
   }
+  
+  /* Adjust bomb blocks for landscape mobile */
+  .disc .bomb-emoji {
+    font-size: 32px;
+    top: -2px;
+    left: -18px;
+  }
+  
+  .disc .bomb-text {
+    font-size: 20px;
+  }
+}
+
+/* Final desktop override to ensure mobile buttons are hidden */
+@media (min-width: 769px) {
+  .mobile-button-row {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+  
+  /* Additional specificity to override any mobile styles */
+  body .game-container .mobile-button-row,
+  html body .game-container .mobile-button-row {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
 }
 </style>
 </head>
@@ -1411,6 +1628,29 @@
       <div class="trash-cost-text">
         <span class="emoji">💰</span>
         <span class="cost" id="trashCost">25</span>
+      </div>
+    </div>
+    
+    <!-- Mobile button row for bomb and trash buttons -->
+    <div class="mobile-button-row">
+      <div class="mobile-bomb-container">
+        <button id="bombConversionBtnMobile" class="bomb-conversion-btn" title="Convert next block to bomb">
+          <span class="emoji">💣</span>
+        </button>
+        <div class="bomb-cost-text">
+          <span class="emoji">💰</span>
+          <span class="cost" id="bombCostMobile">50</span>
+        </div>
+      </div>
+      
+      <div class="mobile-trash-container">
+        <button id="trashButtonMobile" class="trash-btn" title="Remove next block from queue">
+          <span class="emoji">🗑️</span>
+        </button>
+        <div class="trash-cost-text">
+          <span class="emoji">💰</span>
+          <span class="cost" id="trashCostMobile">25</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1823,6 +2063,10 @@ function handleBombConversion() {
     // Show feedback that they don't have enough gold
     bombConversionBtn.classList.add('pulse');
     setTimeout(() => bombConversionBtn.classList.remove('pulse'), 300);
+    if (bombConversionBtnMobile) {
+      bombConversionBtnMobile.classList.add('pulse');
+      setTimeout(() => bombConversionBtnMobile.classList.remove('pulse'), 300);
+    }
     return;
   }
   
@@ -1860,6 +2104,9 @@ function handleBombConversion() {
     if (bombCostEl) {
       bombCostEl.textContent = bombConversionCost;
     }
+    if (bombCostElMobile) {
+      bombCostElMobile.textContent = bombConversionCost;
+    }
     
     // Update button state (cost changed, so force update)
     updateBombConversionButtonState();
@@ -1872,6 +2119,10 @@ function handleTrashButton() {
     // Show feedback that they don't have enough gold
     trashButton.classList.add('pulse');
     setTimeout(() => trashButton.classList.remove('pulse'), 300);
+    if (trashButtonMobile) {
+      trashButtonMobile.classList.add('pulse');
+      setTimeout(() => trashButtonMobile.classList.remove('pulse'), 300);
+    }
     return;
   }
   
@@ -1911,6 +2162,9 @@ function handleTrashButton() {
   if (trashCostEl) {
     trashCostEl.textContent = trashButtonCost;
   }
+  if (trashCostElMobile) {
+    trashCostElMobile.textContent = trashButtonCost;
+  }
   
   // Update button state (cost changed, so force update)
   updateTrashButtonState();
@@ -1933,6 +2187,18 @@ function updateBombConversionButtonState() {
     
     // Update the tracked gold amount
     lastGoldAmount = gold;
+  }
+  
+  // Also update mobile button if it exists
+  if (bombConversionBtnMobile) {
+    const hasEnoughGold = gold >= bombConversionCost;
+    bombConversionBtnMobile.disabled = !hasEnoughGold;
+    
+    if (hasEnoughGold) {
+      bombConversionBtnMobile.classList.add('affordable');
+    } else {
+      bombConversionBtnMobile.classList.remove('affordable');
+    }
   }
 }
 
@@ -1961,6 +2227,18 @@ function updateTrashButtonState() {
     console.log(`Updated lastGoldAmount to: ${lastGoldAmount}`);
   } else {
     console.log('Trash button element not found');
+  }
+  
+  // Also update mobile button if it exists
+  if (trashButtonMobile) {
+    const hasEnoughGold = gold >= trashButtonCost;
+    trashButtonMobile.disabled = !hasEnoughGold;
+    
+    if (hasEnoughGold) {
+      trashButtonMobile.classList.add('affordable');
+    } else {
+      trashButtonMobile.classList.remove('affordable');
+    }
   }
 }
 
@@ -2019,6 +2297,12 @@ const bombCostEl = document.getElementById('bombCost');
 const trashButton = document.getElementById('trashButton');
 const trashCostEl = document.getElementById('trashCost');
 
+// Mobile button DOM refs
+const bombConversionBtnMobile = document.getElementById('bombConversionBtnMobile');
+const bombCostElMobile = document.getElementById('bombCostMobile');
+const trashButtonMobile = document.getElementById('trashButtonMobile');
+const trashCostElMobile = document.getElementById('trashCostMobile');
+
 // Debug pane DOM refs
 debugPane = document.getElementById('debugPane');
 debugClose = document.getElementById('debugClose');
@@ -2056,9 +2340,21 @@ bombConversionBtn.addEventListener('click', handleBombConversion);
 // Trash button event listener
 trashButton.addEventListener('click', handleTrashButton);
 
+// Mobile button event listeners
+bombConversionBtnMobile.addEventListener('click', handleBombConversion);
+trashButtonMobile.addEventListener('click', handleTrashButton);
+
 // Initialize button states
 updateBombConversionButtonState();
 updateTrashButtonState();
+
+// Initialize mobile cost displays
+if (bombCostElMobile) {
+  bombCostElMobile.textContent = bombConversionCost;
+}
+if (trashCostElMobile) {
+  trashCostElMobile.textContent = trashButtonCost;
+}
 
 // Debug button wiring
 debugBtn.addEventListener('click', openDebugPane);
