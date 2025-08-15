@@ -19,7 +19,7 @@ Play the game directly in your browser: [Play Stack Merge](https://lcpckp.github
 - **Progressive Difficulty**: Unlock new block sizes and stacks as you advance
 - **Gold Economy**: Earn gold with merges and spend it on bombs
 - **Strategic Gameplay**: Plan your moves to avoid getting stuck
-- **Smooth Animations**: Beautiful visual effects and smooth gameplay
+- **Smooth Animations**: Beautiful visual effects with adjustable speed settings
 - **Auto-Play Mode**: Watch the AI play or use it to learn strategies
 - **Debug Controls**: Advanced features for testing and experimentation
 
@@ -40,8 +40,8 @@ Play the game directly in your browser: [Play Stack Merge](https://lcpckp.github
 
 - **Pure HTML/CSS/JavaScript** - No external dependencies
 - **Responsive Design** - Works on desktop and mobile
-- **Web Audio Support** - Sound effects and music
 - **Accessibility Features** - Keyboard navigation and screen reader support
+- **Performance Optimized** - Smooth animations with speed controls
 
 ## 📱 Browser Support
 
@@ -51,13 +51,22 @@ Works on all modern browsers:
 - Safari
 - Mobile browsers
 
-## 🎵 Sound
+## 🔧 Debug Features
 
-The game includes immersive sound effects and background music. Use the sound toggle to control audio levels.
+The game includes a comprehensive debug panel (triple-click the title to reveal):
 
-## 🔧 Development
+- **Speed Control**: Adjust game speed from Very Slow to Blazing (instant)
+- **Custom Block Dropper**: Select specific block values and bomb states
+- **Game State Monitor**: Real-time stats for score, gold, stacks, and more
+- **Auto-Play Controls**: Toggle AI assistance and grant resources
+- **Animation Speed**: Fine-tune visual effects and responsiveness
 
-This is a standalone HTML file that can be run locally or hosted anywhere. The game logic is contained entirely in the HTML file with embedded CSS and JavaScript.
+## 🎮 Game Mechanics
+
+- **Block Merging**: Combine blocks of the same value to create larger ones
+- **Stage Progression**: Unlock new stacks and block sizes as you advance
+- **Bomb System**: Convert blocks to bombs using gold to clear entire stacks
+- **Strategic Placement**: Plan your moves to maximize merges and avoid getting stuck
 
 ## 📄 License
 
