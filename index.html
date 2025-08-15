@@ -509,20 +509,8 @@
   
   /* Touch device optimizations */
   @media (hover: none) and (pointer: coarse) {
-    /* On touch devices, reduce hover effects and ensure they don't get stuck */
+    /* On touch devices, completely disable hover effects since they're not useful */
     .pole:hover {
-      border: 2px solid #0ea5e9;
-      transition: border 0.1s ease;
-    }
-    
-    /* Force clear hover states after touch interactions */
-    .pole.touch-active {
-      border: none !important;
-      opacity: 1 !important;
-    }
-    
-    /* Ensure touch-active state overrides any lingering hover effects */
-    .pole.touch-active:hover {
       border: none !important;
       opacity: 1 !important;
     }
@@ -2213,9 +2201,6 @@ function render(){
         touchStartY = e.touches[0].clientY;
         // Prevent default to avoid double-tap zoom on mobile
         e.preventDefault();
-        
-        // Add touch-active class for visual feedback
-        poleDiv.classList.add('touch-active');
       }, { passive: false });
       
       poleDiv.addEventListener('touchend', (e) => {
@@ -2224,42 +2209,24 @@ function render(){
         const touchDuration = touchEndTime - touchStartTime;
         const touchDistance = Math.abs(touchEndY - touchStartY);
         
-        // Remove touch-active class
-        poleDiv.classList.remove('touch-active');
-        
         // Only trigger placement if it's a quick tap (not a swipe) and close to start position
         if (touchDuration < 300 && touchDistance < 20) {
           placeOnPole(idx);
         }
-        
-        // Force clear any lingering hover state on touch devices
-        setTimeout(() => {
-          poleDiv.style.removeProperty('border');
-          poleDiv.style.removeProperty('opacity');
-          // Also remove any CSS hover effects by temporarily disabling pointer events
-          poleDiv.style.pointerEvents = 'none';
-          setTimeout(() => {
-            poleDiv.style.pointerEvents = '';
-          }, 50);
-        }, 100);
       });
       
       // Clear hover state when touch moves (prevents stuck highlights)
       poleDiv.addEventListener('touchmove', (e) => {
-        // If touch moves significantly, clear hover state
+        // If touch moves significantly, don't trigger placement
         const currentY = e.touches[0].clientY;
-        if (Math.abs(currentY - touchStartY) > 10) {
-          poleDiv.classList.remove('touch-active');
-          poleDiv.style.removeProperty('border');
-          poleDiv.style.removeProperty('opacity');
+        if (Math.abs(currentY - touchStartY) > 20) {
+          // Touch moved too much, this won't be a valid tap
         }
       });
       
-      // Clear hover state when touch is cancelled
+      // Handle touch cancellation
       poleDiv.addEventListener('touchcancel', () => {
-        poleDiv.classList.remove('touch-active');
-        poleDiv.style.removeProperty('border');
-        poleDiv.style.removeProperty('opacity');
+        // Touch was cancelled, do nothing
       });
     }
     
@@ -3196,28 +3163,6 @@ window.addEventListener('resize', () => {
   console.log('Window resized to', window.innerWidth, 'x', window.innerHeight, '- updating stack heights');
   updateStackHeight();
 });
-
-// Global touch event handler to clear lingering hover states on touch devices
-document.addEventListener('touchstart', (e) => {
-  // Clear any lingering hover states on poles when touching elsewhere
-  clearAllPoleHoverStates();
-}, { passive: true });
-
-// Utility function to clear all pole hover states
-function clearAllPoleHoverStates() {
-  const poles = document.querySelectorAll('.pole');
-  poles.forEach(pole => {
-    // Remove any inline styles that might be keeping hover effects visible
-    pole.style.removeProperty('border');
-    pole.style.removeProperty('opacity');
-    
-    // Add a temporary class to force clear hover states
-    pole.classList.add('touch-active');
-    setTimeout(() => {
-      pole.classList.remove('touch-active');
-    }, 150);
-  });
-}
 
 // GitHub Pages redirect fix - if we're on the wrong page, redirect to the game
 (function() {
