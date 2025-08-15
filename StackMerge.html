@@ -1,0 +1,2789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Stack Merge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{ 
+    --bg:#0f172a; 
+    --panel:#1e293b; 
+    --text:#f8fafc; 
+    --font-family: 'Quantico', monospace;
+  }
+  body { margin:0; font-family: var(--font-family); background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; }
+  .topbar { width:100%; max-width:1200px; display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 16px 8px; box-sizing:border-box; }
+  h1 { margin:0; font-size:36px; font-weight:700; text-align:center; font-family: var(--font-family); }
+  
+  /* Title section styling */
+  .title-section { display:flex; flex-direction:column; align-items:center; gap:18px; }
+  
+
+  
+  /* Controls section styling */
+  .controls { display:flex; align-items:center; gap:18px; }
+
+  .game-info { display: flex; justify-content: center; gap: 48px; margin-top: 32px; }
+  .score-display { display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .score-label { font-size:18px; opacity:0.9; font-family: var(--font-family); }
+  .next { display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .next .label { font-size:18px; opacity:0.9; font-family: var(--font-family); }
+  .next-row { display:flex; align-items:center; gap:12px; }
+  .next-disc { width:108px; height:45px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:24px; box-shadow:0 3px 0 rgba(0,0,0,0.25); transition: transform calc(0.18s * var(--animation-speed, 1)) ease; font-family: var(--font-family); transform-origin: center center; }
+  .next-disc.current { outline:3px solid #fff; outline-offset:3px; }
+  .next-disc.consume-out { animation: nextConsume calc(0.18s * var(--animation-speed, 1)) ease forwards; }
+  @keyframes nextConsume {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.85); opacity: 0; }
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .next-disc.consume-out[style*="--animation-speed: 0"] { animation: none; transform: scale(0.85); opacity: 0; }
+  .next-disc.shift-left { transform: translateX(-120px); }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .next-disc.shift-left[style*="--animation-speed: 0"] { transform: translateX(-120px); }
+
+
+  
+  /* Score value styling to match other modules */
+  .score-value { 
+    background: var(--panel); 
+    color: var(--text); 
+    padding: 10px 20px; 
+    border-radius: 9px; 
+    font-weight: 600; 
+    font-size: 24px; 
+    min-width: 70px; 
+    text-align: center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    position: relative;
+    font-family: var(--font-family);
+  }
+  
+  /* Score star emoji styling as a badge in top left corner */
+  .score-star {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    font-size: 28px;
+    opacity: 1;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  
+  .score-text {
+    position: relative;
+    z-index: 2;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1;
+    font-family: var(--font-family);
+  }
+
+  /* Gold display styling to match score display */
+  .gold-display { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 12px; 
+  }
+  .gold-label { 
+    font-size: 18px; 
+    opacity: 0.9; 
+    font-family: var(--font-family);
+  }
+  .gold-value { 
+    background: #FCD34D; 
+    color: #000; 
+    padding: 10px 20px; 
+    border-radius: 9px; 
+    font-weight: 600; 
+    font-size: 24px; 
+    min-width: 70px; 
+    text-align: center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    position: relative;
+    font-family: var(--font-family);
+  }
+  
+  /* Gold emoji styling as a badge in top left corner */
+  .gold-emoji {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    font-size: 28px;
+    opacity: 1;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  
+  .gold-text {
+    position: relative;
+    z-index: 2;
+    font-size: 28px !important;
+    font-weight: 600;
+    line-height: 1;
+    font-family: var(--font-family);
+  }
+  
+  /* Score count pulse animation */
+  .score-value.pulse {
+    animation: scorePulse 0.3s ease-out;
+  }
+  
+  @keyframes scorePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Gold earned animation */
+  .gold-earned {
+    position: fixed;
+    color: #FCD34D;
+    font-weight: 700;
+    font-size: 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    z-index: 1000;
+    pointer-events: none;
+    animation: goldEarned 1.2s ease-out forwards;
+  }
+  
+  @keyframes goldEarned {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(0.8);
+    }
+    15% {
+      opacity: 1;
+      transform: translateY(-15px) scale(1.2);
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(-45px) scale(1.1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-65px) scale(1);
+    }
+  }
+  
+  /* Gold count pulse animation */
+  .gold-value.pulse {
+    animation: goldPulse 0.3s ease-out;
+  }
+  
+  @keyframes goldPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* Bomb conversion button pulse animation */
+  .bomb-conversion-btn.pulse {
+    animation: bombBtnPulse 0.3s ease-out;
+  }
+  
+  @keyframes bombBtnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  /* AI button styling to match score-value and interface */
+  .ai-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #475569;
+    padding: 12px 24px;
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    font-family: var(--font-family);
+  }
+  .ai-btn:hover {
+    background: #334155;
+    border-color: #64748b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  .ai-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+  }
+  
+
+
+  .hidden { display:none !important; }
+
+  /* Help modal */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; }
+  .modal { background:var(--panel); color:var(--text); width:min(720px, 92vw); border-radius:16px; padding:24px 28px; box-shadow:0 15px 45px rgba(0,0,0,0.4); font-family: var(--font-family); }
+  .modal h2 { margin:0 0 12px; font-size:24px; font-family: var(--font-family); }
+  .modal p, .modal li { font-size:16px; line-height:1.5; font-family: var(--font-family); }
+  .modal ul { margin:12px 0 0 24px; padding:0; }
+  .modal .actions { display:flex; justify-content:flex-end; margin-top:18px; }
+
+  /* Enhanced Help Modal Styles */
+  .help-modal { 
+    width: min(900px, 95vw); 
+    max-height: 90vh; 
+    overflow-y: auto; 
+  }
+  
+  .help-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 24px; 
+    margin: 24px 0; 
+  }
+  
+  .help-section { 
+    background: #334155; 
+    border-radius: 12px; 
+    padding: 20px; 
+    border: 1px solid #475569; 
+  }
+  
+  .help-section-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin-bottom: 16px; 
+  }
+  
+  .help-icon { 
+    font-size: 24px; 
+    opacity: 0.9; 
+  }
+  
+  .help-section h3 { 
+    margin: 0; 
+    font-size: 18px; 
+    font-weight: 600; 
+    color: #f8fafc; 
+  }
+  
+  .help-content p { 
+    margin: 8px 0; 
+    font-size: 14px; 
+    line-height: 1.4; 
+  }
+  
+  .help-content p:first-child { 
+    margin-top: 0; 
+  }
+  
+  .merge-example { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 16px; 
+    margin: 16px 0; 
+    padding: 16px; 
+    background: #1e293b; 
+    border-radius: 8px; 
+  }
+  
+  .merge-before, .merge-after { 
+    text-align: center; 
+  }
+  
+  .merge-label { 
+    display: block; 
+    font-size: 12px; 
+    color: #94a3b8; 
+    margin-bottom: 8px; 
+    font-weight: 500; 
+  }
+  
+  .merge-blocks { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 4px; 
+  }
+  
+  .merge-block { 
+    width: 50px; 
+    height: 25px; 
+    border-radius: 6px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 700; 
+    font-size: 14px; 
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25); 
+  }
+  
+  .merge-block.block-1 { 
+    background: #cfef08; 
+    color: #000; 
+  }
+  
+  .merge-block.block-2 { 
+    background: #10B981; 
+    color: #fff; 
+  }
+  
+  .merge-arrow { 
+    font-size: 20px; 
+    color: #94a3b8; 
+    font-weight: 600; 
+  }
+  
+  .help-footer { 
+    text-align: center; 
+    margin: 24px 0 16px; 
+    padding: 16px; 
+    background: #334155; 
+    border-radius: 8px; 
+    border: 1px solid #475569; 
+  }
+  
+  .help-footer p { 
+    margin: 0; 
+    font-size: 16px; 
+    color: #f8fafc; 
+  }
+
+  .game-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 32px;
+    padding-bottom: 28px;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .game { 
+    display: flex; 
+    gap: 24px; 
+    justify-content: center; 
+    flex-wrap: wrap;
+    position: relative;
+  }
+  
+  /* Bomb conversion button styling */
+  .bomb-conversion-container {
+    position: absolute;
+    left: calc(100% + 20px);
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .bomb-conversion-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 2px solid #DC2626;
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family);
+    pointer-events: auto;
+  }
+  
+  .bomb-conversion-btn:hover {
+    border: 3px solid #0ea5e9;
+    background: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(220, 38, 38, 0.3);
+  }
+  
+  .bomb-conversion-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.25);
+  }
+  
+  .bomb-conversion-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.2);
+  }
+  
+  .bomb-conversion-btn.affordable {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .bomb-conversion-btn.affordable:hover {
+    border: 3px solid #0ea5e9;
+    background: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(14, 165, 233, 0.3);
+  }
+  
+  .bomb-conversion-btn .emoji {
+    font-size: 32px;
+    line-height: 1;
+  }
+  
+  .bomb-cost-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-family);
+  }
+  
+  .bomb-cost-text .emoji {
+    font-size: 24px;
+  }
+  
+  .bomb-cost-text .cost {
+    color: #FCD34D;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  
+  .bottom-actions { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px; 
+  }
+  
+  /* Next stage display styling */
+  .next-stage-container {
+    position: absolute;
+    right: calc(100% + 20px);
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .next-stage-display { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 12px; 
+  }
+  .next-stage-label { 
+    font-size: 18px; 
+    opacity: 0.9; 
+    font-family: var(--font-family);
+  }
+  .next-stage-indicator { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+  }
+  .next-stage-block { 
+    width: 108px; 
+    height: 45px; 
+    border-radius: 9px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 600; 
+    font-size: 24px; 
+    background: #DC2626; 
+    color: white; 
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25); 
+    font-family: var(--font-family);
+  }
+  .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
+  .pole:hover { border: 3px solid #0ea5e9; }
+  .pole.full { opacity:0.6; }
+  .pole.full:hover { opacity: 0.8; }
+  .pole.no-hover:hover { border: none !important; opacity: 1 !important; }
+  .pole.no-hover { pointer-events: none; }
+  .pole.new-stack { animation: newStackAppear calc(0.3s * var(--animation-speed, 1)) ease-out; }
+  @keyframes newStackAppear {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .pole.new-stack[style*="--animation-speed: 0"] { animation: none; transform: scale(1); opacity: 1; }
+  .disc { width:108px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:24px; margin-top:9px; box-shadow:0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family); transform-origin: center center; position: relative; z-index: 1; }
+  
+  /* Bomb block styling */
+  .bomb-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .bomb-emoji {
+    position: absolute;
+    top: -3px;
+    left: -21px;
+    font-size: 42px;
+    opacity: 1;
+    z-index: 1;
+  }
+  
+  .bomb-text {
+    position: relative;
+    z-index: 2;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-family);
+  }
+  
+  /* remove extra gap at the very top of a full pole (topmost disc has no margin) */
+  .pole .disc:last-child { margin-top: 0; }
+
+  .disc.animate { animation: drop calc(0.15s * var(--animation-speed, 1)) ease-out; }
+  @keyframes drop {
+    from { transform: translateY(-525px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.animate[style*="--animation-speed: 0"] { animation: none; transform: translateY(0); opacity: 1; }
+
+  /* Enhanced merge animations */
+  .disc.merge-out { 
+    animation: mergeOut calc(0.15s * var(--animation-speed, 1)) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    filter: brightness(1.1) saturate(1.2);
+    z-index: 10;
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.merge-out[style*="--animation-speed: 0"] { animation: none; transform: scale(0.7); opacity: 0; filter: brightness(0.8) saturate(0.9); }
+  @keyframes mergeOut {
+    0% { 
+      transform: scale(1); 
+      opacity: 1; 
+      filter: brightness(1) saturate(1);
+    }
+    25% { 
+      transform: scale(1.1); 
+      opacity: 1; 
+      filter: brightness(1.2) saturate(1.3);
+    }
+    50% { 
+      transform: scale(1.15); 
+      opacity: 0.9; 
+      filter: brightness(1.3) saturate(1.4);
+    }
+    75% { 
+      transform: scale(1.05); 
+      opacity: 0.6; 
+      filter: brightness(1.1) saturate(1.2);
+    }
+    100% { 
+      transform: scale(0.7); 
+      opacity: 0; 
+      filter: brightness(0.8) saturate(0.9);
+    }
+  }
+
+  /* Bomb shockwave ripple effect */
+  .disc.bomb-ripple {
+    animation: bombRipple calc(0.5s * var(--animation-speed, 1)) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    filter: brightness(1.3) saturate(1.4);
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), 0 0 30px rgba(220, 38, 38, 0.2);
+    z-index: 10;
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.bomb-ripple[style*="--animation-speed: 0"] { animation: none; transform: scale(0.8) translateY(0); opacity: 0; filter: brightness(0.8) saturate(0.9); }
+  @keyframes bombRipple {
+    0% { 
+      transform: scale(1) translateY(0); 
+      opacity: 1; 
+      filter: brightness(1) saturate(1);
+      box-shadow: 0 0 0px rgba(220, 38, 38, 0);
+    }
+    15% { 
+      transform: scale(1.3) translateY(-8px); 
+      opacity: 1; 
+      filter: brightness(1.6) saturate(1.8);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.3);
+    }
+    35% { 
+      transform: scale(1.15) translateY(-4px); 
+      opacity: 0.95; 
+      filter: brightness(1.4) saturate(1.6);
+      box-shadow: 0 0 15px rgba(220, 38, 38, 0.5), 0 0 30px rgba(220, 38, 38, 0.25);
+    }
+    55% { 
+      transform: scale(0.95) translateY(2px); 
+      opacity: 0.8; 
+      filter: brightness(1.2) saturate(1.4);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.4), 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+    75% { 
+      transform: scale(0.85) translateY(4px); 
+      opacity: 0.5; 
+      filter: brightness(1.1) saturate(1.2);
+      box-shadow: 0 0 8px rgba(220, 38, 38, 0.3), 0 0 15px rgba(220, 38, 38, 0.15);
+    }
+    100% { 
+      transform: scale(0.8) translateY(0); 
+      opacity: 0; 
+      filter: brightness(0.8) saturate(0.9);
+      box-shadow: 0 0 0px rgba(220, 38, 38, 0);
+    }
+  }
+
+  .disc.merge-in { 
+    animation: mergeIn calc(0.2s * var(--animation-speed, 1)) cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    filter: brightness(1.05) saturate(1.1);
+    z-index: 10;
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.merge-in[style*="--animation-speed: 0"] { animation: none; transform: scale(1); opacity: 1; filter: brightness(1) saturate(1); }
+  @keyframes mergeIn {
+    0% { 
+      transform: scale(0.6); 
+      opacity: 0; 
+      filter: brightness(0.7) saturate(0.8);
+    }
+    30% { 
+      transform: scale(0.85); 
+      opacity: 0.7; 
+      filter: brightness(0.9) saturate(1);
+    }
+    60% { 
+      transform: scale(1.05); 
+      opacity: 0.9; 
+      filter: brightness(1.05) saturate(1.1);
+    }
+    80% { 
+      transform: scale(0.98); 
+      opacity: 1; 
+      filter: brightness(1.02) saturate(1.05);
+    }
+    100% { 
+      transform: scale(1); 
+      opacity: 1; 
+      filter: brightness(1) saturate(1);
+    }
+  }
+
+  /* Merge glow effect for visual appeal */
+  .disc.merging {
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4), 0 0 25px rgba(14, 165, 233, 0.2);
+    transition: box-shadow 0.1s ease;
+    z-index: 5;
+  }
+  
+  /* Enhanced disc transitions for smoother animations */
+  .disc {
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity, filter;
+  }
+  
+
+
+  /* special clear animation for high-value blocks */
+  .disc.clear-out { animation: clearOut calc(0.26s * var(--animation-speed, 1)) ease forwards; }
+  @keyframes clearOut {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.85); opacity: 0; }
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.clear-out[style*="--animation-speed: 0"] { animation: none; transform: scale(0.85); opacity: 0; }
+
+  /* removed falling/fade styles for simplified clear */
+
+
+
+  .controls { margin-top:8px; font-size:13px; color:#ccc; }
+
+  /* Debug pane styling */
+  .debug-pane { 
+    position: fixed; 
+    top: 0; 
+    right: 0; 
+    height: 100vh; 
+    background: var(--panel); 
+    color: var(--text); 
+    border-left: 3px solid #475569; 
+    padding: 20px; 
+    z-index: 1002; 
+    width: 320px;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.4);
+    font-family: var(--font-family);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .debug-pane.show {
+    transform: translateX(0);
+  }
+  
+  /* Debug pane backdrop overlay */
+  .debug-pane::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+    z-index: -1;
+  }
+  
+  .debug-pane.show::before {
+    opacity: 1;
+  }
+  
+
+  .debug-pane h3 { margin: 0 0 16px; font-size: 20px; text-align: center; font-family: var(--font-family); }
+  .debug-pane .section { margin-bottom: 18px; }
+  
+  .debug-pane .section:not(.bottom-buttons) {
+    flex: 1;
+  }
+  .debug-pane .section-title { font-weight: 600; margin-bottom: 8px; font-size: 15px; font-family: var(--font-family); }
+  .debug-pane .controls { display: flex; flex-direction: column; gap: 12px; }
+  .debug-pane .control-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .debug-pane .control-row label { font-size: 14px; min-width: 70px; font-family: var(--font-family); flex-shrink: 0; }
+  .debug-pane .control-row input[type="range"] { flex: 1; min-width: 0; accent-color: #0ea5e9; }
+  .debug-pane .control-row .value-display { 
+    background: var(--bg); 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    min-width: 45px; 
+    text-align: center; 
+    font-family: var(--font-family);
+    flex-shrink: 0;
+  }
+  .debug-pane .button { 
+    background: #334155; 
+    color: var(--text); 
+    border: 1px solid #475569; 
+    padding: 10px 16px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 14px;
+    transition: background 0.2s;
+    font-family: var(--font-family);
+    box-sizing: border-box;
+  }
+  
+  .debug-pane .button-row {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .debug-pane .button-row .button {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .debug-pane .bottom-buttons {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+  }
+  
+  /* Block grid styling */
+  .block-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 12px 0;
+  }
+  
+  .block-item {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    user-select: none;
+  }
+  
+  .block-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  }
+  
+  .block-item.selected {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    transform: scale(1.1);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+  }
+  
+  .block-item[data-value="1"] { background: #cfef08; color: #000; }
+  .block-item[data-value="2"] { background: #10B981; color: #fff; }
+  .block-item[data-value="4"] { background: #2563EB; color: #fff; }
+  .block-item[data-value="8"] { background: #7C3AED; color: #fff; }
+  .block-item[data-value="16"] { background: #581C87; color: #fff; }
+  .block-item[data-value="32"] { background: #D946EF; color: #fff; }
+  .block-item[data-value="64"] { background: #EC4899; color: #fff; }
+  .block-item[data-value="128"] { background: #F59E0B; color: #fff; }
+  .block-item[data-value="256"] { background: #e86758; color: #fff; }
+  .block-item[data-value="512"] { background: #dc2626; color: #fff; }
+  .block-item[data-value="1024"] { background: #7c2d12; color: #fff; }
+  .block-item[data-value="2048"] { background: #000; color: #fff; }
+  
+  .selected-block-info {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 8px;
+    padding: 8px;
+    background: var(--bg);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .debug-pane .button:hover { background: #475569; }
+  .debug-pane .button:active { background: #334155; }
+  .debug-pane .button.primary { background: #0ea5e9; border-color: #0284c7; }
+  .debug-pane .button.primary:hover { background: #0284c7; }
+  .debug-pane .button.active { background: #0ea5e9; border-color: #0284c7; }
+  .debug-pane .close-btn { 
+    position: absolute; 
+    top: 8px; 
+    right: 12px; 
+    background: none; 
+    border: none; 
+    color: #94a3b8; 
+    font-size: 20px; 
+    cursor: pointer; 
+    padding: 6px; 
+    border-radius: 6px;
+    font-family: var(--font-family);
+  }
+  .debug-pane .close-btn:hover { background: #475569; color: var(--text); }
+  .debug-pane .status { 
+    background: var(--bg); 
+    padding: 8px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    text-align: center;
+    border: 1px solid #475569;
+    font-family: var(--font-family);
+  }
+  .debug-pane .status.active { border-color: #10B981; background: rgba(16, 185, 129, 0.1); }
+  .debug-pane .status.inactive { border-color: #6B7280; background: rgba(107, 114, 128, 0.1); }
+  
+  /* Hide debug button by default - will be shown via JavaScript */
+  #debugBtn {
+    display: none;
+  }
+
+/* Debug stats table styling */
+.debug-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-size: 12px;
+  table-layout: fixed;
+}
+
+.debug-stats-table td {
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.debug-stats-table td:first-child {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  width: 45%;
+}
+
+.debug-stats-table td:last-child {
+  text-align: right;
+  font-weight: 600;
+  color: var(--text);
+  width: 55%;
+}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="title-section">
+      <h1>Stack Merge</h1>
+    </div>
+  </div>
+
+  <div class="game-info">
+    <div class="score-display">
+      <div class="score-label">Score</div>
+      <div class="score-value" id="scoreDisplay">0</div>
+    </div>
+    
+    <div class="next">
+      <div class="label">Next Blocks</div>
+      <div class="next-row" id="nextContainer" aria-live="polite"></div>
+    </div>
+    
+    <div class="gold-display">
+      <div class="gold-label">Gold</div>
+      <div class="gold-value" id="goldDisplay">0</div>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <!-- Next stage display positioned to the left of stacks -->
+    <div class="next-stage-container">
+      <div class="next-stage-display">
+        <div class="next-stage-label">Next Stage</div>
+        <div class="next-stage-indicator">
+          <div class="next-stage-block" id="targetBlock">1024</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="game" id="game" role="application" aria-label="Stacks"></div>
+    
+    <!-- Bomb conversion button positioned to the right of stacks -->
+    <div class="bomb-conversion-container">
+      <button id="bombConversionBtn" class="bomb-conversion-btn" title="Convert next block to bomb">
+        <span class="emoji">💣</span>
+      </button>
+      <div class="bomb-cost-text">
+        <span class="emoji">💰</span>
+        <span class="cost" id="bombCost">50</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bottom-actions">
+    <button id="helpBtn" class="ai-btn" title="How to play">How to Play</button>
+    <button id="debugBtn" class="ai-btn" title="Debug controls">⚙️</button>
+  </div>
+
+
+  <!-- Help modal (hidden by default) -->
+  <div id="helpModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal help-modal">
+      <h2 id="helpTitle">How to Play</h2>
+      
+      <div class="help-grid">
+        <!-- Basic Controls Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🎮</span>
+            <h3>Basic Controls</h3>
+          </div>
+          <div class="help-content">
+            <p>Click any stack to drop the next block.</p>
+            <p>Blocks fall from top to bottom, stacking on top of each other.</p>
+            <p>Use the <strong>Bomb</strong> button to convert blocks into bombs that clear entire stacks.</p>
+          </div>
+        </div>
+
+        <!-- Merging Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🔗</span>
+            <h3>Merging Blocks</h3>
+          </div>
+          <div class="help-content">
+            <p>When two blocks with the same number touch, they merge into one bigger block.</p>
+            <div class="merge-example">
+              <div class="merge-before">
+                <span class="merge-label">Before</span>
+                <div class="merge-blocks">
+                  <div class="merge-block block-1">1</div>
+                  <div class="merge-block block-1">1</div>
+                </div>
+              </div>
+              <div class="merge-arrow">→</div>
+              <div class="merge-after">
+                <span class="merge-label">After</span>
+                <div class="merge-blocks">
+                  <div class="merge-block block-2">2</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gold & Rewards Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">💰</span>
+            <h3>Gold & Rewards</h3>
+          </div>
+          <div class="help-content">
+            <p><strong>Earn gold with every merge!</strong></p>
+            <p>• Each merge gives you gold based on the merge number</p>
+            <p>• Gold earnings multiply as you progress through stages</p>
+            <p>• Use gold to convert blocks into bombs</p>
+            <p>• Higher stage = more gold per merge!</p>
+          </div>
+        </div>
+
+        <!-- Strategy Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🧠</span>
+            <h3>Strategy Tips</h3>
+          </div>
+          <div class="help-content">
+            <p>• Keep stacks organized from largest to smallest</p>
+            <p>• Plan merges to avoid filling up your stacks</p>
+            <p>• Use bombs strategically to clear blocked stacks</p>
+            <p>• Progress through stages to unlock new block sizes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-footer">
+        <p><strong>Goal:</strong> Merge blocks strategically, earn gold, and progress through stages!</p>
+      </div>
+
+      <div class="actions">
+        <button id="helpClose" class="ai-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug pane (hidden by default) -->
+  <div id="debugPane" class="debug-pane">
+    <button class="close-btn" id="debugClose" title="Close debug pane">×</button>
+    <h3>Debug Controls</h3>
+    
+    <div class="section">
+      <div class="section-title">Game Speed</div>
+      <div class="controls">
+        <div class="control-row">
+          <label for="debugSpeedSlider">Speed:</label>
+          <input type="range" id="debugSpeedSlider" min="0" max="4" value="2" step="1">
+          <div class="value-display" id="debugSpeedLabel">Medium</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Custom Block Dropper</div>
+      <div class="controls">
+        <div class="control-row">
+          <label for="bombToggle">Bomb:</label>
+          <input type="checkbox" id="bombToggle">
+          <div class="value-display" id="bombStatus">No</div>
+        </div>
+        <div class="block-grid">
+          <div class="block-item" data-value="1">1</div>
+          <div class="block-item" data-value="2">2</div>
+          <div class="block-item" data-value="4">4</div>
+          <div class="block-item" data-value="8">8</div>
+          <div class="block-item" data-value="16">16</div>
+          <div class="block-item" data-value="32">32</div>
+          <div class="block-item" data-value="64">64</div>
+          <div class="block-item" data-value="128">128</div>
+          <div class="block-item" data-value="256">256</div>
+          <div class="block-item" data-value="512">512</div>
+          <div class="block-item" data-value="1024">1024</div>
+          <div class="block-item" data-value="2048">2048</div>
+        </div>
+        <div class="selected-block-info">
+          Next block: <span id="nextBlockValue">1</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Game State</div>
+      <div class="controls">
+        <table class="debug-stats-table">
+          <tr><td>Score:</td><td id="debugScore">0</td></tr>
+          <tr><td>Gold:</td><td id="debugGold">0</td></tr>
+          <tr><td>Stacks:</td><td id="debugStacks">4</td></tr>
+          <tr><td>Capacity:</td><td id="debugCapacity">10</td></tr>
+          <tr><td>Target:</td><td id="debugTarget">1024</td></tr>
+          <tr><td>Max Block:</td><td id="debugMaxBlock">512</td></tr>
+          <tr><td>Blocks Dropped:</td><td id="debugBlocksDropped">0</td></tr>
+          <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
+          <tr><td>Stage:</td><td id="debugStage">1</td></tr>
+        </table>
+      </div>
+    </div>
+    
+    <div class="section bottom-buttons">
+      <div class="controls">
+        <div class="button-row">
+          <button id="debugAiToggle" class="button primary">Auto Play: Off</button>
+          <button id="grantScoreBtn" class="button primary">Grant 1000 Score</button>
+          <button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// weights and probabilities - will be dynamically updated based on stage
+let weights = [1, 2]; // Start with 1 and 2, unlock others as player progresses
+let probabilities = [0.5, 0.5]; // Equal chance for 1 and 2 initially
+
+// Number formatting utility function
+function formatNumber(num) {
+  if (num < 1000) {
+    return num.toString();
+  } else if (num < 1000000) {
+    return (num / 1000).toFixed(1) + 'k';
+  } else if (num < 1000000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else {
+    return (num / 1000000000).toFixed(1) + 'B';
+  }
+}
+
+// Centralized display update functions
+function updateScoreDisplay() {
+  const scoreDisplay = document.querySelector('.score-value');
+  if (scoreDisplay) {
+    scoreDisplay.innerHTML = `<div class="score-star">⭐</div><div class="score-text">${score}</div>`;
+  }
+  // Update debug score display with exact value
+  if (debugScore) {
+    debugScore.textContent = score;
+  }
+}
+
+function updateGoldDisplay() {
+  const goldDisplay = document.querySelector('.gold-value');
+  if (goldDisplay) {
+    goldDisplay.innerHTML = `<div class="gold-emoji">💰</div><div class="gold-text">${formatNumber(gold)}</div>`;
+  }
+  // Update debug gold display with exact value
+  if (debugGold) {
+    debugGold.textContent = gold;
+  }
+}
+const MAX_HEIGHT = 10;
+const BOMB_CHANCE = 0.02; // 2% chance for bombs
+const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
+const MAX_STACKS = 8; // Maximum number of stacks allowed
+const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
+
+function getRandomWeight(){
+  let r = Math.random();
+  let cum = 0;
+  for(let i=0;i<probabilities.length;i++){
+    cum += probabilities[i];
+    if (r < cum) {
+      console.log(`Random weight selected: ${weights[i]} (probability: ${probabilities[i].toFixed(4)})`);
+      return weights[i];
+    }
+  }
+  console.log(`Random weight fallback: ${weights[probabilities.length-1]}`);
+  return weights[probabilities.length-1];
+}
+
+function getRandomPiece(){
+  // Prevent bombs from spawning for the first 50 blocks
+  const canSpawnBomb = blocksDropped >= BOMB_DELAY_BLOCKS;
+  const bombChance = canSpawnBomb ? BOMB_CHANCE : 0;
+  
+  return { w: getRandomWeight(), bomb: Math.random() < bombChance };
+}
+
+let poles = [[],[],[],[]];
+let score = 0;
+let gold = 0; // Track accumulated gold
+let blocksDropped = 0; // Track total blocks dropped for bomb delay
+let placing = false; // block multiple rapid placements while animating
+let lastPlacementTime = 0; // track when placement started for timeout safety
+let currentTargetBlockSize = STARTING_BLOCK_SIZE; // Current block size needed to unlock new stack
+let currentStackCapacity = MAX_HEIGHT; // Current maximum height for each stack (no longer reduced per stage)
+let currentStage = 1; // Current stage (1 = starting, 2 = after first stack unlock, etc.)
+
+// Bomb conversion button state
+let bombConversionCost = 50; // Starting cost
+let bombConversionPresses = 0; // Number of times button has been pressed
+
+// Set up initial probability distribution for the starting block sizes (1 and 2)
+updateProbabilityDistribution();
+
+// Initialize next queue after probability distribution is set up
+let nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+
+// Emergency reset keyboard shortcut (Ctrl+R)
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'r') {
+    e.preventDefault();
+    console.log('Emergency reset triggered via Ctrl+R');
+    placing = false; // Force reset placing state
+    
+    // Re-enable hover effects and pointer events on all poles
+    const allPoles = Array.from(gameDiv.children);
+    allPoles.forEach(poleDiv => {
+      poleDiv.style.pointerEvents = '';
+      poleDiv.classList.remove('no-hover');
+    });
+    
+    resetGame();
+  }
+});
+
+
+
+function checkForNewStack() {
+  // Check if we should add a new stack based on current target block size
+  if (poles.length < MAX_STACKS) {
+    addNewStack();
+    // Increment stage counter for gold multiplier
+    currentStage++;
+    // Double the target block size for the next unlock
+    currentTargetBlockSize *= 2;
+    // Update the range of valid pieces to include the next incremental block
+    updateBlockRange();
+    console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${currentStage}`);
+  }
+}
+
+function checkForNewBlockSize(mergedSize) {
+  // Check if this merge unlocks a new block size for future drops
+  // The merged size should be available as a droppable piece
+  if (!weights.includes(mergedSize)) {
+    weights.push(mergedSize);
+    
+    // Implement a better probability distribution system
+    // Lower tier blocks should remain more common, higher tiers progressively rarer
+    updateProbabilityDistribution();
+    
+    console.log(`New block size unlocked: ${mergedSize}`);
+  }
+}
+
+function updateProbabilityDistribution() {
+  // Create a better probability distribution that maintains game balance
+  // Blocks 1, 2, and 4 should have equal probabilities, then curve down from there
+  
+  const numBlocks = weights.length;
+  
+  // Base probabilities with special handling for the first three block sizes
+  const baseProbabilities = [];
+  
+  for (let i = 0; i < numBlocks; i++) {
+    const blockSize = weights[i];
+    
+    if (i < 3) {
+      // First three block sizes (1, 2, 4) get equal probabilities
+      baseProbabilities.push(0.25);
+    } else {
+      // For block sizes 8 and above, use exponential decay
+      // Start from the same level as the first three, then decrease
+      const decayFactor = 0.5; // Steeper decay for better balance
+      const probability = 0.25 * Math.pow(decayFactor, i - 2);
+      baseProbabilities.push(probability);
+    }
+  }
+  
+  // Normalize probabilities to sum to 1.0
+  const totalProbability = baseProbabilities.reduce((sum, p) => sum + p, 0);
+  probabilities = baseProbabilities.map(p => p / totalProbability);
+  
+  console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
+  console.log('Expected distribution: 1,2,4 should be equal, then decreasing');
+  console.log('Current weights array:', weights);
+  console.log('Current probabilities array:', probabilities);
+}
+
+function updateBlockRange() {
+  // Add the next incremental block size to the weights array
+  const nextBlockSize = currentTargetBlockSize * 2;
+  
+  // Only add if it's not already in the weights array
+  if (!weights.includes(nextBlockSize)) {
+    weights.push(nextBlockSize);
+    
+    // Implement a better probability distribution system
+    updateProbabilityDistribution();
+    
+    console.log(`New stage: Added block size ${nextBlockSize} to available pieces`);
+  }
+}
+
+function addNewStack() {
+  if (poles.length >= MAX_STACKS) return; // Safety check
+  
+  // Add a new empty stack
+  poles.push([]);
+  
+  // No longer reduce stack capacity - keep it at MAX_HEIGHT
+  // currentStackCapacity remains unchanged
+  
+  // Update visual stack height (no change needed but keeping for consistency)
+  updateStackHeight();
+  
+  // Re-render to show the new stack
+  render();
+  
+  // Add animation class to the new stack
+  const newStackIndex = poles.length - 1;
+  const newStackElement = gameDiv.children[newStackIndex];
+  if (newStackElement) {
+    newStackElement.classList.add('new-stack');
+    // Remove the animation class after animation completes
+    setTimeout(() => {
+      if (newStackElement) {
+        newStackElement.classList.remove('new-stack');
+      }
+    }, 300);
+  }
+  
+  // Show unlock message
+  showUnlockMessage();
+}
+
+function showUnlockMessage() {
+  // Create a temporary message element
+  const messageEl = document.createElement('div');
+  messageEl.textContent = 'New Stack Unlocked';
+  messageEl.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #10B981;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    z-index: 1001;
+    animation: unlockMessage 2s ease-out forwards;
+  `;
+  
+  // Add CSS animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes unlockMessage {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(messageEl);
+  
+  // Remove after animation
+  setTimeout(() => {
+    if (messageEl.parentNode) {
+      messageEl.parentNode.removeChild(messageEl);
+    }
+    if (style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }, 2000);
+}
+
+function showGoldEarned(amount) {
+  // Create the gold earned display element
+  const goldEl = document.createElement('div');
+  goldEl.className = 'gold-earned';
+  goldEl.textContent = `+${amount}`;
+  
+  // Position it closer to the top right corner of the gold display
+  const goldDisplay = document.querySelector('.gold-value');
+  if (goldDisplay) {
+    const rect = goldDisplay.getBoundingClientRect();
+    goldEl.style.left = (rect.right + 2) + 'px';
+    goldEl.style.top = (rect.top + 5) + 'px';
+  } else {
+    // Fallback positioning if gold display not found
+    goldEl.style.left = '50%';
+    goldEl.style.top = '50%';
+    goldEl.style.transform = 'translate(-50%, -50%)';
+  }
+  
+  document.body.appendChild(goldEl);
+  
+  // Add pulse animation to the gold count
+  if (goldDisplay) {
+    goldDisplay.classList.add('pulse');
+    setTimeout(() => {
+      goldDisplay.classList.remove('pulse');
+    }, 300);
+  }
+  
+  // Remove after animation completes
+  setTimeout(() => {
+    if (goldEl.parentNode) {
+      goldEl.parentNode.removeChild(goldEl);
+    }
+  }, 1200);
+}
+
+function handleBombConversion() {
+  // Check if player has enough gold
+  if (gold < bombConversionCost) {
+    // Show feedback that they don't have enough gold
+    bombConversionBtn.classList.add('pulse');
+    setTimeout(() => bombConversionBtn.classList.remove('pulse'), 300);
+    return;
+  }
+  
+  // Check if there's a next block to convert
+  if (nextQueue.length === 0) {
+    return;
+  }
+  
+  // Deduct gold
+  gold -= bombConversionCost;
+  
+  // Convert the current next block to a bomb
+  const currentBlock = nextQueue[0];
+  if (currentBlock) {
+    currentBlock.bomb = true;
+    console.log(`Converted block ${currentBlock.w} to bomb for ${bombConversionCost} gold`);
+    
+    // Update gold display
+    updateGoldDisplay();
+    const goldDisplay = document.querySelector('.gold-value');
+    if (goldDisplay) {
+      goldDisplay.classList.add('pulse');
+      setTimeout(() => {
+        goldDisplay.classList.remove('pulse');
+      }, 300);
+    }
+    
+    // Re-render to show the bomb
+    renderNext();
+    
+    // Increment press count and double the cost
+    bombConversionPresses++;
+    bombConversionCost *= 2;
+    
+    // Update button cost display
+    if (bombCostEl) {
+      bombCostEl.textContent = bombConversionCost;
+    }
+    
+    // Update button state
+    updateBombConversionButtonState();
+  }
+}
+
+function updateBombConversionButtonState() {
+  // Disable button if not enough gold and update visual state
+  if (bombConversionBtn) {
+    const hasEnoughGold = gold >= bombConversionCost;
+    bombConversionBtn.disabled = !hasEnoughGold;
+    
+    // Update visual styling based on affordability
+    if (hasEnoughGold) {
+      bombConversionBtn.classList.add('affordable');
+    } else {
+      bombConversionBtn.classList.remove('affordable');
+    }
+  }
+}
+
+// AI state
+let aiEnabled = false;
+let aiInterval = null;
+const AI_DELAY_MS = 500;
+
+// Speed control state
+let currentSpeed = 2; // 0-4, default 2 (Medium): 0=Very Slow, 1=Slow, 2=Medium, 3=Fast, 4=Blazing
+
+// Debug pane state
+let debugPane = null;
+let debugClose = null;
+let bombToggle = null;
+let bombStatus = null;
+let debugScore = null;
+let debugGold = null;
+let debugStacks = null;
+let debugCapacity = null;
+let debugTarget = null;
+let debugMaxBlock = null;
+let debugBlocksDropped = null;
+let debugBombStatus = null;
+let customBlockMode = false;
+let customBlockSize = 1;
+let customBlockBomb = false;
+
+// DOM refs
+const gameDiv = document.getElementById('game');
+const nextContainer = document.getElementById('nextContainer');
+const scoreEl = document.getElementById('scoreDisplay');
+const goldEl = document.getElementById('goldDisplay');
+
+const helpBtn = document.getElementById('helpBtn');
+const helpModal = document.getElementById('helpModal');
+const helpClose = document.getElementById('helpClose');
+
+// Bomb conversion button DOM refs
+const bombConversionBtn = document.getElementById('bombConversionBtn');
+const bombCostEl = document.getElementById('bombCost');
+
+// Debug pane DOM refs
+debugPane = document.getElementById('debugPane');
+debugClose = document.getElementById('debugClose');
+bombToggle = document.getElementById('bombToggle');
+bombStatus = document.getElementById('bombStatus');
+debugScore = document.getElementById('debugScore');
+debugGold = document.getElementById('debugGold');
+debugStacks = document.getElementById('debugStacks');
+debugCapacity = document.getElementById('debugCapacity');
+debugTarget = document.getElementById('debugTarget');
+debugMaxBlock = document.getElementById('debugMaxBlock');
+debugBlocksDropped = document.getElementById('debugBlocksDropped');
+debugBombStatus = document.getElementById('debugBombStatus');
+const grantGoldBtn = document.getElementById('grantGoldBtn');
+const grantScoreBtn = document.getElementById('grantScoreBtn');
+
+  // Debug auto-play DOM refs
+  debugAiToggle = document.getElementById('debugAiToggle');
+  debugSpeedSlider = document.getElementById('debugSpeedSlider');
+debugSpeedLabel = document.getElementById('debugSpeedLabel');
+
+
+
+// Help modal wiring
+function openHelp(){ helpModal.classList.remove('hidden'); }
+function closeHelp(){ helpModal.classList.add('hidden'); }
+helpBtn.addEventListener('click', openHelp);
+helpClose.addEventListener('click', closeHelp);
+helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) closeHelp(); });
+
+// Bomb conversion button event listener
+bombConversionBtn.addEventListener('click', handleBombConversion);
+
+// Debug button wiring
+debugBtn.addEventListener('click', openDebugPane);
+
+// Simple title selection detection to reveal debug button
+document.addEventListener('DOMContentLoaded', () => {
+  const titleElement = document.querySelector('h1');
+  const debugBtn = document.getElementById('debugBtn');
+  
+  titleElement.addEventListener('mouseup', () => {
+    const selection = window.getSelection();
+    if (selection.toString().toLowerCase().includes('merge')) {
+      debugBtn.style.display = 'block';
+      console.log('Debug button revealed!');
+    }
+  });
+});
+
+function toggleAI(enable){
+  if(enable === aiEnabled) return;
+  aiEnabled = enable;
+  
+  console.log('AI toggled:', aiEnabled ? 'ON' : 'OFF');
+  
+  // Update debug pane display if it exists
+  if (debugAiToggle) {
+    updateDebugAutoPlayDisplay();
+  }
+  
+
+  
+  if(aiEnabled){
+    // start AI interval
+    if(aiInterval) clearInterval(aiInterval);
+    // make an immediate move then interval
+    console.log('AI: Starting immediate move');
+    aiStep();
+    // Set up the initial interval based on current speed
+    const delays = [2000, 1500, 1000, 500, 50];
+    const initialDelay = delays[currentSpeed];
+    console.log('AI: Setting up interval with delay:', initialDelay, 'ms');
+    aiInterval = setInterval(aiStep, initialDelay);
+  } else {
+    if(aiInterval) clearInterval(aiInterval);
+    aiInterval = null;
+    console.log('AI: Stopped and cleared interval');
+    
+    // Reset animation speed to default when auto-play is turned off
+    currentSpeed = 2; // Medium
+    if (debugSpeedSlider) {
+      debugSpeedSlider.value = currentSpeed;
+    }
+    updateSpeedLabel();
+    updateDebugSpeedLabel();
+    updateAnimationSpeed();
+  }
+}
+
+function updateSpeedLabel() {
+  if (debugSpeedLabel) {
+    const speedLabels = ['Very Slow', 'Slow', 'Medium', 'Fast', 'Blazing'];
+    debugSpeedLabel.textContent = speedLabels[currentSpeed];
+  }
+}
+
+function updateAISpeed() {
+  if (!aiEnabled) return;
+  
+  // Clear existing interval if it exists
+  if (aiInterval) {
+    clearInterval(aiInterval);
+  }
+  
+  // Calculate new delay based on speed (0-4)
+  // Speed 0 = Very Slow (2000ms), Speed 4 = Blazing (50ms)
+  const delays = [2000, 1500, 1000, 500, 50];
+  const newDelay = delays[currentSpeed];
+  
+  // Restart interval with new speed
+  aiInterval = setInterval(aiStep, newDelay);
+}
+
+function updateAnimationSpeed() {
+  // Calculate animation multiplier based on speed (0-4)
+  // Speed 0 = Very Slow (3x slower), Speed 4 = Blazing (0x - instant, no animations)
+  const multipliers = [3, 2, 1, 0.5, 0];
+  
+  // When speed is 4 (Blazing), set multiplier to 0 to disable animations
+  const multiplier = multipliers[currentSpeed];
+  
+  // Update CSS custom properties for animation durations
+  document.documentElement.style.setProperty('--animation-speed', multiplier);
+  
+  // Apply animation speed to all animated elements for instant animation support
+  const animatedElements = document.querySelectorAll('.disc, .next-disc, .pole');
+  animatedElements.forEach(el => {
+    el.style.setProperty('--animation-speed', multiplier);
+  });
+  
+  console.log(`Animation speed updated: ${multiplier} (speed level: ${currentSpeed})`);
+}
+
+function updateStackHeight() {
+  // Stack height is now fixed at MAX_HEIGHT (10) - no more dynamic reduction
+  // Keep the base height of 525px for all stages (scaled up from 350px)
+  const baseHeight = 525;
+  
+  // Update CSS custom property for stack height
+  document.documentElement.style.setProperty('--stack-height', baseHeight + 'px');
+}
+
+function updateDebugPane() {
+  if (debugScore) debugScore.textContent = score;
+  if (debugGold) debugGold.textContent = gold;
+  if (debugStacks) debugStacks.textContent = poles.length;
+  if (debugCapacity) debugCapacity.textContent = currentStackCapacity;
+  if (debugTarget) debugTarget.textContent = currentTargetBlockSize * 2;
+  if (debugMaxBlock) debugMaxBlock.textContent = Math.max(...weights);
+  if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
+  if (debugBombStatus) debugBombStatus.textContent = blocksDropped >= BOMB_DELAY_BLOCKS ? 'Enabled' : 'Disabled';
+  if (debugStage) debugStage.textContent = currentStage;
+}
+
+
+
+// Debug pane wiring
+function openDebugPane(){ 
+  debugPane.classList.add('show'); 
+  syncDebugControls();
+}
+function closeDebugPane(){ 
+  debugPane.classList.remove('show'); 
+  // Reset custom block mode when debug pane is closed
+  customBlockMode = false;
+  console.log('Debug pane closed, custom block mode disabled');
+}
+debugClose.addEventListener('click', closeDebugPane);
+debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && debugPane.classList.contains('show')) closeDebugPane(); });
+
+function syncDebugControls() {
+  // Sync auto-play state
+  updateDebugAutoPlayDisplay();
+  
+  // Sync speed control
+  if (debugSpeedSlider) {
+    debugSpeedSlider.value = currentSpeed;
+  }
+  updateDebugSpeedLabel();
+}
+
+// Debug pane controls - Block grid interface
+document.querySelectorAll('.block-item').forEach(blockItem => {
+  blockItem.addEventListener('click', () => {
+    // Remove previous selection
+    document.querySelectorAll('.block-item').forEach(item => item.classList.remove('selected'));
+    
+    // Select this block
+    blockItem.classList.add('selected');
+    
+    // Update the custom block size
+    const value = parseInt(blockItem.dataset.value);
+    customBlockSize = value;
+    
+    // Update the display
+    document.getElementById('nextBlockValue').textContent = value;
+    
+    // Enable custom block mode
+    customBlockMode = true;
+    
+    console.log(`Selected block: ${value}`);
+  });
+});
+
+bombToggle.addEventListener('change', (e) => {
+  customBlockBomb = e.target.checked;
+  bombStatus.textContent = customBlockBomb ? 'Yes' : 'No';
+});
+
+// Gold grant button
+grantGoldBtn.addEventListener('click', () => {
+  gold += 1000;
+  // Update gold display
+  updateGoldDisplay();
+  // Update bomb conversion button state
+  updateBombConversionButtonState();
+  console.log(`Granted 1000 gold. New balance: ${gold}`);
+});
+
+// Score grant button
+grantScoreBtn.addEventListener('click', () => {
+  score += 1000;
+  // Update score display
+  updateScoreDisplay();
+  console.log(`Granted 1000 score. New score: ${score}`);
+});
+
+// Debug auto-play controls
+debugAiToggle.addEventListener('click', () => {
+  toggleAI(!aiEnabled);
+  updateDebugAutoPlayDisplay();
+});
+
+debugSpeedSlider.addEventListener('input', (e) => {
+  currentSpeed = parseInt(e.target.value);
+  updateSpeedLabel();
+  updateDebugSpeedLabel();
+  updateAISpeed();
+  updateAnimationSpeed();
+});
+
+function updateDebugAutoPlayDisplay() {
+  debugAiToggle.textContent = aiEnabled ? 'Auto Play: On' : 'Auto Play: Off';
+  debugAiToggle.classList.toggle('active', aiEnabled);
+}
+
+function updateDebugSpeedLabel() {
+  const speedLabels = ['Very Slow', 'Slow', 'Medium', 'Fast', 'Blazing'];
+  debugSpeedLabel.textContent = speedLabels[currentSpeed];
+}
+
+function colorFor(w){
+  const colors = [
+    '#cfef08', // lime green - value 1 (subtle)
+    '#10B981', // emerald-500 - value 2 (soft green)
+    '#2563EB', // blue-600 - value 4 (medium blue)
+    '#7C3AED', // violet-600 - value 8 (violet - midpoint between blue and dark purple)
+    '#581C87', // violet-800 - value 16 (dark purple)
+    '#D946EF', // fuchsia-500 - value 32 (bright fuchsia - clearly different from 16)
+    '#EC4899', // pink-500 - value 64 (hot pink)
+    '#F59E0B', // amber-500 - value 128 (bright amber)
+    '#e86758', // red-500 - value 256 (intense red)
+    '#DC2626'  // red-600 - value 512 (deepest red)
+  ];
+  
+  const log2w = Math.log2(w);
+  const colorIndex = Math.min(Math.floor(log2w), colors.length - 1);
+  return colors[colorIndex];
+}
+
+function labelForPiece(piece){
+  if (piece && piece.bomb) {
+    return `<div class="bomb-content"><div class="bomb-emoji">💣</div><div class="bomb-text">${piece.w}</div></div>`;
+  }
+  return String(piece.w);
+}
+
+function getTextColorFor(w){
+  // Return black text for lime green block (value 1), white for others
+  return w === 1 ? '#000000' : '#ffffff';
+}
+
+function render(){
+  // build poles
+  gameDiv.innerHTML = '';
+  poles.forEach((pole, idx) => {
+    const poleDiv = document.createElement('div');
+  const isAtCapacity = pole.length >= currentStackCapacity;
+  const playable = canPlaceOnPole(nextQueue[0], pole);
+    poleDiv.className = 'pole' + (isAtCapacity && !playable ? ' full' : '');
+    
+    // Preserve the no-hover state if we're currently placing
+    if (placing) {
+      poleDiv.classList.add('no-hover');
+      poleDiv.style.pointerEvents = 'none';
+    }
+    
+    poleDiv.setAttribute('role', 'button');
+    poleDiv.tabIndex = 0;
+    poleDiv.setAttribute('aria-label', `Stack ${idx + 1}, contains ${pole.length} blocks${isAtCapacity ? (playable ? ', merge available' : ', blocked') : ''}`);
+    poleDiv.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        placeOnPole(idx);
+      }
+    });
+    // existing discs (no animation class)
+    pole.forEach(p => {
+      const d = document.createElement('div');
+      d.className = 'disc';
+      if (p.bomb) {
+        d.innerHTML = labelForPiece(p);
+      } else {
+        d.textContent = labelForPiece(p);
+      }
+      d.style.background = p.bomb ? '#000' : colorFor(p.w);
+      d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+      poleDiv.appendChild(d);
+    });
+    poleDiv.addEventListener('click', () => placeOnPole(idx));
+    gameDiv.appendChild(poleDiv);
+    
+    // Apply current animation speed to the new pole
+    poleDiv.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
+  });
+  // update score display in game info
+  updateScoreDisplay();
+  
+  // update gold display in game info
+  updateGoldDisplay();
+  
+  // Update bomb conversion button state
+  updateBombConversionButtonState();
+  
+  // update next stage display in bottom actions
+  const targetBlockEl = document.getElementById('targetBlock');
+  if (targetBlockEl) {
+    // Show the target block size (what you get after merging)
+    targetBlockEl.textContent = currentTargetBlockSize * 2;
+  }
+  
+
+  
+  updateDebugPane();
+  
+  renderNext();
+  
+
+}
+
+function renderNext(){
+  nextContainer.innerHTML = '';
+  nextQueue.forEach((p, idx) => {
+    const d = document.createElement('div');
+    d.className = 'next-disc' + (idx === 0 ? ' current' : '');
+    if (p.bomb) {
+      d.innerHTML = labelForPiece(p);
+    } else {
+      d.textContent = labelForPiece(p);
+    }
+    d.style.background = p.bomb ? '#000' : colorFor(p.w);
+    d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+    nextContainer.appendChild(d);
+    
+    // Apply current animation speed to the new next disc
+    d.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
+  });
+}
+
+function placeOnPole(idx){
+  console.log('placeOnPole called with idx:', idx, 'placing:', placing);
+  if (placing) { 
+    console.log('Placement in progress, ignoring click for pole:', idx);
+    return; // Simply ignore clicks during placement instead of queueing
+  }
+  const pole = poles[idx];
+  
+  // Check if custom block mode is active AND debug pane is open
+  let nextPiece;
+  let wasCustomBlock = false;
+  if (customBlockMode && debugPane && debugPane.classList.contains('show')) {
+    nextPiece = { w: customBlockSize, bomb: customBlockBomb };
+    wasCustomBlock = true;
+    // Custom block mode only works when debug pane is visible
+  } else {
+    nextPiece = nextQueue[0];
+  }
+  
+  if (pole.length >= currentStackCapacity && (!topOf(pole) || topOf(pole).w !== nextPiece.w)) return;
+  placing = true;
+  lastPlacementTime = Date.now();
+
+  // Disable hover effects on all poles during placement
+  const allPoles = Array.from(gameDiv.children);
+  allPoles.forEach(poleDiv => {
+    poleDiv.style.pointerEvents = 'none';
+    poleDiv.classList.add('no-hover');
+    console.log('Added no-hover class to pole:', poleDiv);
+    console.log('Pole classes after adding no-hover:', poleDiv.className);
+    console.log('Pole computed pointer-events:', window.getComputedStyle(poleDiv).pointerEvents);
+  });
+
+  // append an animated disc to the pole DOM, without modifying the data model yet
+  const poleDiv = gameDiv.children[idx];
+  const animDisc = document.createElement('div');
+  animDisc.className = 'disc animate';
+  if (nextPiece.bomb) {
+    animDisc.innerHTML = labelForPiece(nextPiece);
+  } else {
+    animDisc.textContent = labelForPiece(nextPiece);
+  }
+  animDisc.style.background = nextPiece.bomb ? '#000' : colorFor(nextPiece.w);
+  animDisc.style.color = nextPiece.bomb ? '#fff' : getTextColorFor(nextPiece.w);
+  
+  // Apply current animation speed to the animated disc
+  animDisc.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
+  
+  poleDiv.appendChild(animDisc);
+
+  // Check if animations are disabled (speed = 0)
+  const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
+  const isInstantAnimation = animationSpeed === 0;
+
+  // after drop animation, commit, then animate merge cascade step-by-step
+  const handlePlacement = async () => {
+    // Add safety timeout to prevent hanging
+    const safetyTimeout = setTimeout(() => {
+      if (placing) {
+        console.error('Placement safety timeout - forcing completion');
+        placing = false;
+        
+        render();
+        checkGameOver();
+      }
+    }, 10000); // 10 second safety timeout
+    
+    try {
+      poles[idx].push(nextPiece);
+      // scoring: add only the dropped piece's weight
+      score += nextPiece.w;
+      updateScoreDisplay();
+      
+      // Add pulse animation to the score display
+      const scoreDisplay = document.querySelector('.score-value');
+      if (scoreDisplay) {
+        scoreDisplay.classList.add('pulse');
+        setTimeout(() => {
+          scoreDisplay.classList.remove('pulse');
+        }, 300);
+      }
+      
+      // Increment blocks dropped counter (only for regular pieces, not custom debug pieces)
+      if (!wasCustomBlock) {
+        blocksDropped++;
+      }
+      
+      // Only advance the queue if we used a regular piece, not a custom one
+      if (!wasCustomBlock) {
+        // animate next queue: consume current, shift others, append new
+        await animateNextQueueAdvance();
+      }
+      
+      render();
+      try {
+        await animateMergeCascade(idx);
+        
+        // Only set placing to false after merge cascade completes
+        placing = false;
+        console.log('Placement completed, placing set to false');
+      } catch (error) {
+        console.error('Merge cascade error:', error);
+        // Force reset placing flag on error to prevent game freeze
+        placing = false;
+        console.log('Placement error - forcing placing to false');
+        
+        // Re-enable hover effects and pointer events after placing is false
+        const allPoles = Array.from(gameDiv.children);
+        allPoles.forEach(poleDiv => {
+          poleDiv.style.pointerEvents = '';
+          poleDiv.classList.remove('no-hover');
+          console.log('Removed no-hover class from pole (error):', poleDiv);
+        });
+      }
+      render();
+      checkGameOver();
+      
+
+      
+    } finally {
+      clearTimeout(safetyTimeout);
+    }
+  };
+
+  // If animations are disabled or very fast, execute placement immediately
+  if (isInstantAnimation || animationSpeed <= 0.5) {
+    console.log(`Fast/instant animation detected (${animationSpeed}), executing placement immediately`);
+    // Remove the animated disc since we don't need it
+    animDisc.remove();
+    // Execute placement logic immediately
+    handlePlacement();
+  } else {
+    // Wait for animation to complete
+    console.log(`Normal animation speed (${animationSpeed}), waiting for animationend event`);
+    animDisc.addEventListener('animationend', handlePlacement, { once: true });
+  }
+}
+
+function waitForAnimation(element){
+  return new Promise(resolve => {
+    // Check if animations are disabled (speed = 0)
+    const animationSpeed = element.style.getPropertyValue('--animation-speed') || 
+                          document.documentElement.style.getPropertyValue('--animation-speed') || '1';
+    const speedValue = parseFloat(animationSpeed);
+    
+    if (speedValue === 0) {
+      console.log('Animations disabled, resolving immediately');
+      // Add a small delay to ensure DOM updates are processed
+      setTimeout(resolve, 10);
+      return;
+    }
+    
+    // For very fast animations (speed <= 0.5), add a small delay to ensure proper timing
+    if (speedValue <= 0.5) {
+      console.log(`Very fast animation detected (${speedValue}), adding delay`);
+      setTimeout(resolve, Math.max(50, speedValue * 100)); // At least 50ms delay
+      return;
+    }
+    
+    // Add multiple event listeners to catch different animation end events
+    const handleAnimationEnd = () => {
+      console.log('Animation ended for element:', element);
+      resolve();
+    };
+    
+    element.addEventListener('animationend', handleAnimationEnd, { once: true });
+    element.addEventListener('webkitAnimationEnd', handleAnimationEnd, { once: true });
+    
+    // Also check if animation is actually running
+    const computedStyle = window.getComputedStyle(element);
+    const animationName = computedStyle.animationName;
+    
+    if (animationName === 'none') {
+      console.log('No animation detected, resolving immediately');
+      resolve();
+      return;
+    }
+    
+    // Fallback timeout to prevent hanging
+    setTimeout(() => {
+      console.log('Animation timeout fallback triggered for:', animationName);
+      resolve();
+    }, 1500); // 1.5 second timeout
+  });
+}
+
+// Function to check if any animations are currently running
+function areAnyAnimationsRunning() {
+  // Check all poles for running animations
+  const allPoles = Array.from(gameDiv.children);
+  for (const pole of allPoles) {
+    const discs = pole.querySelectorAll('.disc');
+    for (const disc of discs) {
+      const computedStyle = window.getComputedStyle(disc);
+      const animationName = computedStyle.animationName;
+      if (animationName !== 'none') {
+        console.log('Found running animation on disc:', animationName, disc);
+        return true;
+      }
+    }
+  }
+  
+  // Check next queue for running animations
+  const nextItems = nextContainer.querySelectorAll('.next-disc');
+  for (const item of nextItems) {
+    const computedStyle = window.getComputedStyle(item);
+    const animationName = computedStyle.animationName;
+    if (animationName !== 'none') {
+      console.log('Found running animation on next item:', animationName, item);
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+async function animateMergeCascade(index){
+  console.log('Starting merge cascade for pole:', index);
+  
+  // Global timeout to prevent infinite hanging
+  const globalTimeout = setTimeout(() => {
+    console.error('Merge cascade global timeout - forcing completion');
+    throw new Error('Merge cascade timeout');
+  }, 5000); // 5 second global timeout
+  
+  try {
+    let iterationCount = 0;
+    const maxIterations = 20; // Prevent infinite loops
+    let mergeCount = 0; // Track number of merges in this cascade for gold calculation
+    
+    while (true){
+      iterationCount++;
+      if (iterationCount > maxIterations) {
+        console.error('Merge cascade exceeded max iterations, forcing completion');
+        break;
+      }
+      
+      const poleArr = poles[index];
+      // find top-first adjacent equal pair
+      let pairIndex = -1;
+      for (let i = poleArr.length - 1; i > 0; i--) {
+        if (poleArr[i] && poleArr[i - 1] && poleArr[i].w === poleArr[i - 1].w) { pairIndex = i; break; }
+      }
+      if (pairIndex === -1) {
+        console.log('No more merges found, breaking');
+        break;
+      }
+    
+    console.log('Found merge pair at index:', pairIndex, 'weights:', poleArr[pairIndex].w, poleArr[pairIndex-1].w);
+
+    // animate both discs merging out with enhanced visual effects
+    const poleDiv = gameDiv.children[index];
+    const discs = poleDiv.querySelectorAll('.disc');
+    const topEl = discs[pairIndex];
+    const belowEl = discs[pairIndex - 1];
+    if (!topEl || !belowEl) break;
+    
+    try {
+      // Add glow effect to both discs before merging
+      topEl.classList.add('merging');
+      belowEl.classList.add('merging');
+      
+      // Stagger the merge-out animations slightly for better visual flow
+      topEl.classList.add('merge-out');
+      await new Promise(resolve => setTimeout(resolve, 25)); // Reduced delay for snappier effect
+      belowEl.classList.add('merge-out');
+      
+      // Wait for both animations to complete with error handling
+      await Promise.all([
+        waitForAnimation(topEl).catch(err => console.log('Top animation error:', err)),
+        waitForAnimation(belowEl).catch(err => console.log('Bottom animation error:', err))
+      ]);
+      
+      // Remove glow effects
+      topEl.classList.remove('merging');
+      belowEl.classList.remove('merging');
+    } catch (error) {
+      console.log('Merge animation error:', error);
+      // Clean up classes in case of error
+      topEl.classList.remove('merging', 'merge-out');
+      belowEl.classList.remove('merging', 'merge-out');
+    }
+
+    // commit merge to data model
+    const a = poleArr[pairIndex];
+    const b = poleArr[pairIndex - 1];
+    const newW = a.w * 2; // weights are equal here
+    const isBombMerge = a.bomb || b.bomb;
+    poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge });
+    
+    // Earn gold for this merge (increases by 1 for each merge in the cascade, multiplied by current stage)
+    mergeCount++;
+    const baseGoldEarned = mergeCount;
+    const goldEarned = baseGoldEarned * currentStage;
+    gold += goldEarned;
+    updateGoldDisplay();
+    console.log(`Merge ${mergeCount}: Earned ${goldEarned} gold (${baseGoldEarned} × Stage ${currentStage}) (Total: ${gold})`);
+    
+    // Show gold earned animation
+    showGoldEarned(goldEarned);
+    
+    // Update bomb conversion button state
+    updateBombConversionButtonState();
+
+    if (isBombMerge){
+      // Bomb merge - clear the entire stack
+      await animateClearPoleWithFallingBlock(index, pairIndex - 1, newW);
+      // after animation, pole is cleared; continue which will break
+      continue;
+    }
+    
+    // Check if this merge unlocks a new stack (stage progression)
+    if (newW === currentTargetBlockSize * 2){
+      // Stage progression: keep the merged block, clear the rest of the stack
+      await animateStageProgression(index, pairIndex - 1, newW);
+      // Check if we should add a new stack
+      checkForNewStack();
+      // after animation, pole has only the merged block; continue which will break
+      continue;
+    }
+
+    // Check if this merge unlocks a new block size for future drops
+    checkForNewBlockSize(newW);
+    
+    // re-render and pop-in the new merged disc with enhanced effects
+    render();
+    const poleDivAfter = gameDiv.children[index];
+    const discsAfter = poleDivAfter.querySelectorAll('.disc');
+    const mergedEl = discsAfter[pairIndex - 1];
+    if (mergedEl){
+      try {
+        // Add glow effect for the new merged block
+        mergedEl.classList.add('merging');
+        mergedEl.classList.add('merge-in');
+        await waitForAnimation(mergedEl);
+        mergedEl.classList.remove('merge-in');
+        mergedEl.classList.remove('merging');
+      } catch (error) {
+        console.log('Merge-in animation error:', error);
+        // Clean up classes in case of error
+        mergedEl.classList.remove('merging', 'merge-in');
+      }
+    }
+    
+    console.log('Merge iteration completed, checking for more merges...');
+    
+    // Re-render to ensure DOM is up to date before next iteration
+    render();
+  }
+  
+  console.log('Merge cascade completed for pole:', index);
+  
+  // Re-enable hover effects and pointer events after the cascade is complete
+  const allPoles = Array.from(gameDiv.children);
+  allPoles.forEach(poleDiv => {
+    poleDiv.style.pointerEvents = '';
+    poleDiv.classList.remove('no-hover');
+    console.log('Re-enabled hover effects for pole:', poleDiv);
+  });
+  
+  } finally {
+    clearTimeout(globalTimeout);
+  }
+}
+
+function checkGameOver(){
+  if (!hasAnyMove(nextQueue[0])){
+    if (aiEnabled) toggleAI(false);
+    setTimeout(() => {
+      alert('Game over — Score: ' + score);
+      resetGame();
+    }, 10);
+  }
+}
+
+function resetGame(){
+  poles = [[],[],[],[]];
+  score = 0;
+  gold = 0; // Reset gold counter
+  blocksDropped = 0; // Reset blocks dropped counter
+  currentTargetBlockSize = STARTING_BLOCK_SIZE; // Reset target block size
+  currentStackCapacity = MAX_HEIGHT; // Reset stack capacity
+  currentStage = 1; // Reset stage counter
+  
+  // Reset bomb conversion button state
+  bombConversionCost = 50;
+  bombConversionPresses = 0;
+  
+  // Reset weights and probabilities to initial state
+  weights = [1, 2];
+  probabilities = [0.5, 0.5];
+  
+  nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+  placing = false;
+  
+  // Re-enable hover effects and pointer events on all poles
+  const allPoles = Array.from(gameDiv.children);
+  allPoles.forEach(poleDiv => {
+    poleDiv.style.pointerEvents = '';
+    poleDiv.classList.remove('no-hover');
+  });
+  
+  // Reset custom block mode
+  customBlockMode = false;
+  
+  // Reset speed to default (Medium)
+  currentSpeed = 2;
+  updateAnimationSpeed();
+  
+  updateStackHeight();
+  updateScoreDisplay();
+  updateGoldDisplay();
+  render();
+}
+
+// ------------------
+// AI logic: simplified to focus on core priorities:
+// 1. MERGING - If a merge can be made, do it immediately
+// 2. CLEAN STACKS - Place blocks on next size up (16 on 32, 8 on 16, etc.)
+// 3. NEXT CLOSEST - Place on closest larger size when optimal isn't available
+// 4. BOMB STRATEGY - Clean up messy stacks, avoid disrupting valuable ones
+// 5. MINIMAL DISRUPTION - Only disrupt when necessary, prefer empty poles
+// ------------------
+function topOf(pole){
+  return pole.length === 0 ? null : pole[pole.length - 1];
+}
+
+function canPlaceOnPole(pieceOrWeight, pole){
+  const weight = typeof pieceOrWeight === 'number' ? pieceOrWeight : pieceOrWeight.w;
+  const top = topOf(pole);
+  return pole.length < currentStackCapacity || (top && top.w === weight);
+}
+
+function hasAnyMove(pieceOrWeight){
+  return poles.some(p => canPlaceOnPole(pieceOrWeight, p));
+}
+
+async function animateNextQueueAdvance(){
+  // add consume animation to current
+  const items = nextContainer.querySelectorAll('.next-disc');
+  const current = items[0];
+  const second = items[1];
+  const third = items[2];
+  if (current) current.classList.add('consume-out');
+  if (second) second.classList.add('shift-left');
+  if (third) third.classList.add('shift-left');
+
+  // wait for ALL animations to complete before proceeding
+  const animations = [];
+  if (current) animations.push(waitForAnimation(current));
+  if (second) animations.push(waitForAnimation(second));
+  if (third) animations.push(waitForAnimation(third));
+  
+  // Wait for all animations to complete
+  await Promise.all(animations);
+
+  // update queue data and re-render
+  nextQueue.shift();
+  nextQueue.push(getRandomPiece());
+  renderNext();
+}
+
+function getElementPageRect(el){
+  const r = el.getBoundingClientRect();
+  return { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height };
+}
+
+
+
+async function animateStageProgression(index, mergedIndex, weight){
+  // Render so the merged block exists in the DOM
+  render();
+  const poleDiv = gameDiv.children[index];
+  const discs = poleDiv.querySelectorAll('.disc');
+  const mergedEl = discs[mergedIndex];
+  if(!mergedEl){
+    poles[index] = [];
+    render();
+    return;
+  }
+
+
+
+  // Let the new block behave like a normal merge result first
+  mergedEl.classList.add('merge-in');
+  await waitForAnimation(mergedEl);
+  mergedEl.classList.remove('merge-in');
+
+  // Keep only the merged block, clear everything else
+  const mergedBlock = poles[index][mergedIndex];
+  poles[index] = [mergedBlock]; // Keep only the merged block
+  
+  // Animate clearing of other blocks (but not the merged one)
+  const blocksToClear = Array.from(poleDiv.querySelectorAll('.disc')).filter((_, i) => i !== mergedIndex);
+  blocksToClear.forEach(d => d.classList.add('clear-out'));
+  await Promise.all(blocksToClear.map(d => waitForAnimation(d)));
+
+  // Re-render to show the cleared stack with only the merged block
+  render();
+}
+
+async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
+  // Render so the merged block exists in the DOM
+  render();
+  const poleDiv = gameDiv.children[index];
+  const discs = poleDiv.querySelectorAll('.disc');
+  const mergedEl = discs[mergedIndex];
+  if(!mergedEl){
+    poles[index] = [];
+    render();
+    return;
+  }
+
+  // Calculate gold reward for bomb clear based on number of blocks cleared and current stage
+  const blocksCleared = discs.length;
+  // Gold increases by 1 for each block cleared (like cascade merges), multiplied by current stage
+  const totalGoldEarned = (blocksCleared * (blocksCleared + 1) / 2) * currentStage;
+  
+  // Add total gold to player's balance
+  gold += totalGoldEarned;
+  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${totalGoldEarned} gold (sum of 1 to ${blocksCleared} × Stage ${currentStage}) (Total: ${gold})`);
+  
+  // Show individual gold animations for each block cleared (like cascade merges)
+  for (let i = 0; i < blocksCleared; i++) {
+    const blockGoldEarned = (i + 1) * currentStage; // Gold increases by 1 for each block, multiplied by current stage
+    setTimeout(() => {
+      showGoldEarned(blockGoldEarned);
+    }, i * 100); // Stagger each animation by 100ms for visual effect
+  }
+  
+  // Update gold display
+  updateGoldDisplay();
+  
+  // Update bomb conversion button state
+  updateBombConversionButtonState();
+
+
+
+  // Let the new block behave like a normal merge result first
+  mergedEl.classList.add('merge-in');
+  await waitForAnimation(mergedEl);
+  mergedEl.classList.remove('merge-in');
+
+  // Create a shockwave ripple effect that propagates through the stack
+  const allDiscs = Array.from(poleDiv.querySelectorAll('.disc'));
+  
+  // Check if animations are disabled (speed = 0)
+  const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
+  const isInstantAnimation = animationSpeed === 0;
+  
+  if (isInstantAnimation) {
+    // Instant animation - immediately hide all blocks
+    allDiscs.forEach(d => {
+      d.style.transform = 'scale(0.8) translateY(0)';
+      d.style.opacity = '0';
+      d.style.filter = 'brightness(0.8) saturate(0.9)';
+    });
+  } else {
+    // Start the ripple from the merged block (bomb location) and propagate outward in both directions
+    const bombIndex = mergedIndex; // The bomb merge location
+    
+    for (let i = 0; i < allDiscs.length; i++) {
+      const disc = allDiscs[i];
+      // Calculate distance from bomb location for wave propagation
+      const distanceFromBomb = Math.abs(i - bombIndex);
+      // Add a small delay to create the wave effect, starting from bomb location
+      const delay = distanceFromBomb * 60; // 60ms delay per block distance for the ripple effect
+      
+      setTimeout(() => {
+        disc.classList.add('bomb-ripple');
+      }, delay);
+    }
+    
+    // Wait for the entire ripple animation to complete
+    const totalAnimationTime = Math.max(...Array.from({length: allDiscs.length}, (_, i) => 
+      Math.abs(i - bombIndex) * 60 + 500
+    )); // Max delay + 500ms animation duration
+    await new Promise(resolve => setTimeout(resolve, totalAnimationTime));
+    
+    // Clean up the ripple classes
+    allDiscs.forEach(d => d.classList.remove('bomb-ripple'));
+  }
+
+  // Clear pole and re-render
+  poles[index] = [];
+  render();
+}
+
+function choosePoleFor(pieceOrWeight){
+  console.log('choosePoleFor called with:', pieceOrWeight);
+  let avail = poles.map((p,i)=> ({p,i})).filter(x=> canPlaceOnPole(pieceOrWeight, x.p));
+  console.log('Available poles:', avail);
+  if(avail.length === 0) {
+    console.log('No available poles found');
+    return null;
+  }
+  
+  const piece = typeof pieceOrWeight === 'number' ? { w: pieceOrWeight, bomb: false } : pieceOrWeight;
+  const isBomb = piece.bomb;
+  
+  // Helper function to check if a stack is "messy" (order disrupted)
+  function isStackMessy(pole) {
+    if (pole.length < 2) return false;
+    for (let i = pole.length - 1; i > 0; i--) {
+      if (pole[i].w >= pole[i-1].w) return true; // Order is disrupted
+    }
+    return false;
+  }
+  
+  // Helper function to get stack height
+  function getStackHeight(pole) {
+    return pole.length;
+  }
+  
+  // Helper function to get total point value of a stack
+  function getStackValue(pole) {
+    return pole.reduce((sum, disc) => sum + disc.w, 0);
+  }
+  
+  // Helper function to check if placing this piece would create a merge
+  function wouldCreateMerge(pole, piece) {
+    if (pole.length === 0) return false;
+    const top = pole[pole.length - 1];
+    return top.w === piece.w;
+  }
+  
+  // Helper function to check if placing this piece would be on a block exactly 1 size above
+  function wouldBeOnExactSize(pole, piece) {
+    if (pole.length === 0) return false;
+    const top = pole[pole.length - 1];
+    return top.w === piece.w * 2;
+  }
+  
+  // Helper function to check if placing this piece would be on a larger block (but not exact size)
+  function wouldBeOnLargerBlock(pole, piece) {
+    if (pole.length === 0) return false;
+    const top = pole[pole.length - 1];
+    return top.w > piece.w;
+  }
+  
+  // Check for bomb in queue (special case 1.5)
+  const hasBombInQueue = nextQueue.some(p => p.bomb);
+  const isBombMatch = hasBombInQueue && nextQueue.some(p => p.bomb && p.w === piece.w);
+  
+  if (!isBomb) {
+    // NORMAL BLOCKS LOGIC
+    
+    // Priority 1: Merges (100% override)
+    const mergeOptions = avail.filter(x => wouldCreateMerge(x.p, piece));
+    if (mergeOptions.length > 0) {
+      return mergeOptions[0].i;
+    }
+    
+    // Priority 1.5: Avoid placing normal blocks on stacks with bombs anywhere in them
+    // This prevents cutting off bombs from being able to merge and clear the stack
+    const bombAvoidanceOptions = avail.filter(x => {
+      if (x.p.length === 0) return true; // Empty stack is fine
+      
+      // Check if there's a bomb anywhere in the stack
+      const hasBombInStack = x.p.some(disc => disc.bomb);
+      
+      if (hasBombInStack) {
+        // If there's a bomb in the stack, only allow placement if:
+        // 1. The block is smaller than the bomb it would be placed on, OR
+        // 2. We're placing on an empty stack (which shouldn't happen here, but safety check)
+        const top = x.p[x.p.length - 1];
+        if (top.bomb) {
+          // Placing on a bomb - only allow if block is smaller
+          return piece.w < top.w;
+        } else {
+          // Placing above a bomb - this would cut off the bomb, so never allow larger blocks
+          return piece.w < top.w;
+        }
+      }
+      
+      return true; // No bomb in stack, so placement is fine
+    });
+    
+    // If we have no valid options after bomb avoidance, fall back to all available
+    if (bombAvoidanceOptions.length === 0) {
+      // This should rarely happen, but if it does, we'll use the original avail list
+      console.warn('AI: No bomb-avoidance options available, using fallback');
+    } else {
+      // Use the filtered options for the rest of the logic
+      avail = bombAvoidanceOptions;
+    }
+    
+    // Priority 2: Special case - bomb match in queue
+    if (isBombMatch) {
+      const messyStacks = avail.filter(x => isStackMessy(x.p));
+      if (messyStacks.length > 0) {
+        return messyStacks[0].i;
+      }
+    }
+    
+    // Priority 3: Place on block exactly 1 size above
+    const exactSizeOptions = avail.filter(x => wouldBeOnExactSize(x.p, piece));
+    if (exactSizeOptions.length > 0) {
+      // Prefer stacks with less height if multiple options
+      exactSizeOptions.sort((a, b) => getStackHeight(a.p) - getStackHeight(b.p));
+      return exactSizeOptions[0].i;
+    }
+    
+    // Priority 4: Place on larger block (but not exact size)
+    const largerBlockOptions = avail.filter(x => wouldBeOnLargerBlock(x.p, piece));
+    if (largerBlockOptions.length > 0) {
+      // Prefer messy stacks, then by height
+      const messyOptions = largerBlockOptions.filter(x => isStackMessy(x.p));
+      const cleanOptions = largerBlockOptions.filter(x => !isStackMessy(x.p));
+      
+      if (messyOptions.length > 0) {
+        // Choose messiest stack among messy options
+        messyOptions.sort((a, b) => {
+          // Count how many order violations each stack has
+          const getViolations = (pole) => {
+            let violations = 0;
+            for (let i = pole.length - 1; i > 0; i--) {
+              if (pole[i].w >= pole[i-1].w) violations++;
+            }
+            return violations;
+          };
+          return getViolations(b.p) - getViolations(a.p); // More violations = messier
+        });
+        return messyOptions[0].i;
+      } else {
+        // All stacks are clean, choose by height
+        cleanOptions.sort((a, b) => getStackHeight(a.p) - getStackHeight(b.p));
+        return cleanOptions[0].i;
+      }
+    }
+    
+    // Priority 5: Place on smaller block or empty stack
+    const remainingOptions = avail.filter(x => !wouldBeOnLargerBlock(x.p, piece));
+    if (remainingOptions.length > 0) {
+      // Prefer messy stacks, then by height
+      const messyOptions = remainingOptions.filter(x => isStackMessy(x.p));
+      const cleanOptions = remainingOptions.filter(x => !isStackMessy(x.p));
+      
+      if (messyOptions.length > 0) {
+        // Choose messiest stack among messy options
+        messyOptions.sort((a, b) => {
+          const getViolations = (pole) => {
+            let violations = 0;
+            for (let i = pole.length - 1; i > 0; i--) {
+              if (pole[i].w >= pole[i-1].w) violations++;
+            }
+            return violations;
+          };
+          return getViolations(b.p) - getViolations(a.p);
+        });
+        return messyOptions[0].i;
+      } else {
+        // All stacks are clean, choose by height
+        cleanOptions.sort((a, b) => getStackHeight(a.p) - getStackHeight(b.p));
+        return cleanOptions[0].i;
+      }
+    }
+    
+  } else {
+    // BOMB LOGIC
+    
+    // Priority 1: Tallest, messiest stack
+    const messyStacks = avail.filter(x => isStackMessy(x.p));
+    if (messyStacks.length > 0) {
+      // Sort by height first, then by messiness
+      messyStacks.sort((a, b) => {
+        const heightDiff = getStackHeight(b.p) - getStackHeight(a.p);
+        if (Math.abs(heightDiff) > 0) return heightDiff;
+        
+        // If heights are equal, sort by messiness
+        const getViolations = (pole) => {
+          let violations = 0;
+          for (let i = pole.length - 1; i > 0; i--) {
+            if (pole[i].w >= pole[i-1].w) violations++;
+          }
+          return violations;
+        };
+        return getViolations(b.p) - getViolations(a.p);
+      });
+      return messyStacks[0].i;
+    }
+    
+    // Priority 2: Must place on clean stack - choose lowest total value
+    const cleanStacks = avail.filter(x => !isStackMessy(x.p));
+    if (cleanStacks.length > 0) {
+      cleanStacks.sort((a, b) => getStackValue(a.p) - getStackValue(b.p));
+      return cleanStacks[0].i;
+    }
+  }
+  
+  // Fallback: return first available pole
+  return avail[0].i;
+}
+
+function aiStep(){
+  console.log('AI: aiStep called, placing:', placing, 'aiEnabled:', aiEnabled);
+  
+  if(placing) {
+    console.log('AI: Waiting for placement to complete...');
+    return;
+  }
+  
+  // Safety check: if placing has been true for too long, reset it
+  if (placing && Date.now() - lastPlacementTime > 10000) { // 10 second timeout
+    console.warn('AI: Placement timeout detected, resetting placing flag');
+    placing = false;
+    
+    // Re-enable hover effects and pointer events on all poles
+    const allPoles = Array.from(gameDiv.children);
+    allPoles.forEach(poleDiv => {
+      poleDiv.style.pointerEvents = '';
+      poleDiv.classList.remove('no-hover');
+    });
+  }
+  
+  // if game over, nothing to do
+  const pick = choosePoleFor(nextQueue[0]);
+  if(pick === null) { 
+    console.log('AI: No valid move available, checking game over');
+    checkGameOver(); 
+    return; 
+  }
+  
+  console.log('AI: Making move on pole', pick, 'with piece', nextQueue[0]);
+  placeOnPole(pick);
+}
+
+// initial render
+render();
+
+// Initialize animation speed and stack height
+updateAnimationSpeed();
+updateStackHeight();
+
+// Initialize displays with proper formatting
+updateScoreDisplay();
+updateGoldDisplay();
+
+// Initialize debug pane - Block grid interface
+document.addEventListener('DOMContentLoaded', () => {
+  // Set initial selection to block 1
+  const firstBlock = document.querySelector('.block-item[data-value="1"]');
+  if (firstBlock) {
+    firstBlock.classList.add('selected');
+    customBlockSize = 1;
+    customBlockMode = true;
+  }
+});
+
+if (bombToggle && bombStatus) {
+  bombToggle.checked = false;
+  bombStatus.textContent = 'No';
+  customBlockBomb = false;
+}
+
+// Initialize debug auto-play controls
+if (debugSpeedSlider) {
+  debugSpeedSlider.value = currentSpeed;
+}
+updateDebugSpeedLabel();
+updateAnimationSpeed();
+
+// Initialize bomb conversion button state
+updateBombConversionButtonState();
+
+
+
+</script>
+</body>
+</html>
