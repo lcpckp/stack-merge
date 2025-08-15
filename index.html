@@ -2185,7 +2185,7 @@ function handleTrashButton() {
   }
   
   // Play the same animation as placing a block, but don't place it
-  animateNextQueueAdvance();
+  animateNextQueueAdvance(true); // true = queue already modified
   
   // Increment press count and double the cost
   trashButtonCost *= 2;
@@ -2924,7 +2924,7 @@ function placeOnPole(idx){
       // Only advance the queue if we used a regular piece, not a custom one
       if (!wasCustomBlock) {
         // animate next queue: consume current, shift others, append new
-        await animateNextQueueAdvance();
+        await animateNextQueueAdvance(); // false = queue not yet modified
       }
       
       render();
@@ -3284,7 +3284,7 @@ function hasAnyMove(pieceOrWeight){
   return poles.some(p => canPlaceOnPole(pieceOrWeight, p));
 }
 
-async function animateNextQueueAdvance(){
+async function animateNextQueueAdvance(queueAlreadyModified = false){
   // add consume animation to current
   const items = nextContainer.querySelectorAll('.next-disc');
   const current = items[0];
@@ -3303,9 +3303,12 @@ async function animateNextQueueAdvance(){
   // Wait for all animations to complete
   await Promise.all(animations);
 
-  // update queue data and re-render
-  nextQueue.shift();
-  nextQueue.push(getRandomPiece());
+  // Only update queue data if it hasn't already been modified
+  if (!queueAlreadyModified) {
+    nextQueue.shift();
+    nextQueue.push(getRandomPiece());
+  }
+  
   renderNext();
   
   // Update button states since queue changed
