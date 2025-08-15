@@ -12,7 +12,7 @@ A fun and addictive puzzle game where you merge blocks to create bigger ones, ea
 
 ## 🚀 Play Now
 
-Play the game directly in your browser: [Play Stack Merge](https://YOUR_USERNAME.github.io/stackmerge/)
+Play the game directly in your browser: [Play Stack Merge](https://lcpckp.github.io/stack-merge/)
 
 ## 🎯 Game Features
 
