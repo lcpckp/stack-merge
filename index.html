@@ -501,11 +501,38 @@
   }
   .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
   .pole:hover { border: 3px solid #0ea5e9; }
-  .pole.full { opacity:0.6; }
-  .pole.full:hover { opacity: 0.8; }
+  .pole.full { opacity:0.6; cursor: not-allowed; }
+  .pole.full:hover { opacity: 0.6; border: none; }
   .pole.no-hover:hover { border: none !important; opacity: 1 !important; }
   .pole.no-hover { pointer-events: none; }
   .pole.new-stack { animation: newStackAppear calc(0.3s * var(--animation-speed, 1)) ease-out; }
+  
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    /* On touch devices, reduce hover effects and ensure they don't get stuck */
+    .pole:hover {
+      border: 2px solid #0ea5e9;
+      transition: border 0.1s ease;
+    }
+    
+    /* Force clear hover states after touch interactions */
+    .pole.touch-active {
+      border: none !important;
+      opacity: 1 !important;
+    }
+    
+    /* Ensure touch-active state overrides any lingering hover effects */
+    .pole.touch-active:hover {
+      border: none !important;
+      opacity: 1 !important;
+    }
+    
+    /* Reduce transition duration on touch devices for snappier feedback */
+    .pole {
+      transition: all 0.1s ease;
+    }
+  }
+  
   @keyframes newStackAppear {
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
@@ -546,9 +573,11 @@
   /* remove extra gap at the very top of a full pole (topmost disc has no margin) */
   .pole .disc:last-child { margin-top: 0; }
 
-  .disc.animate { animation: drop calc(0.15s * var(--animation-speed, 1)) ease-out; }
+  .disc.animate { 
+    animation: drop calc(0.15s * var(--animation-speed, 1)) ease-out;
+  }
   @keyframes drop {
-    from { transform: translateY(-525px); opacity: 0; }
+    from { transform: translateY(-60px); opacity: 0; }
     to   { transform: translateY(0); opacity: 1; }
   }
   
@@ -985,6 +1014,16 @@
     animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
   }
   
+  /* Fix drop animation for mobile - override default with higher specificity */
+  .game .pole .disc.animate {
+    animation: dropMobile calc(0.15s * var(--animation-speed, 1)) ease-out !important;
+  }
+  
+  @keyframes dropMobile {
+    from { transform: translateY(-50px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  
   /* Adjust game container for mobile */
   .game-container {
     margin-top: 20px;
@@ -1021,7 +1060,7 @@
   /* Make poles smaller for mobile */
   .pole {
     width: 100px;
-    height: 350px;
+    /* Height will be set by JavaScript via --stack-height variable */
     padding: 12px;
   }
   
@@ -1107,7 +1146,7 @@
   
   .pole {
     width: 80px;
-    height: 280px;
+    /* Height will be set by JavaScript via --stack-height variable */
     padding: 8px;
   }
   
@@ -1131,6 +1170,18 @@
   
   .next-disc.consume-out {
     animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
+  }
+  
+  /* Extra small mobile uses same drop animation approach */
+  
+  /* Fix drop animation for extra small mobile - override default with higher specificity */
+  .game .pole .disc.animate {
+    animation: dropMobileSmall calc(0.15s * var(--animation-speed, 1)) ease-out !important;
+  }
+  
+  @keyframes dropMobileSmall {
+    from { transform: translateY(-40px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
   }
   
   .game {
@@ -1935,17 +1986,28 @@ function updateAnimationSpeed() {
 function updateStackHeight() {
   // Stack height is now fixed at MAX_HEIGHT (10) - no more dynamic reduction
   // Base height varies by screen size for mobile responsiveness
-  let baseHeight = 525; // Default desktop height
+  // Each slot needs: disc height + margin-top
+  // 10 slots need: (disc height + margin) × 10 + pole padding
+  let baseHeight = 542; // Desktop: 42px disc + 9px margin = 51px per slot, 10 slots = 510px + 32px padding = 542px
   
   // Check if we're on mobile and adjust height accordingly
   if (window.innerWidth <= 480) {
-    baseHeight = 280; // Extra small mobile
+    // Extra small mobile: 26px disc + 4px margin = 30px per slot
+    // 10 slots: 30px × 10 = 300px + 16px padding (8px top + 8px bottom) = 316px
+    baseHeight = 316;
+    console.log('Mobile (≤480px): Setting stack height to', baseHeight, 'px for 10 slots');
   } else if (window.innerWidth <= 768) {
-    baseHeight = 350; // Regular mobile
+    // Regular mobile: 30px disc + 6px margin = 36px per slot  
+    // 10 slots: 36px × 10 = 360px + 24px padding (12px top + 12px bottom) = 384px
+    baseHeight = 384;
+    console.log('Mobile (≤768px): Setting stack height to', baseHeight, 'px for 10 slots');
+  } else {
+    console.log('Desktop: Setting stack height to', baseHeight, 'px for 10 slots');
   }
   
   // Update CSS custom property for stack height
   document.documentElement.style.setProperty('--stack-height', baseHeight + 'px');
+  console.log('Updated --stack-height to', baseHeight, 'px');
 }
 
 function updateDebugPane() {
@@ -2094,9 +2156,11 @@ function render(){
   gameDiv.innerHTML = '';
   poles.forEach((pole, idx) => {
     const poleDiv = document.createElement('div');
-  const isAtCapacity = pole.length >= currentStackCapacity;
-  const playable = canPlaceOnPole(nextQueue[0], pole);
-    poleDiv.className = 'pole' + (isAtCapacity && !playable ? ' full' : '');
+    const isAtCapacity = pole.length >= currentStackCapacity;
+    const playable = canPlaceOnPole(nextQueue[0], pole);
+    const isDisabled = isAtCapacity && !playable;
+    
+    poleDiv.className = 'pole' + (isDisabled ? ' full' : '');
     
     // Preserve the no-hover state if we're currently placing
     if (placing) {
@@ -2104,13 +2168,22 @@ function render(){
       poleDiv.style.pointerEvents = 'none';
     }
     
+    // If stack is disabled (full and can't merge), disable interactions
+    if (isDisabled) {
+      poleDiv.classList.add('no-hover');
+      poleDiv.style.pointerEvents = 'none';
+      poleDiv.style.cursor = 'not-allowed';
+    }
+    
     poleDiv.setAttribute('role', 'button');
-    poleDiv.tabIndex = 0;
+    poleDiv.tabIndex = isDisabled ? -1 : 0;
     poleDiv.setAttribute('aria-label', `Stack ${idx + 1}, contains ${pole.length} blocks${isAtCapacity ? (playable ? ', merge available' : ', blocked') : ''}`);
     poleDiv.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        placeOnPole(idx);
+        if (!isDisabled) {
+          placeOnPole(idx);
+        }
       }
     });
     // existing discs (no animation class)
@@ -2126,7 +2199,70 @@ function render(){
       d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
       poleDiv.appendChild(d);
     });
-    poleDiv.addEventListener('click', () => placeOnPole(idx));
+    
+    // Only add click handler if stack is not disabled
+    if (!isDisabled) {
+      poleDiv.addEventListener('click', () => placeOnPole(idx));
+      
+      // Add touch event handling for better mobile experience
+      let touchStartTime = 0;
+      let touchStartY = 0;
+      
+      poleDiv.addEventListener('touchstart', (e) => {
+        touchStartTime = Date.now();
+        touchStartY = e.touches[0].clientY;
+        // Prevent default to avoid double-tap zoom on mobile
+        e.preventDefault();
+        
+        // Add touch-active class for visual feedback
+        poleDiv.classList.add('touch-active');
+      }, { passive: false });
+      
+      poleDiv.addEventListener('touchend', (e) => {
+        const touchEndTime = Date.now();
+        const touchEndY = e.changedTouches[0].clientY;
+        const touchDuration = touchEndTime - touchStartTime;
+        const touchDistance = Math.abs(touchEndY - touchStartY);
+        
+        // Remove touch-active class
+        poleDiv.classList.remove('touch-active');
+        
+        // Only trigger placement if it's a quick tap (not a swipe) and close to start position
+        if (touchDuration < 300 && touchDistance < 20) {
+          placeOnPole(idx);
+        }
+        
+        // Force clear any lingering hover state on touch devices
+        setTimeout(() => {
+          poleDiv.style.removeProperty('border');
+          poleDiv.style.removeProperty('opacity');
+          // Also remove any CSS hover effects by temporarily disabling pointer events
+          poleDiv.style.pointerEvents = 'none';
+          setTimeout(() => {
+            poleDiv.style.pointerEvents = '';
+          }, 50);
+        }, 100);
+      });
+      
+      // Clear hover state when touch moves (prevents stuck highlights)
+      poleDiv.addEventListener('touchmove', (e) => {
+        // If touch moves significantly, clear hover state
+        const currentY = e.touches[0].clientY;
+        if (Math.abs(currentY - touchStartY) > 10) {
+          poleDiv.classList.remove('touch-active');
+          poleDiv.style.removeProperty('border');
+          poleDiv.style.removeProperty('opacity');
+        }
+      });
+      
+      // Clear hover state when touch is cancelled
+      poleDiv.addEventListener('touchcancel', () => {
+        poleDiv.classList.remove('touch-active');
+        poleDiv.style.removeProperty('border');
+        poleDiv.style.removeProperty('opacity');
+      });
+    }
+    
     gameDiv.appendChild(poleDiv);
     
     // Apply current animation speed to the new pole
@@ -2184,6 +2320,14 @@ function placeOnPole(idx){
   }
   const pole = poles[idx];
   
+  // Additional safety check: ensure this stack can actually accept the next piece
+  const isAtCapacity = pole.length >= currentStackCapacity;
+  const playable = canPlaceOnPole(nextQueue[0], pole);
+  if (isAtCapacity && !playable) {
+    console.log('Stack is full and cannot merge, ignoring click');
+    return;
+  }
+  
   // Check if custom block mode is active AND debug pane is open
   let nextPiece;
   let wasCustomBlock = false;
@@ -2223,6 +2367,12 @@ function placeOnPole(idx){
   
   // Apply current animation speed to the animated disc
   animDisc.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
+  
+  // Apply current stack height to the animated disc
+  animDisc.style.setProperty('--stack-height', document.documentElement.style.getPropertyValue('--stack-height'));
+  
+  // Let CSS handle the mobile-specific drop animations
+  // The CSS media queries will automatically apply the correct animation
   
   poleDiv.appendChild(animDisc);
 
@@ -3043,8 +3193,31 @@ updateBombConversionButtonState();
 
 // Handle window resize for mobile responsiveness
 window.addEventListener('resize', () => {
+  console.log('Window resized to', window.innerWidth, 'x', window.innerHeight, '- updating stack heights');
   updateStackHeight();
 });
+
+// Global touch event handler to clear lingering hover states on touch devices
+document.addEventListener('touchstart', (e) => {
+  // Clear any lingering hover states on poles when touching elsewhere
+  clearAllPoleHoverStates();
+}, { passive: true });
+
+// Utility function to clear all pole hover states
+function clearAllPoleHoverStates() {
+  const poles = document.querySelectorAll('.pole');
+  poles.forEach(pole => {
+    // Remove any inline styles that might be keeping hover effects visible
+    pole.style.removeProperty('border');
+    pole.style.removeProperty('opacity');
+    
+    // Add a temporary class to force clear hover states
+    pole.classList.add('touch-active');
+    setTimeout(() => {
+      pole.classList.remove('touch-active');
+    }, 150);
+  });
+}
 
 // GitHub Pages redirect fix - if we're on the wrong page, redirect to the game
 (function() {
