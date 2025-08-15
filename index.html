@@ -505,8 +505,6 @@
   .pole.full:hover { opacity: 0.6; border: none; }
   .pole.no-hover:hover { border: none !important; opacity: 1 !important; }
   .pole.no-hover { pointer-events: none; }
-  .pole.new-stack { animation: newStackAppear calc(0.3s * var(--animation-speed, 1)) ease-out; }
-  
   /* Touch device optimizations */
   @media (hover: none) and (pointer: coarse) {
     /* On touch devices, completely disable hover effects since they're not useful */
@@ -520,14 +518,6 @@
       transition: all 0.1s ease;
     }
   }
-  
-  @keyframes newStackAppear {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  
-  /* Instant animations when speed is 0 (Blazing) */
-  .pole.new-stack[style*="--animation-speed: 0"] { animation: none; transform: scale(1); opacity: 1; }
   .disc { width:108px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:24px; margin-top:9px; box-shadow:0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family); transform-origin: center center; position: relative; z-index: 1; }
   
   /* Bomb block styling */
@@ -1477,7 +1467,6 @@ function updateGoldDisplay() {
 const MAX_HEIGHT = 10;
 const BOMB_CHANCE = 0.02; // 2% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
-const MAX_STACKS = 8; // Maximum number of stacks allowed
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
 
 function getRandomWeight(){
@@ -1543,17 +1532,14 @@ document.addEventListener('keydown', (e) => {
 
 
 function checkForNewStack() {
-  // Check if we should add a new stack based on current target block size
-  if (poles.length < MAX_STACKS) {
-    addNewStack();
-    // Increment stage counter for gold multiplier
-    currentStage++;
-    // Double the target block size for the next unlock
-    currentTargetBlockSize *= 2;
-    // Update the range of valid pieces to include the next incremental block
-    updateBlockRange();
-    console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${currentStage}`);
-  }
+  // Stage progression without adding new stacks
+  // Increment stage counter for gold multiplier
+  currentStage++;
+  // Double the target block size for the next unlock
+  currentTargetBlockSize *= 2;
+  // Update the range of valid pieces to include the next incremental block
+  updateBlockRange();
+  console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${currentStage}`);
 }
 
 function checkForNewBlockSize(mergedSize) {
@@ -1571,8 +1557,8 @@ function checkForNewBlockSize(mergedSize) {
 }
 
 function updateProbabilityDistribution() {
-  // Create a better probability distribution that maintains game balance
-  // Blocks 1, 2, and 4 should have equal probabilities, then curve down from there
+  // Create a probability distribution with gentler decay for higher value blocks
+  // Blocks 1, 2, and 4 should have equal probabilities, then gentle decay for higher values
   
   const numBlocks = weights.length;
   
@@ -1584,14 +1570,14 @@ function updateProbabilityDistribution() {
     
     if (i < 3) {
       // First three block sizes (1, 2, 4) get equal probabilities
-      baseProbabilities.push(0.25);
-    } else {
-      // For block sizes 8 and above, use exponential decay
-      // Start from the same level as the first three, then decrease
-      const decayFactor = 0.5; // Steeper decay for better balance
-      const probability = 0.25 * Math.pow(decayFactor, i - 2);
-      baseProbabilities.push(probability);
-    }
+      baseProbabilities.push(0.15);
+          } else {
+        // For block sizes 8 and above, use exponential decay
+        // Start from the same level as the first three, then decrease
+        const decayFactor = 0.7; // Gentler decay - higher values appear more frequently than before
+        const probability = 0.15 * Math.pow(decayFactor, i - 2);
+        baseProbabilities.push(probability);
+      }
   }
   
   // Normalize probabilities to sum to 1.0
@@ -1599,7 +1585,7 @@ function updateProbabilityDistribution() {
   probabilities = baseProbabilities.map(p => p / totalProbability);
   
   console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
-  console.log('Expected distribution: 1,2,4 should be equal, then decreasing');
+  console.log('Expected distribution: 1,2,4 should be equal, then gentle decay for higher values');
   console.log('Current weights array:', weights);
   console.log('Current probabilities array:', probabilities);
 }
@@ -1619,81 +1605,9 @@ function updateBlockRange() {
   }
 }
 
-function addNewStack() {
-  if (poles.length >= MAX_STACKS) return; // Safety check
-  
-  // Add a new empty stack
-  poles.push([]);
-  
-  // No longer reduce stack capacity - keep it at MAX_HEIGHT
-  // currentStackCapacity remains unchanged
-  
-  // Update visual stack height (no change needed but keeping for consistency)
-  updateStackHeight();
-  
-  // Re-render to show the new stack
-  render();
-  
-  // Add animation class to the new stack
-  const newStackIndex = poles.length - 1;
-  const newStackElement = gameDiv.children[newStackIndex];
-  if (newStackElement) {
-    newStackElement.classList.add('new-stack');
-    // Remove the animation class after animation completes
-    setTimeout(() => {
-      if (newStackElement) {
-        newStackElement.classList.remove('new-stack');
-      }
-    }, 300);
-  }
-  
-  // Show unlock message
-  showUnlockMessage();
-}
 
-function showUnlockMessage() {
-  // Create a temporary message element
-  const messageEl = document.createElement('div');
-  messageEl.textContent = 'New Stack Unlocked';
-  messageEl.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #10B981;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 16px;
-    z-index: 1001;
-    animation: unlockMessage 2s ease-out forwards;
-  `;
-  
-  // Add CSS animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes unlockMessage {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  document.body.appendChild(messageEl);
-  
-  // Remove after animation
-  setTimeout(() => {
-    if (messageEl.parentNode) {
-      messageEl.parentNode.removeChild(messageEl);
-    }
-    if (style.parentNode) {
-      style.parentNode.removeChild(style);
-    }
-  }, 2000);
-}
+
+
 
 function showGoldEarned(amount) {
   // Create the gold earned display element
