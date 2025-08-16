@@ -2543,7 +2543,7 @@
       </button>
       <div class="bomb-cost-text">
         <span class="emoji">💰</span>
-        <span class="cost" id="bombCost">50</span>
+        <span class="cost" id="bombCost">25</span>
       </div>
     </div>
     
@@ -2566,7 +2566,7 @@
         </button>
         <div class="bomb-cost-text">
           <span class="emoji">💰</span>
-          <span class="cost" id="bombCostMobile">50</span>
+          <span class="cost" id="bombCostMobile">25</span>
         </div>
       </div>
       
@@ -3103,7 +3103,7 @@ function restoreGameState(gameState) {
     // Restore button costs from saved state
     const oldBombCost = bombConversionCost;
     const oldTrashCost = trashButtonCost;
-    bombConversionCost = gameState.bombConversionCost || 50;
+    bombConversionCost = gameState.bombConversionCost || 25;
     trashButtonCost = gameState.trashButtonCost || 25;
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
@@ -3521,11 +3521,11 @@ let currentStackCapacity = MAX_HEIGHT; // Current maximum height for each stack 
 let currentStage = 1; // Current stage (1 = starting, 2 = after first stack unlock, etc.)
 
 // Bomb conversion button state
-let bombConversionCost = 50;
+let bombConversionCost = 25;
 let bombConversionPresses = 0; // Number of times button has been pressed
 let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
 let bombSelected = false; // Track if a bomb is currently selected but not yet placed
-let previousBombCost = 50; // Store the previous bomb cost before conversion
+let previousBombCost = 25; // Store the previous bomb cost before conversion
 
 // Trash button state
 let trashButtonCost = 25;
@@ -5237,11 +5237,11 @@ function resetGame(isFreshGame = true){
   // Only reset button costs if this is a fresh game (not a UI reset)
   if (isFreshGame) {
     // Reset bomb conversion button state
-    bombConversionCost = 50;
+    bombConversionCost = 25;
     bombConversionPresses = 0;
     lastGoldAmount = 0; // Reset tracked gold amount to force button state update
     bombSelected = false; // Reset bomb selection state
-    previousBombCost = 50; // Reset previous bomb cost
+    previousBombCost = 25; // Reset previous bomb cost
     
     // Reset trash button state
     trashButtonCost = 25;
