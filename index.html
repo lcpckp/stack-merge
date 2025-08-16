@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Stack Merge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
     box-shadow: 0 2px 0 rgba(0,0,0,0.25);
   }
   
-  /* Glowing + button after game over */
+  /* Glowing ➕ button after game over */
   .title-btn.game-over-glow {
     box-shadow: 0 0 8px rgba(14, 165, 233, 0.5), 0 0 12px rgba(14, 165, 233, 0.3), 0 3px 0 rgba(0,0,0,0.25);
     animation: breatheGlow 2s ease-in-out infinite;
@@ -336,7 +336,18 @@
   .hidden { display:none !important; }
 
   /* Help modal */
-  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:1000; }
+  .modal-backdrop { 
+    position:fixed; 
+    inset:0; 
+    background:rgba(0,0,0,0.6); 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    z-index:1000; 
+    /* Ensure backdrop covers safe areas on mobile */
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-left, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-right, 0px);
+    box-sizing: border-box;
+  }
   .modal { background:var(--panel); color:var(--text); width:min(720px, 92vw); border-radius:16px; padding:24px 28px; box-shadow:0 15px 45px rgba(0,0,0,0.4); font-family: var(--font-family); }
   .modal h2 { margin:0 0 12px; font-size:24px; font-family: var(--font-family); }
   .modal p, .modal li { font-size:16px; line-height:1.5; font-family: var(--font-family); }
@@ -345,6 +356,40 @@
   
   /* Mobile responsive sizing for help modal stage progression elements */
   @media (max-width: 768px) {
+    /* Ensure modal is properly positioned on mobile with safe areas */
+    .help-modal {
+      max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 40px);
+      margin: max(env(safe-area-inset-top, 16px), 16px) max(env(safe-area-inset-left, 16px), 16px) max(env(safe-area-inset-bottom, 16px), 16px) max(env(safe-area-inset-right, 16px), 16px);
+      padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px)) 20px;
+    }
+    
+    /* Ensure modal title is always visible */
+    .help-modal h2 {
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      padding: 16px 0 12px 0;
+      margin: -20px -20px 12px -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      z-index: 10;
+      border-bottom: 1px solid #475569;
+    }
+    
+    /* Ensure close button is always visible */
+    .help-modal .actions {
+      position: sticky;
+      bottom: 0;
+      background: var(--panel);
+      padding: 16px 0 0 0;
+      margin: 18px -20px -20px -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      z-index: 10;
+      border-top: 1px solid #475569;
+    }
+    
     /* Make target blocks smaller in help modal */
     .help-modal .next-stage-block[style*="width: 120px"] {
       width: 60px !important;
@@ -397,11 +442,13 @@
   /* Enhanced Help Modal Styles */
   .help-modal { 
     width: min(900px, 95vw); 
-    max-height: 90vh; 
+    max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px); 
     overflow-y: auto; 
     /* Hide scrollbar while maintaining scroll functionality */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Ensure modal doesn't get cut off by mobile browser controls */
+    margin: max(env(safe-area-inset-top), 20px) max(env(safe-area-inset-left), 20px) max(env(safe-area-inset-bottom), 20px) max(env(safe-area-inset-right), 20px);
   }
   
   /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
@@ -2480,9 +2527,9 @@
 
   <div class="topbar">
     <div class="title-section">
-      <button id="addBtn" class="title-btn" title="New Game">+</button>
+      <button id="addBtn" class="title-btn" title="New Game">➕</button>
       <h1>Stack Merge</h1>
-      <button id="helpBtn" class="title-btn" title="How to play">?</button>
+      <button id="helpBtn" class="title-btn" title="How to play">❓</button>
     </div>
   </div>
 
@@ -5195,7 +5242,7 @@ function showGameOver(){
     }, 200);
   }
   
-  // Add glowing effect to the + button to guide user to start new game
+      // Add glowing effect to the ➕ button to guide user to start new game
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
     addBtn.classList.add('game-over-glow');
@@ -5220,7 +5267,7 @@ function resetGame(isFreshGame = true){
     gameOverButton.classList.remove('show');
   }
   
-  // Remove glowing effect from the + button
+      // Remove glowing effect from the ➕ button
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
     addBtn.classList.remove('game-over-glow');
