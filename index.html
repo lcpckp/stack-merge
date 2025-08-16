@@ -1107,6 +1107,75 @@
     display: none;
   }
 
+  /* Game Over Button Overlay */
+  .game-over-button-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(30, 41, 59, 0.95); /* Semi-transparent panel background */
+    backdrop-filter: blur(8px); /* Add subtle blur effect */
+    border: 2px solid rgba(255, 255, 255, 0.8); /* Semi-transparent white border */
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth easing curve for fade-in */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-width: 200px;
+  }
+
+  .game-over-button-overlay.hiding {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Fast transition for fade-out */
+  }
+
+  .game-over-button-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .game-over-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ef4444;
+    font-family: var(--font-family);
+    text-align: center;
+    margin: 0;
+  }
+
+  .new-game-btn {
+    background: #10B981;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+  }
+
+  .new-game-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .new-game-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
 /* Debug stats table styling */
 .debug-stats-table {
   width: 100%;
@@ -1893,6 +1962,37 @@
   background: #334155;
 }
 
+
+
+/* Hide next blocks section when game is over */
+.next.game-over-hidden {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Show new game button in place of next blocks */
+.new-game-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.new-game-container.show {
+  display: flex;
+}
+
+.new-game-container .label {
+  font-size: 18px;
+  opacity: 0.9;
+  font-family: var(--font-family);
+}
+
+.new-game-container .new-game-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+}
 </style>
 </head>
 <body>
@@ -1928,10 +2028,18 @@
       <div class="next-row" id="nextContainer" aria-live="polite"></div>
     </div>
     
+
+    
     <div class="gold-display">
       <div class="gold-label">Gold</div>
       <div class="gold-value" id="goldDisplay">0</div>
     </div>
+  </div>
+
+  <!-- Game Over Button Overlay -->
+  <div id="gameOverButton" class="game-over-button-overlay">
+    <div class="game-over-text">Game Over</div>
+    <button id="newGameBtn" class="new-game-btn">Try Again</button>
   </div>
 
   <div class="game-container">
@@ -2911,6 +3019,19 @@ trashButton.addEventListener('click', handleTrashButton);
 bombConversionBtnMobile.addEventListener('click', handleBombConversion);
 trashButtonMobile.addEventListener('click', handleTrashButton);
 
+// New game button event listeners
+const newGameBtnInline = document.getElementById('newGameBtnInline');
+
+if (newGameBtnInline) {
+  newGameBtnInline.addEventListener('click', resetGame);
+}
+
+// New game button event listener
+const newGameBtn = document.getElementById('newGameBtn');
+if (newGameBtn) {
+  newGameBtn.addEventListener('click', resetGame);
+}
+
 // Initialize button states
 updateBombConversionButtonState();
 updateTrashButtonState();
@@ -3751,14 +3872,44 @@ async function animateMergeCascade(index){
 function checkGameOver(){
   if (!hasAnyMove(nextQueue[0])){
     if (aiEnabled) toggleAI(false);
-    setTimeout(() => {
-      alert('Game over — Score: ' + score);
-      resetGame();
-    }, 10);
+    showGameOver();
   }
 }
 
+function showGameOver(){
+  // Show game over button overlay centered on screen with fade-in effect
+  const gameOverButton = document.getElementById('gameOverButton');
+  if (gameOverButton) {
+    // Small delay to make the fade-in more noticeable
+    setTimeout(() => {
+      gameOverButton.classList.add('show');
+    }, 200);
+  }
+  
+  // Disable pole interactions
+  const allPoles = Array.from(gameDiv.children);
+  allPoles.forEach(poleDiv => {
+    poleDiv.style.pointerEvents = 'none';
+    poleDiv.classList.add('no-hover');
+  });
+}
+
+
+
 function resetGame(){
+  // Hide game over button overlay with fast fade-out
+  const gameOverButton = document.getElementById('gameOverButton');
+  if (gameOverButton) {
+    // Add hiding class for fast transition, then remove show class
+    gameOverButton.classList.add('hiding');
+    gameOverButton.classList.remove('show');
+    
+    // Remove hiding class after animation completes
+    setTimeout(() => {
+      gameOverButton.classList.remove('hiding');
+    }, 300);
+  }
+  
   poles = [[],[],[],[]];
   score = 0;
   gold = 0; // Reset gold counter
@@ -4446,6 +4597,8 @@ if (probTestModal) {
     }
   });
 }
+
+
 
 // Add keyboard support for probability test modal
 window.addEventListener('keydown', (e) => {
