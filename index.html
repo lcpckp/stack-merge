@@ -2168,8 +2168,14 @@ function formatNumber(num) {
     return (num / 1000).toFixed(1) + 'k';
   } else if (num < 1000000000) {
     return (num / 1000000).toFixed(1) + 'm';
-  } else {
+  } else if (num < 1000000000000) {
     return (num / 1000000000).toFixed(1) + 'b';
+  } else if (num < 1000000000000000) {
+    return (num / 1000000000000).toFixed(1) + 't';
+  } else if (num < 1000000000000000000) {
+    return (num / 1000000000000000).toFixed(1) + 'q';
+  } else {
+    return (num / 1000000000000000000).toFixed(1) + 'Q';
   }
 }
 
@@ -2292,11 +2298,11 @@ function checkForNewStack() {
   currentStage++;
   // Double the target block size for the next unlock
   currentTargetBlockSize *= 2;
-  // Update the range of valid pieces to include the next incremental block
-  updateBlockRange();
+  // Don't call updateBlockRange() here - let the merge system handle block unlocking
   const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
   console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${stageMultiplier}x`);
   console.log(`Poles count remains at ${poles.length} (should always be 4)`);
+  console.log(`New target block size: ${currentTargetBlockSize} (need to merge to ${currentTargetBlockSize * 2} for next stage)`);
 }
 
 function checkForNewBlockSize(mergedSize) {
@@ -2304,6 +2310,15 @@ function checkForNewBlockSize(mergedSize) {
   // The merged size should be available as a droppable piece
   if (!weights.includes(mergedSize)) {
     weights.push(mergedSize);
+    
+    // Check if this was a stage-triggering block
+    if (mergedSize === currentTargetBlockSize * 2) {
+      // This was a stage progression block
+      console.log(`Stage progression block ${mergedSize} added to droppable pieces`);
+    } else {
+      // This was a regular merge unlock
+      console.log(`Regular block size ${mergedSize} unlocked`);
+    }
     
     // Implement a better probability distribution system
     // Lower tier blocks should remain more common, higher tiers progressively rarer
@@ -2412,21 +2427,7 @@ function validateProbabilityDistribution() {
   return true;
 }
 
-function updateBlockRange() {
-  // Add the next stage's target block size to the weights array
-  // This should be the current target block size, not double it
-  const nextBlockSize = currentTargetBlockSize;
-  
-  // Only add if it's not already in the weights array
-  if (!weights.includes(nextBlockSize)) {
-    weights.push(nextBlockSize);
-    
-    // Implement a better probability distribution system
-    updateProbabilityDistribution();
-    
-    console.log(`New stage: Added block size ${nextBlockSize} to available pieces`);
-  }
-}
+// updateBlockRange function removed - block unlocking now handled entirely by checkForNewBlockSize
 
 
 
@@ -3547,15 +3548,16 @@ async function animateMergeCascade(index){
       continue;
     }
     
-    // Check if this merge unlocks a new stack (stage progression)
-    if (newW === currentTargetBlockSize * 2){
-      // Stage progression: keep the merged block, clear the rest of the stack
-      await animateStageProgression(index, pairIndex - 1, newW);
-      // Check if we should add a new stack
-      checkForNewStack();
-      // after animation, pole has only the merged block; continue which will break
-      continue;
-    }
+      // Check if this merge unlocks a new stack (stage progression)
+  if (newW === currentTargetBlockSize * 2){
+    console.log(`Stage progression triggered! Merged to ${newW}, target was ${currentTargetBlockSize}`);
+    // Stage progression: keep the merged block, clear the rest of the stack
+    await animateStageProgression(index, pairIndex - 1, newW);
+    // Check if we should add a new stack
+    checkForNewStack();
+    // after animation, pole has only the merged block; continue which will break
+    continue;
+  }
 
     // Check if this merge unlocks a new block size for future drops
     checkForNewBlockSize(newW);
