@@ -19,7 +19,58 @@
   h1 { margin:0; font-size:36px; font-weight:700; text-align:center; font-family: var(--font-family); }
   
   /* Title section styling */
-  .title-section { display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .title-section { 
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    gap: 24px; 
+  }
+  
+  /* Title button styling */
+  .title-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid #475569;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    font-family: var(--font-family);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .title-btn:hover {
+    background: #334155;
+    border-color: #64748b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  }
+  
+  .title-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+  }
+  
+  /* Mobile responsive sizing for title buttons */
+  @media (max-width: 768px) {
+    .title-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    
+    .title-section {
+      gap: 16px;
+    }
+  }
   
 
   
@@ -276,6 +327,57 @@
   .modal p, .modal li { font-size:16px; line-height:1.5; font-family: var(--font-family); }
   .modal ul { margin:12px 0 0 24px; padding:0; }
   .modal .actions { display:flex; justify-content:flex-end; margin-top:18px; }
+  
+  /* Mobile responsive sizing for help modal stage progression elements */
+  @media (max-width: 768px) {
+    /* Make target blocks smaller in help modal */
+    .help-modal .next-stage-block[style*="width: 120px"] {
+      width: 60px !important;
+      height: 28px !important;
+      font-size: 14px !important;
+    }
+    
+    /* Make gold displays smaller in help modal */
+    .help-modal .gold-value[style*="padding: 10px 20px"] {
+      padding: 4px 8px !important;
+      font-size: 14px !important;
+      min-width: 40px !important;
+    }
+    
+    /* Make gold emojis smaller in help modal */
+    .help-modal .gold-emoji[style*="font-size: 28px"] {
+      font-size: 16px !important;
+      top: -6px !important;
+      left: -6px !important;
+    }
+    
+    /* Make gold text smaller in help modal */
+    .help-modal .gold-text[style*="font-size: 20px"] {
+      font-size: 14px !important;
+    }
+    
+    /* Make stage multiplier badges smaller in help modal */
+    .help-modal .stage-multiplier-badge[style*="font-size: 12px"] {
+      font-size: 8px !important;
+      padding: 1px 3px !important;
+      bottom: -8px !important;
+      min-width: 14px !important;
+    }
+    
+    /* Reduce gaps in help modal stage progression */
+    .help-modal .merge-example[style*="gap: 40px"] {
+      gap: 16px !important;
+    }
+    
+    .help-modal [style*="gap: 40px"] {
+      gap: 16px !important;
+    }
+    
+    /* Make the stage progression examples more compact on mobile */
+    .help-modal [style*="max-width: 600px"] {
+      max-width: 90vw !important;
+    }
+  }
 
   /* Enhanced Help Modal Styles */
   .help-modal { 
@@ -2018,7 +2120,9 @@
 
   <div class="topbar">
     <div class="title-section">
+      <button id="addBtn" class="title-btn" title="Add">+</button>
       <h1>Stack Merge</h1>
+      <button id="helpBtn" class="title-btn" title="How to play">?</button>
     </div>
   </div>
 
@@ -2107,7 +2211,6 @@
   </div>
   
   <div class="bottom-actions">
-    <button id="helpBtn" class="ai-btn" title="How to play">How to Play</button>
     <button id="debugBtn" class="ai-btn" title="Debug controls">⚙️</button>
   </div>
 
@@ -2212,7 +2315,8 @@
               <p>• Each additional block in a cascade of merges earns more gold.</p>
               <p>• Use gold to buy power-ups.</p>
               <p>• <strong>Warning! </strong>Power-ups double in cost each time they are used, so try to increase your gold multiplier as soon as possible.</p>
-              <p><strong>Power-ups:</strong></p>
+              
+              <p style="text-align: center;"><strong>Power-ups:</strong></p>
                             <div style="display: flex; gap: 80px; margin: 16px 0; justify-content: center;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                   <button class="bomb-conversion-btn" style="width: 60px; height: 60px; pointer-events: none;">
@@ -2273,7 +2377,7 @@
                     <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
                       <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
                       <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">15.5k</div>
-                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1.0e+5x</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">100x</div>
                     </div>
                   </div>
                 </div>
@@ -2291,7 +2395,7 @@
                     <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
                       <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
                       <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">555.5k</div>
-                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1.0e+6x</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1000x</div>
                     </div>
                   </div>
                 </div>
