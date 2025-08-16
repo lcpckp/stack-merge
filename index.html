@@ -2687,9 +2687,12 @@ function saveGameState() {
       bombConversionCost: bombConversionCost,
       trashButtonCost: trashButtonCost,
       bombConversionPresses: bombConversionPresses,
-      trashButtonPresses: trashButtonPresses
+      trashButtonPresses: trashButtonPresses,
+      bombSelected: bombSelected,
+      previousBombCost: previousBombCost
     });
     console.log('💾 Saving button costs - Bomb:', bombConversionCost, 'Trash:', trashButtonCost);
+    console.log('💾 Saving bomb state - Selected:', bombSelected, 'Previous Cost:', previousBombCost);
     
     const gameState = {
       poles: poles,
@@ -2705,6 +2708,8 @@ function saveGameState() {
       trashButtonCost: trashButtonCost,
       bombConversionPresses: bombConversionPresses,
       trashButtonPresses: trashButtonPresses,
+      bombSelected: bombSelected,
+      previousBombCost: previousBombCost,
       timestamp: Date.now()
     };
     
@@ -2894,9 +2899,9 @@ function restoreGameState(gameState) {
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
     
-    // Reset bomb selection state when loading (bombs should not persist across sessions)
-    bombSelected = false;
-    previousBombCost = bombConversionCost;
+    // Restore bomb selection state from saved state
+    bombSelected = gameState.bombSelected || false;
+    previousBombCost = gameState.previousBombCost || bombConversionCost;
     
     console.log('🔄 Restored button costs - Bomb:', oldBombCost, '→', bombConversionCost, 'Trash:', oldTrashCost, '→', trashButtonCost);
     
@@ -2909,6 +2914,8 @@ function restoreGameState(gameState) {
     console.log('- Next queue length:', nextQueue.length);
     console.log('- Bomb conversion cost:', bombConversionCost);
     console.log('- Trash button cost:', trashButtonCost);
+    console.log('- Bomb selected:', bombSelected);
+    console.log('- Previous bomb cost:', previousBombCost);
     
     // Update cost displays after restoring game state
     if (bombCostEl) {
@@ -2923,6 +2930,9 @@ function restoreGameState(gameState) {
     if (trashCostElMobile) {
       trashCostElMobile.textContent = formatNumber(trashButtonCost);
     }
+    
+    // Update button states to reflect restored bomb selection state
+    updateBombConversionButtonState();
     
     console.log('=== LOAD COMPLETE ===');
     return true;
@@ -3581,6 +3591,18 @@ function handleBombConversion() {
     return;
   }
   
+  // Check if the next block is already a bomb (either natural or from previous conversion)
+  if (currentBlock.bomb) {
+    // Show feedback that the block is already a bomb
+    bombConversionBtn.classList.add('pulse');
+    setTimeout(() => bombConversionBtn.classList.remove('pulse'), 300);
+    if (bombConversionBtnMobile) {
+      bombConversionBtnMobile.classList.add('pulse');
+      setTimeout(() => bombConversionBtnMobile.classList.remove('pulse'), 300);
+    }
+    return;
+  }
+  
   // Check if player has enough gold for new bomb conversion
   if (gold < bombConversionCost) {
     // Show feedback that they don't have enough gold
@@ -3718,20 +3740,33 @@ function updateBombConversionButtonState() {
       bombConversionBtn.title = "Press again to undo bomb selection";
       bombConversionBtn.querySelector('.emoji').textContent = "↩️";
     } else {
-      const hasEnoughGold = gold >= bombConversionCost;
-      bombConversionBtn.disabled = !hasEnoughGold;
+      // Check if the next block is already a bomb (either natural or from previous conversion)
+      const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
       
-      // Update visual styling based on affordability
-      // Red border (default): when gold < cost (disabled)
-      // White border (affordable): when gold >= cost (enabled)
-      if (hasEnoughGold) {
-        bombConversionBtn.classList.add('affordable');
-      } else {
+      if (nextBlockIsBomb) {
+        // Next block is already a bomb, disable the button
+        bombConversionBtn.disabled = true;
         bombConversionBtn.classList.remove('affordable');
+        bombConversionBtn.classList.remove('undo-mode');
+        bombConversionBtn.title = "Next block is already a bomb";
+        bombConversionBtn.querySelector('.emoji').textContent = "💣";
+      } else {
+        // Next block is not a bomb, check if player has enough gold
+        const hasEnoughGold = gold >= bombConversionCost;
+        bombConversionBtn.disabled = !hasEnoughGold;
+        
+        // Update visual styling based on affordability
+        // Red border (default): when gold < cost (disabled)
+        // White border (affordable): when gold >= cost (enabled)
+        if (hasEnoughGold) {
+          bombConversionBtn.classList.add('affordable');
+        } else {
+          bombConversionBtn.classList.remove('affordable');
+        }
+        bombConversionBtn.classList.remove('undo-mode');
+        bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+        bombConversionBtn.querySelector('.emoji').textContent = "💣";
       }
-      bombConversionBtn.classList.remove('undo-mode');
-      bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
-      bombConversionBtn.querySelector('.emoji').textContent = "💣";
     }
     
     // Update the tracked gold amount
@@ -3748,17 +3783,30 @@ function updateBombConversionButtonState() {
       bombConversionBtnMobile.title = "Press again to undo bomb selection";
       bombConversionBtnMobile.querySelector('.emoji').textContent = "↩️";
     } else {
-      const hasEnoughGold = gold >= bombConversionCost;
-      bombConversionBtnMobile.disabled = !hasEnoughGold;
+      // Check if the next block is already a bomb (either natural or from previous conversion)
+      const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
       
-      if (hasEnoughGold) {
-        bombConversionBtnMobile.classList.add('affordable');
-      } else {
+      if (nextBlockIsBomb) {
+        // Next block is already a bomb, disable the button
+        bombConversionBtnMobile.disabled = true;
         bombConversionBtnMobile.classList.remove('affordable');
+        bombConversionBtnMobile.classList.remove('undo-mode');
+        bombConversionBtnMobile.title = "Next block is already a bomb";
+        bombConversionBtnMobile.querySelector('.emoji').textContent = "💣";
+      } else {
+        // Next block is not a bomb, check if player has enough gold
+        const hasEnoughGold = gold >= bombConversionCost;
+        bombConversionBtnMobile.disabled = !hasEnoughGold;
+        
+        if (hasEnoughGold) {
+          bombConversionBtnMobile.classList.add('affordable');
+        } else {
+          bombConversionBtnMobile.classList.remove('affordable');
+        }
+        bombConversionBtnMobile.classList.remove('undo-mode');
+        bombConversionBtnMobile.title = "Convert next block to bomb (press again to undo)";
+        bombConversionBtnMobile.querySelector('.emoji').textContent = "💣";
       }
-      bombConversionBtnMobile.classList.remove('undo-mode');
-      bombConversionBtnMobile.title = "Convert next block to bomb (press again to undo)";
-      bombConversionBtnMobile.querySelector('.emoji').textContent = "💣";
     }
   }
 }
