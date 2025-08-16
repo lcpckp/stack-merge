@@ -532,7 +532,17 @@
   }
   
   .merge-block.block-128 { 
+    background: #e86758; 
+    color: #fff; 
+  }
+  
+  .merge-block.block-256 { 
     background: #F59E0B; 
+    color: #fff; 
+  }
+  
+  .merge-block.block-512 { 
+    background: #ea580c; 
     color: #fff; 
   }
   
@@ -850,10 +860,26 @@
     justify-content: center; 
     font-weight: 600; 
     font-size: 24px; 
-    background: #DC2626; 
+    background: #dc2626; 
     color: white; 
     box-shadow: 0 3px 0 rgba(0,0,0,0.25); 
     font-family: var(--font-family);
+  }
+  
+  /* Target block colors for different values */
+  .next-stage-block[data-value="1024"] { 
+    background: #dc2626; 
+    color: white; 
+  }
+  
+  .next-stage-block[data-value="2048"] { 
+    background: #9d174d; 
+    color: white; 
+  }
+  
+  .next-stage-block[data-value="4096"] { 
+    background: #000; 
+    color: white; 
   }
   .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
   .pole:hover { border: 3px solid #0ea5e9; }
@@ -1211,11 +1237,50 @@
   .block-item[data-value="16"] { background: #581C87; color: #fff; }
   .block-item[data-value="32"] { background: #D946EF; color: #fff; }
   .block-item[data-value="64"] { background: #EC4899; color: #fff; }
-  .block-item[data-value="128"] { background: #F59E0B; color: #fff; }
-  .block-item[data-value="256"] { background: #e86758; color: #fff; }
-  .block-item[data-value="512"] { background: #dc2626; color: #fff; }
-  .block-item[data-value="1024"] { background: #7c2d12; color: #fff; }
-  .block-item[data-value="2048"] { background: #000; color: #fff; }
+  .block-item[data-value="128"] { background: #e86758; color: #fff; }
+  .block-item[data-value="256"] { background: #F59E0B; color: #fff; }
+  .block-item[data-value="512"] { background: #ea580c; color: #fff; }
+  .block-item[data-value="1024"] { background: #dc2626; color: #fff; }
+  .block-item[data-value="2048"] { background: #9d174d; color: #fff; }
+  .block-item[data-value="4096"] { background: #000; color: #fff; }
+  .block-item[data-value="8192"] { background: #64748b; color: #fff; }
+  .block-item[data-value="16384"] { background: #fff; color: #000; }
+  
+  /* Dynamic gold glow effect for white blocks (16384+) in the game */
+  .disc.white-block-glow {
+    --glow-intensity: 1;
+    --glow-spread: 8px;
+    --glow-opacity: 0.6;
+    --border-width: 2px;
+    --border-opacity: 0.8;
+    --inset-opacity: 0.1;
+    
+    box-shadow: 
+      0 0 calc(var(--glow-spread) * 1) rgba(245, 215, 110, var(--glow-opacity)),
+      0 0 calc(var(--glow-spread) * 2) rgba(245, 215, 110, calc(var(--glow-opacity) * 0.67)),
+      0 0 calc(var(--glow-spread) * 3) rgba(245, 215, 110, calc(var(--glow-opacity) * 0.33)),
+      0 0 calc(var(--glow-spread) * 4) rgba(245, 215, 110, calc(var(--glow-opacity) * 0.17)),
+      inset 0 0 calc(var(--glow-spread) * 1) rgba(245, 215, 110, var(--inset-opacity));
+    border: var(--border-width) solid rgba(245, 215, 110, var(--border-opacity));
+  }
+  
+  .block-item.no-block {
+    background: #64748b;
+    color: #fff;
+    border: 2px solid #94a3b8;
+    font-weight: 600;
+  }
+  
+  .block-item.no-block:hover {
+    background: #475569;
+    border-color: #cbd5e1;
+  }
+  
+  .block-item.no-block.selected {
+    background: #475569;
+    border-color: #e2e8f0;
+    outline: 3px solid #e2e8f0;
+  }
   
   .selected-block-info {
     text-align: center;
@@ -2324,7 +2389,7 @@
       <div class="next-stage-display">
         <div class="next-stage-label">Next Stage</div>
         <div class="next-stage-indicator">
-          <div class="next-stage-block" id="targetBlock">1024</div>
+          <div class="next-stage-block" id="targetBlock" data-value="1024">1024</div>
         </div>
       </div>
     </div>
@@ -2516,7 +2581,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div class="next-stage-display" style="margin: 0; justify-self: end;">
                     <div class="next-stage-indicator">
-                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">1024</div>
+                      <div class="next-stage-block" data-value="1024" style="width: 120px; height: 50px; font-size: 24px;">1024</div>
                     </div>
                   </div>
                   
@@ -2534,7 +2599,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div class="next-stage-display" style="margin: 0; justify-self: end;">
                     <div class="next-stage-indicator">
-                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">2048</div>
+                      <div class="next-stage-block" data-value="2048" style="width: 120px; height: 50px; font-size: 24px;">2048</div>
                     </div>
                   </div>
                   
@@ -2552,7 +2617,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div class="next-stage-display" style="margin: 0; justify-self: end;">
                     <div class="next-stage-indicator">
-                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">4096</div>
+                      <div class="next-stage-block" data-value="4096" style="width: 120px; height: 50px; font-size: 24px;">4096</div>
                     </div>
                   </div>
                   
@@ -2607,6 +2672,7 @@
           <div class="value-display" id="bombStatus">No</div>
         </div>
         <div class="block-grid">
+          <div class="block-item no-block" data-value="none">No Block</div>
           <div class="block-item" data-value="1">1</div>
           <div class="block-item" data-value="2">2</div>
           <div class="block-item" data-value="4">4</div>
@@ -2619,9 +2685,12 @@
           <div class="block-item" data-value="512">512</div>
           <div class="block-item" data-value="1024">1024</div>
           <div class="block-item" data-value="2048">2048</div>
+          <div class="block-item" data-value="4096">4096</div>
+          <div class="block-item" data-value="8192">8192</div>
+          <div class="block-item" data-value="16384">16.4k</div>
         </div>
         <div class="selected-block-info">
-          Next block: <span id="nextBlockValue">1</span>
+          Next block: <span id="nextBlockValue">Queue</span>
         </div>
       </div>
     </div>
@@ -3889,7 +3958,7 @@ let debugAiToggle = null;
 let debugSpeedSlider = null;
 let debugSpeedLabel = null;
 let customBlockMode = false;
-let customBlockSize = 1;
+let customBlockSize = null;
 let customBlockBomb = false;
 
 // DOM refs
@@ -4222,17 +4291,26 @@ document.querySelectorAll('.block-item').forEach(blockItem => {
     // Select this block
     blockItem.classList.add('selected');
     
-    // Update the custom block size
-    const value = parseInt(blockItem.dataset.value);
-    customBlockSize = value;
-    
-    // Update the display
-    document.getElementById('nextBlockValue').textContent = value;
-    
-    // Enable custom block mode
-    customBlockMode = true;
-    
-    console.log(`Selected block: ${value}`);
+    // Check if "No Block" is selected
+    if (blockItem.dataset.value === 'none') {
+      customBlockSize = null;
+      customBlockMode = false;
+      document.getElementById('nextBlockValue').textContent = 'Queue';
+      console.log('No block selected - using queue');
+    } else {
+      // Update the custom block size
+      const value = parseInt(blockItem.dataset.value);
+      customBlockSize = value;
+      
+      // Update the display with number formatting for large values
+      const displayValue = value >= 100000 ? formatNumber(value) : value;
+      document.getElementById('nextBlockValue').textContent = displayValue;
+      
+      // Enable custom block mode
+      customBlockMode = true;
+      
+      console.log(`Selected block: ${value}`);
+    }
   });
 });
 
@@ -4304,9 +4382,14 @@ function colorFor(w){
     '#581C87', // violet-800 - value 16 (dark purple)
     '#D946EF', // fuchsia-500 - value 32 (bright fuchsia - clearly different from 16)
     '#EC4899', // pink-500 - value 64 (hot pink)
-    '#F59E0B', // amber-500 - value 128 (bright amber)
-    '#e86758', // red-500 - value 256 (intense red)
-    '#DC2626'  // red-600 - value 512 (deepest red)
+    '#e86758', // red-500 - value 128 (intense red)
+    '#F59E0B', // amber-500 - value 256 (bright amber)
+    '#ea580c', // orange-600 - value 512 (vibrant orange)
+    '#dc2626', // red-600 - value 1024 (bright red)
+    '#9d174d', // rose-700 - value 2048 (darker magenta)
+    '#000',    // black - value 4096
+    '#64748b', // gray - value 8192
+    '#fff'     // white - value 16384
   ];
   
   const log2w = Math.log2(w);
@@ -4316,14 +4399,17 @@ function colorFor(w){
 
 function labelForPiece(piece){
   if (piece && piece.bomb) {
-    return `<div class="bomb-content"><div class="bomb-emoji">💣</div><div class="bomb-text">${piece.w}</div></div>`;
+    // Format bomb text for large numbers (6+ digits)
+    const displayValue = piece.w >= 100000 ? formatNumber(piece.w) : piece.w;
+    return `<div class="bomb-content"><div class="bomb-emoji">💣</div><div class="bomb-text">${displayValue}</div></div>`;
   }
-  return String(piece.w);
+  // Format regular block text for large numbers (6+ digits)
+  return piece.w >= 100000 ? formatNumber(piece.w) : String(piece.w);
 }
 
 function getTextColorFor(w){
-  // Return black text for lime green block (value 1), white for others
-  return w === 1 ? '#000000' : '#ffffff';
+  // Return black text for lime green block (value 1) and blocks >= 16384, white for others
+  return (w === 1 || w >= 16384) ? '#000000' : '#ffffff';
 }
 
 function render(){
@@ -4381,6 +4467,25 @@ function render(){
       }
       d.style.background = p.bomb ? '#000' : colorFor(p.w);
       d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+      
+      // Add dynamic gold glow effect for white blocks (16384+)
+      if (!p.bomb && p.w >= 16384) {
+        d.classList.add('white-block-glow');
+        
+        // Calculate glow intensity based on block value
+        const log2Value = Math.log2(p.w);
+        const baseLog2 = Math.log2(16384); // 14
+        const intensityMultiplier = Math.max(1, (log2Value - baseLog2 + 1) * 0.5);
+        
+        // Set CSS custom properties for dynamic glow
+        d.style.setProperty('--glow-intensity', intensityMultiplier.toString());
+        d.style.setProperty('--glow-spread', Math.max(8, 8 * intensityMultiplier) + 'px');
+        d.style.setProperty('--glow-opacity', Math.min(1, 0.6 * intensityMultiplier).toString());
+        d.style.setProperty('--border-width', Math.max(2, 2 * intensityMultiplier) + 'px');
+        d.style.setProperty('--border-opacity', Math.min(1, 0.8 * intensityMultiplier).toString());
+        d.style.setProperty('--inset-opacity', Math.min(1, 0.1 * intensityMultiplier).toString());
+      }
+      
       poleDiv.appendChild(d);
     });
     
@@ -4479,6 +4584,25 @@ function renderNext(){
     }
     d.style.background = p.bomb ? '#000' : colorFor(p.w);
     d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+    
+    // Add dynamic gold glow effect for white blocks (16384+)
+    if (!p.bomb && p.w >= 16384) {
+      d.classList.add('white-block-glow');
+      
+      // Calculate glow intensity based on block value
+      const log2Value = Math.log2(p.w);
+      const baseLog2 = Math.log2(16384); // 14
+      const intensityMultiplier = Math.max(1, (log2Value - baseLog2 + 1) * 0.5);
+      
+      // Set CSS custom properties for dynamic glow
+      d.style.setProperty('--glow-intensity', intensityMultiplier.toString());
+      d.style.setProperty('--glow-spread', Math.max(8, 8 * intensityMultiplier) + 'px');
+      d.style.setProperty('--glow-opacity', Math.min(1, 0.6 * intensityMultiplier).toString());
+      d.style.setProperty('--border-width', Math.max(2, 2 * intensityMultiplier) + 'px');
+      d.style.setProperty('--border-opacity', Math.min(1, 0.8 * intensityMultiplier).toString());
+      d.style.setProperty('--inset-opacity', Math.min(1, 0.1 * intensityMultiplier).toString());
+    }
+    
     nextContainer.appendChild(d);
     
     // Apply current animation speed to the new next disc
@@ -4505,10 +4629,10 @@ function placeOnPole(idx){
   // Check if custom block mode is active AND debug pane is open
   let nextPiece;
   let wasCustomBlock = false;
-  if (customBlockMode && debugPane && debugPane.classList.contains('show')) {
+  if (customBlockMode && customBlockSize && debugPane && debugPane.classList.contains('show')) {
     nextPiece = { w: customBlockSize, bomb: customBlockBomb };
     wasCustomBlock = true;
-    // Custom block mode only works when debug pane is visible
+    // Custom block mode only works when debug pane is visible and a block is selected
   } else {
     nextPiece = nextQueue[0];
   }
@@ -4538,6 +4662,24 @@ function placeOnPole(idx){
   }
   animDisc.style.background = nextPiece.bomb ? '#000' : colorFor(nextPiece.w);
   animDisc.style.color = nextPiece.bomb ? '#fff' : getTextColorFor(nextPiece.w);
+  
+  // Add dynamic gold glow effect for white blocks (16384+)
+  if (!nextPiece.bomb && nextPiece.w >= 16384) {
+    animDisc.classList.add('white-block-glow');
+    
+    // Calculate glow intensity based on block value
+    const log2Value = Math.log2(nextPiece.w);
+    const baseLog2 = Math.log2(16384); // 14
+    const intensityMultiplier = Math.max(1, (log2Value - baseLog2 + 1) * 0.5);
+    
+    // Set CSS custom properties for dynamic glow
+    animDisc.style.setProperty('--glow-intensity', intensityMultiplier.toString());
+    animDisc.style.setProperty('--glow-spread', Math.max(8, 8 * intensityMultiplier) + 'px');
+    animDisc.style.setProperty('--glow-opacity', Math.min(1, 0.6 * intensityMultiplier).toString());
+    animDisc.style.setProperty('--border-width', Math.max(2, 2 * intensityMultiplier) + 'px');
+    animDisc.style.setProperty('--border-opacity', Math.min(1, 0.8 * intensityMultiplier).toString());
+    animDisc.style.setProperty('--inset-opacity', Math.min(1, 0.1 * intensityMultiplier).toString());
+  }
   
   // Apply current animation speed to the animated disc
   animDisc.style.setProperty('--animation-speed', document.documentElement.style.getPropertyValue('--animation-speed'));
@@ -5457,12 +5599,13 @@ ensureCorrectPoleCount();
 
 // Initialize debug pane - Block grid interface
 document.addEventListener('DOMContentLoaded', () => {
-  // Set initial selection to block 1
-  const firstBlock = document.querySelector('.block-item[data-value="1"]');
-  if (firstBlock) {
-    firstBlock.classList.add('selected');
-    customBlockSize = 1;
-    customBlockMode = true;
+  // Set initial selection to "No Block" option
+  const noBlockOption = document.querySelector('.block-item[data-value="none"]');
+  if (noBlockOption) {
+    noBlockOption.classList.add('selected');
+    customBlockSize = null;
+    customBlockMode = false;
+    document.getElementById('nextBlockValue').textContent = 'Queue';
   }
 });
 
