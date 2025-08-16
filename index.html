@@ -860,26 +860,166 @@
     justify-content: center; 
     font-weight: 600; 
     font-size: 24px; 
-    background: #dc2626; 
+    background: #6b7280; /* Default neutral gray */
     color: white; 
     box-shadow: 0 3px 0 rgba(0,0,0,0.25); 
     font-family: var(--font-family);
   }
   
-  /* Target block colors for different values */
-  .next-stage-block[data-value="1024"] { 
-    background: #dc2626; 
-    color: white; 
+  /* Target block colors for different values - using the same color scheme as blocks */
+  .next-stage-block[data-value="1"] { background: #cfef08; color: #000; }
+  .next-stage-block[data-value="2"] { background: #10B981; color: #fff; }
+  .next-stage-block[data-value="4"] { background: #2563EB; color: #fff; }
+  .next-stage-block[data-value="8"] { background: #7C3AED; color: #fff; }
+  .next-stage-block[data-value="16"] { background: #581C87; color: #fff; }
+  .next-stage-block[data-value="32"] { background: #D946EF; color: #fff; }
+  .next-stage-block[data-value="64"] { background: #EC4899; color: #fff; }
+  .next-stage-block[data-value="128"] { background: #e86758; color: #fff; }
+  .next-stage-block[data-value="256"] { background: #F59E0B; color: #fff; }
+  .next-stage-block[data-value="512"] { background: #ea580c; color: #fff; }
+  .next-stage-block[data-value="1024"] { background: #dc2626; color: #fff; }
+  .next-stage-block[data-value="2048"] { background: #9d174d; color: #fff; }
+  .next-stage-block[data-value="4096"] { background: #000; color: #fff; }
+  .next-stage-block[data-value="8192"] { background: #64748b; color: #fff; }
+  .next-stage-block[data-value="16384"] { background: #fff; color: #000; }
+  /* For values above 16384, use white background with black text (same as game blocks) */
+  .next-stage-block[data-value^="32768"],
+  .next-stage-block[data-value^="65536"],
+  .next-stage-block[data-value^="131072"],
+  .next-stage-block[data-value^="262144"],
+  .next-stage-block[data-value^="524288"],
+  .next-stage-block[data-value^="1048576"],
+  .next-stage-block[data-value^="2097152"],
+  .next-stage-block[data-value^="4194304"],
+  .next-stage-block[data-value^="8388608"],
+  .next-stage-block[data-value^="16777216"],
+  .next-stage-block[data-value^="33554432"],
+  .next-stage-block[data-value^="67108864"],
+  .next-stage-block[data-value^="134217728"],
+  .next-stage-block[data-value^="268435456"],
+  .next-stage-block[data-value^="536870912"],
+  .next-stage-block[data-value^="1073741824"],
+  .next-stage-block[data-value^="2147483648"],
+  .next-stage-block[data-value^="4294967296"],
+  .next-stage-block[data-value^="8589934592"],
+  .next-stage-block[data-value^="17179869184"],
+  .next-stage-block[data-value^="34359738368"],
+  .next-stage-block[data-value^="68719476736"],
+  .next-stage-block[data-value^="137438953472"],
+  .next-stage-block[data-value^="274877906944"],
+  .next-stage-block[data-value^="549755813888"],
+  .next-stage-block[data-value^="1099511627776"],
+  .next-stage-block[data-value^="2199023255552"],
+  .next-stage-block[data-value^="4398046511104"],
+  .next-stage-block[data-value^="8796093022208"],
+  .next-stage-block[data-value^="17592186044416"],
+  .next-stage-block[data-value^="35184372088832"],
+  .next-stage-block[data-value^="70368744177664"],
+  .next-stage-block[data-value^="140737488355328"],
+  .next-stage-block[data-value^="281474976710656"],
+  .next-stage-block[data-value^="562949953421312"],
+  .next-stage-block[data-value^="1125899906842624"],
+  .next-stage-block[data-value^="2251799813685248"],
+  .next-stage-block[data-value^="4503599627370496"],
+  .next-stage-block[data-value^="9007199254740992"],
+  .next-stage-block[data-value^="18014398509481984"],
+  .next-stage-block[data-value^="36028797018963968"],
+  .next-stage-block[data-value^="72057594037927936"],
+  .next-stage-block[data-value^="144115188075855872"],
+  .next-stage-block[data-value^="288230376151711744"],
+  .next-stage-block[data-value^="576460752303423488"],
+  .next-stage-block[data-value^="1152921504606846976"],
+  .next-stage-block[data-value^="2305843009213693952"],
+  .next-stage-block[data-value^="4611686018427387904"],
+  .next-stage-block[data-value^="9223372036854775808"] {
+    background: #fff;
+    color: #000;
   }
   
-  .next-stage-block[data-value="2048"] { 
-    background: #9d174d; 
-    color: white; 
+  /* Next block display styling in debug panel */
+  .next-block-display {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 40px;
+    text-align: center;
+    background: #6b7280; /* Default gray for "Queue" */
+    color: white;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
   }
   
-  .next-stage-block[data-value="4096"] { 
-    background: #000; 
-    color: white; 
+  /* Apply block colors based on data attributes */
+  .next-block-display[data-value="1"] { background: #cfef08; color: #000; }
+  .next-block-display[data-value="2"] { background: #10B981; color: #fff; }
+  .next-block-display[data-value="4"] { background: #2563EB; color: #fff; }
+  .next-block-display[data-value="8"] { background: #7C3AED; color: #fff; }
+  .next-block-display[data-value="16"] { background: #581C87; color: #fff; }
+  .next-block-display[data-value="32"] { background: #D946EF; color: #fff; }
+  .next-block-display[data-value="64"] { background: #EC4899; color: #fff; }
+  .next-block-display[data-value="128"] { background: #e86758; color: #fff; }
+  .next-block-display[data-value="256"] { background: #F59E0B; color: #fff; }
+  .next-block-display[data-value="512"] { background: #ea580c; color: #fff; }
+  .next-block-display[data-value="1024"] { background: #dc2626; color: #fff; }
+  .next-block-display[data-value="2048"] { background: #9d174d; color: #fff; }
+  .next-block-display[data-value="4096"] { background: #000; color: #fff; }
+  .next-block-display[data-value="8192"] { background: #64748b; color: #fff; }
+  .next-block-display[data-value="16384"] { background: #fff; color: #000; }
+  /* For values above 16384, use white background with black text (same as game blocks) */
+  .next-block-display[data-value^="32768"],
+  .next-block-display[data-value^="65536"],
+  .next-block-display[data-value^="131072"],
+  .next-block-display[data-value^="262144"],
+  .next-block-display[data-value^="524288"],
+  .next-block-display[data-value^="1048576"],
+  .next-block-display[data-value^="2097152"],
+  .next-block-display[data-value^="4194304"],
+  .next-block-display[data-value^="8388608"],
+  .next-block-display[data-value^="16777216"],
+  .next-block-display[data-value^="33554432"],
+  .next-block-display[data-value^="67108864"],
+  .next-block-display[data-value^="134217728"],
+  .next-block-display[data-value^="268435456"],
+  .next-block-display[data-value^="536870912"],
+  .next-block-display[data-value^="1073741824"],
+  .next-block-display[data-value^="2147483648"],
+  .next-block-display[data-value^="4294967296"],
+  .next-block-display[data-value^="8589934592"],
+  .next-block-display[data-value^="17179869184"],
+  .next-block-display[data-value^="34359738368"],
+  .next-block-display[data-value^="68719476736"],
+  .next-block-display[data-value^="137438953472"],
+  .next-block-display[data-value^="274877906944"],
+  .next-block-display[data-value^="549755813888"],
+  .next-block-display[data-value^="1099511627776"],
+  .next-block-display[data-value^="2199023255552"],
+  .next-block-display[data-value^="4398046511104"],
+  .next-block-display[data-value^="8796093022208"],
+  .next-block-display[data-value^="17592186044416"],
+  .next-block-display[data-value^="35184372088832"],
+  .next-block-display[data-value^="70368744177664"],
+  .next-block-display[data-value^="140737488355328"],
+  .next-block-display[data-value^="281474976710656"],
+  .next-block-display[data-value^="562949953421312"],
+  .next-block-display[data-value^="1125899906842624"],
+  .next-block-display[data-value^="2251799813685248"],
+  .next-block-display[data-value^="4503599627370496"],
+  .next-block-display[data-value^="9007199254740992"],
+  .next-block-display[data-value^="18014398509481984"],
+  .next-block-display[data-value^="36028797018963968"],
+  .next-block-display[data-value^="72057594037927936"],
+  .next-block-display[data-value^="144115188075855872"],
+  .next-block-display[data-value^="288230376151711744"],
+  .next-block-display[data-value^="576460752303423488"],
+  .next-block-display[data-value^="1152921504606846976"],
+  .next-block-display[data-value^="2305843009213693952"],
+  .next-block-display[data-value^="4611686018427387904"],
+  .next-block-display[data-value^="9223372036854775808"] {
+    background: #fff;
+    color: #000;
   }
   .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
   .pole:hover { border: 3px solid #0ea5e9; }
@@ -2690,7 +2830,7 @@
           <div class="block-item" data-value="16384">16.4k</div>
         </div>
         <div class="selected-block-info">
-          Next block: <span id="nextBlockValue">Queue</span>
+          Next block: <span id="nextBlockValue" class="next-block-display">Queue</span>
         </div>
       </div>
     </div>
@@ -4241,6 +4381,14 @@ function closeDebugPane(){
   debugPane.classList.remove('show'); 
   // Reset custom block mode when debug pane is closed
   customBlockMode = false;
+  
+  // Reset next block display to show "Queue" when debug pane is closed
+  const nextBlockElement = document.getElementById('nextBlockValue');
+  if (nextBlockElement) {
+    nextBlockElement.textContent = 'Queue';
+    nextBlockElement.removeAttribute('data-value');
+  }
+  
   console.log('Debug pane closed, custom block mode disabled');
 }
 debugClose.addEventListener('click', closeDebugPane);
@@ -4295,7 +4443,9 @@ document.querySelectorAll('.block-item').forEach(blockItem => {
     if (blockItem.dataset.value === 'none') {
       customBlockSize = null;
       customBlockMode = false;
-      document.getElementById('nextBlockValue').textContent = 'Queue';
+      const nextBlockElement = document.getElementById('nextBlockValue');
+      nextBlockElement.textContent = 'Queue';
+      nextBlockElement.removeAttribute('data-value');
       console.log('No block selected - using queue');
     } else {
       // Update the custom block size
@@ -4304,7 +4454,9 @@ document.querySelectorAll('.block-item').forEach(blockItem => {
       
       // Update the display with number formatting for large values
       const displayValue = value >= 100000 ? formatNumber(value) : value;
-      document.getElementById('nextBlockValue').textContent = displayValue;
+      const nextBlockElement = document.getElementById('nextBlockValue');
+      nextBlockElement.textContent = displayValue;
+      nextBlockElement.setAttribute('data-value', value);
       
       // Enable custom block mode
       customBlockMode = true;
@@ -4564,7 +4716,9 @@ function render(){
   const targetBlockEl = document.getElementById('targetBlock');
   if (targetBlockEl) {
     // Show the target block size (what you get after merging)
-    targetBlockEl.textContent = currentTargetBlockSize * 2;
+    const targetValue = currentTargetBlockSize * 2;
+    targetBlockEl.textContent = targetValue;
+    targetBlockEl.setAttribute('data-value', targetValue);
   }
   
   updateDebugPane();
@@ -5128,6 +5282,13 @@ function resetGame(isFreshGame = true){
   // Reset custom block mode
   customBlockMode = false;
   
+  // Reset next block display to show "Queue"
+  const nextBlockElement = document.getElementById('nextBlockValue');
+  if (nextBlockElement) {
+    nextBlockElement.textContent = 'Queue';
+    nextBlockElement.removeAttribute('data-value');
+  }
+  
   // Reset speed to default (Medium)
   currentSpeed = 2;
   updateAnimationSpeed();
@@ -5605,7 +5766,25 @@ document.addEventListener('DOMContentLoaded', () => {
     noBlockOption.classList.add('selected');
     customBlockSize = null;
     customBlockMode = false;
-    document.getElementById('nextBlockValue').textContent = 'Queue';
+    const nextBlockElement = document.getElementById('nextBlockValue');
+    nextBlockElement.textContent = 'Queue';
+    nextBlockElement.removeAttribute('data-value');
+  }
+  
+  // Initialize the target block display with proper styling
+  const targetBlockEl = document.getElementById('targetBlock');
+  if (targetBlockEl) {
+    const targetValue = currentTargetBlockSize * 2;
+    targetBlockEl.textContent = targetValue;
+    targetBlockEl.setAttribute('data-value', targetValue);
+  }
+  
+  // Initial render to set up the game display
+  if (typeof render === 'function') {
+    render();
+  }
+  if (typeof renderNext === 'function') {
+    renderNext();
   }
 });
 
