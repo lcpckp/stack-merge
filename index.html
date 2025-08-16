@@ -2637,6 +2637,7 @@ function saveGameState() {
       bombConversionPresses: bombConversionPresses,
       trashButtonPresses: trashButtonPresses
     });
+    console.log('💾 Saving button costs - Bomb:', bombConversionCost, 'Trash:', trashButtonCost);
     
     const gameState = {
       poles: poles,
@@ -2832,10 +2833,16 @@ function restoreGameState(gameState) {
     weights = gameState.weights || [1, 2];
     probabilities = gameState.probabilities || [0.5, 0.5];
     nextQueue = gameState.nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+    
+    // Restore button costs from saved state
+    const oldBombCost = bombConversionCost;
+    const oldTrashCost = trashButtonCost;
     bombConversionCost = gameState.bombConversionCost || 50;
     trashButtonCost = gameState.trashButtonCost || 25;
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
+    
+    console.log('🔄 Restored button costs - Bomb:', oldBombCost, '→', bombConversionCost, 'Trash:', oldTrashCost, '→', trashButtonCost);
     
     console.log('Game state restored:');
     console.log('- Poles changed from', oldPoles.length, 'to', poles.length);
@@ -2844,6 +2851,22 @@ function restoreGameState(gameState) {
     console.log('- Current stage:', currentStage);
     console.log('- Weights:', weights);
     console.log('- Next queue length:', nextQueue.length);
+    console.log('- Bomb conversion cost:', bombConversionCost);
+    console.log('- Trash button cost:', trashButtonCost);
+    
+    // Update cost displays after restoring game state
+    if (bombCostEl) {
+      bombCostEl.textContent = formatNumber(bombConversionCost);
+    }
+    if (trashCostEl) {
+      trashCostEl.textContent = formatNumber(trashButtonCost);
+    }
+    if (bombCostElMobile) {
+      bombCostElMobile.textContent = formatNumber(bombConversionCost);
+    }
+    if (trashCostElMobile) {
+      trashCostElMobile.textContent = formatNumber(trashButtonCost);
+    }
     
     console.log('=== LOAD COMPLETE ===');
     return true;
@@ -3251,7 +3274,7 @@ document.addEventListener('keydown', (e) => {
       poleDiv.classList.remove('no-hover');
     });
     
-    resetGame();
+    resetGame(true);
   }
 });
 
@@ -3489,10 +3512,6 @@ function handleBombConversion() {
       }, 300);
     }
     
-    // Save game state after bomb conversion
-    console.log('🔄 Triggering save after bomb conversion...');
-    saveGameState();
-    
     // Re-render to show the bomb
     renderNext();
     
@@ -3513,6 +3532,10 @@ function handleBombConversion() {
     
     // Update button state (cost changed, so force update)
     updateBombConversionButtonState();
+    
+    // Save game state after bomb conversion and cost increase
+    console.log('🔄 Triggering save after bomb conversion and cost increase...');
+    saveGameState();
   }
 }
 
@@ -3576,8 +3599,8 @@ function handleTrashButton() {
   // Update button state (cost changed, so force update)
   updateTrashButtonState();
   
-  // Save game state after using trash button
-  console.log('🔄 Triggering save after using trash button...');
+  // Save game state after using trash button and cost increase
+  console.log('🔄 Triggering save after using trash button and cost increase...');
   saveGameState();
 }
 
@@ -3997,7 +4020,7 @@ function closeNewGameModal() {
 
 function handleNewGameConfirmation() {
   closeNewGameModal();
-  resetGame();
+  resetGame(true);
 }
 
 function handleNewGameCancel() {
@@ -4716,7 +4739,7 @@ function showGameOver(){
 
 
 
-function resetGame(){
+function resetGame(isFreshGame = true){
   // Hide game over button overlay
   const gameOverButton = document.getElementById('gameOverButton');
   if (gameOverButton) {
@@ -4737,27 +4760,32 @@ function resetGame(){
   currentStackCapacity = MAX_HEIGHT; // Reset stack capacity
   currentStage = 1; // Reset stage counter
   
-  // Reset bomb conversion button state
-  bombConversionCost = 50;
-  bombConversionPresses = 0;
-  lastGoldAmount = 0; // Reset tracked gold amount to force button state update
+  // Only reset button costs if this is a fresh game (not a UI reset)
+  if (isFreshGame) {
+    // Reset bomb conversion button state
+    bombConversionCost = 50;
+    bombConversionPresses = 0;
+    lastGoldAmount = 0; // Reset tracked gold amount to force button state update
+    
+    // Reset trash button state
+    trashButtonCost = 25;
+    trashButtonPresses = 0;
+  }
   
-  // Reset trash button state
-  trashButtonCost = 25;
-  trashButtonPresses = 0;
-  
-  // Update cost displays after reset
-  if (bombCostEl) {
-    bombCostEl.textContent = formatNumber(bombConversionCost);
-  }
-  if (trashCostEl) {
-    trashCostEl.textContent = formatNumber(trashButtonCost);
-  }
-  if (bombCostElMobile) {
-    bombCostElMobile.textContent = formatNumber(bombConversionCost);
-  }
-  if (trashCostElMobile) {
-    trashCostElMobile.textContent = formatNumber(trashButtonCost);
+  // Update cost displays after reset (only if costs were actually reset)
+  if (isFreshGame) {
+    if (bombCostEl) {
+      bombCostEl.textContent = formatNumber(bombConversionCost);
+    }
+    if (trashCostEl) {
+      trashCostEl.textContent = formatNumber(trashButtonCost);
+    }
+    if (bombCostElMobile) {
+      bombCostElMobile.textContent = formatNumber(bombConversionCost);
+    }
+    if (trashCostElMobile) {
+      trashCostElMobile.textContent = formatNumber(trashButtonCost);
+    }
   }
   
   // Reset weights and probabilities to initial state
