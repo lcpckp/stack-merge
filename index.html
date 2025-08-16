@@ -58,6 +58,21 @@
     box-shadow: 0 2px 0 rgba(0,0,0,0.25);
   }
   
+  /* Glowing + button after game over */
+  .title-btn.game-over-glow {
+    box-shadow: 0 0 8px rgba(14, 165, 233, 0.5), 0 0 12px rgba(14, 165, 233, 0.3), 0 3px 0 rgba(0,0,0,0.25);
+    animation: breatheGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes breatheGlow {
+    0%, 100% { 
+      box-shadow: 0 0 8px rgba(14, 165, 233, 0.5), 0 0 12px rgba(14, 165, 233, 0.3), 0 3px 0 rgba(0,0,0,0.25);
+    }
+    50% { 
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.7), 0 0 16px rgba(14, 165, 233, 0.5), 0 3px 0 rgba(0,0,0,0.25);
+    }
+  }
+  
   /* Mobile responsive sizing for title buttons */
   @media (max-width: 768px) {
     .title-btn {
@@ -384,6 +399,14 @@
     width: min(900px, 95vw); 
     max-height: 90vh; 
     overflow-y: auto; 
+    /* Hide scrollbar while maintaining scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  .help-modal::-webkit-scrollbar {
+    display: none;
   }
   
   .help-grid { 
@@ -1281,6 +1304,78 @@
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
   }
 
+
+
+  /* New Game Modal Styling */
+  .new-game-modal {
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .new-game-modal h2 {
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .new-game-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .confirm-new-game-btn {
+    background: #10B981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+  }
+
+  .confirm-new-game-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .confirm-new-game-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .cancel-new-game-btn {
+    background: #DC2626;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+  }
+
+  .cancel-new-game-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .cancel-new-game-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
 /* Debug stats table styling */
 .debug-stats-table {
   width: 100%;
@@ -1725,6 +1820,14 @@
   .help-modal {
     width: 95vw;
     padding: 20px;
+    /* Hide scrollbar while maintaining scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) on mobile */
+  .help-modal::-webkit-scrollbar {
+    display: none;
   }
   
   .help-grid {
@@ -2120,7 +2223,7 @@
 
   <div class="topbar">
     <div class="title-section">
-      <button id="addBtn" class="title-btn" title="Add">+</button>
+      <button id="addBtn" class="title-btn" title="New Game">+</button>
       <h1>Stack Merge</h1>
       <button id="helpBtn" class="title-btn" title="How to play">?</button>
     </div>
@@ -2148,7 +2251,17 @@
   <!-- Game Over Button Overlay -->
   <div id="gameOverButton" class="game-over-button-overlay">
     <div class="game-over-text">Game Over</div>
-    <button id="newGameBtn" class="new-game-btn">Try Again</button>
+  </div>
+
+  <!-- New Game Confirmation Modal -->
+  <div id="newGameModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="newGameTitle">
+    <div class="modal new-game-modal">
+      <h2 id="newGameTitle">New Game?</h2>
+      <div class="new-game-buttons">
+        <button id="confirmNewGameBtn" class="confirm-new-game-btn">Yes</button>
+        <button id="cancelNewGameBtn" class="cancel-new-game-btn">No</button>
+      </div>
+    </div>
   </div>
 
   <div class="game-container">
@@ -3140,18 +3253,50 @@ trashButton.addEventListener('click', handleTrashButton);
 bombConversionBtnMobile.addEventListener('click', handleBombConversion);
 trashButtonMobile.addEventListener('click', handleTrashButton);
 
-// New game button event listeners
-const newGameBtnInline = document.getElementById('newGameBtnInline');
-
-if (newGameBtnInline) {
-  newGameBtnInline.addEventListener('click', resetGame);
+// Game over popup - any click anywhere closes it
+const gameOverButton = document.getElementById('gameOverButton');
+if (gameOverButton) {
+  // Add click listener to the document to close game over popup on any click
+  document.addEventListener('click', () => {
+    if (gameOverButton.classList.contains('show')) {
+      gameOverButton.classList.remove('show');
+    }
+  });
 }
 
-// New game button event listener
-const newGameBtn = document.getElementById('newGameBtn');
-if (newGameBtn) {
-  newGameBtn.addEventListener('click', resetGame);
+// Add button event listener for new game
+const addBtn = document.getElementById('addBtn');
+if (addBtn) {
+  addBtn.addEventListener('click', openNewGameModal);
 }
+
+// New game modal button event listeners
+const confirmNewGameBtn = document.getElementById('confirmNewGameBtn');
+if (confirmNewGameBtn) {
+  confirmNewGameBtn.addEventListener('click', handleNewGameConfirmation);
+}
+
+const cancelNewGameBtn = document.getElementById('cancelNewGameBtn');
+if (cancelNewGameBtn) {
+  cancelNewGameBtn.addEventListener('click', handleNewGameCancel);
+}
+
+// Close new game modal when clicking outside
+const newGameModal = document.getElementById('newGameModal');
+if (newGameModal) {
+  newGameModal.addEventListener('click', (e) => {
+    if (e.target === newGameModal) {
+      closeNewGameModal();
+    }
+  });
+}
+
+// Close new game modal with Escape key
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && newGameModal && !newGameModal.classList.contains('hidden')) {
+    closeNewGameModal();
+  }
+});
 
 // Initialize button states
 updateBombConversionButtonState();
@@ -3327,6 +3472,30 @@ function closeDebugPane(){
 debugClose.addEventListener('click', closeDebugPane);
 debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && debugPane.classList.contains('show')) closeDebugPane(); });
+
+// New Game Modal Functions
+function openNewGameModal() {
+  const newGameModal = document.getElementById('newGameModal');
+  if (newGameModal) {
+    newGameModal.classList.remove('hidden');
+  }
+}
+
+function closeNewGameModal() {
+  const newGameModal = document.getElementById('newGameModal');
+  if (newGameModal) {
+    newGameModal.classList.add('hidden');
+  }
+}
+
+function handleNewGameConfirmation() {
+  closeNewGameModal();
+  resetGame();
+}
+
+function handleNewGameCancel() {
+  closeNewGameModal();
+}
 
 function syncDebugControls() {
   // Sync auto-play state
@@ -4007,28 +4176,28 @@ function showGameOver(){
     }, 200);
   }
   
-  // Disable pole interactions
-  const allPoles = Array.from(gameDiv.children);
-  allPoles.forEach(poleDiv => {
-    poleDiv.style.pointerEvents = 'none';
-    poleDiv.classList.add('no-hover');
-  });
+  // Add glowing effect to the + button to guide user to start new game
+  const addBtn = document.getElementById('addBtn');
+  if (addBtn) {
+    addBtn.classList.add('game-over-glow');
+  }
+  
+  // Note: Pole interactions are no longer disabled to allow players to examine the final state
 }
 
 
 
 function resetGame(){
-  // Hide game over button overlay with fast fade-out
+  // Hide game over button overlay
   const gameOverButton = document.getElementById('gameOverButton');
   if (gameOverButton) {
-    // Add hiding class for fast transition, then remove show class
-    gameOverButton.classList.add('hiding');
     gameOverButton.classList.remove('show');
-    
-    // Remove hiding class after animation completes
-    setTimeout(() => {
-      gameOverButton.classList.remove('hiding');
-    }, 300);
+  }
+  
+  // Remove glowing effect from the + button
+  const addBtn = document.getElementById('addBtn');
+  if (addBtn) {
+    addBtn.classList.remove('game-over-glow');
   }
   
   poles = [[],[],[],[]];
