@@ -2247,6 +2247,8 @@
       <div class="gold-value" id="goldDisplay">0</div>
     </div>
   </div>
+  
+
 
   <!-- Game Over Button Overlay -->
   <div id="gameOverButton" class="game-over-button-overlay">
@@ -2608,6 +2610,485 @@
 let weights = [1, 2]; // Start with 1 and 2, unlock others as player progresses
 let probabilities = [0.5, 0.5]; // Equal chance for 1 and 2 initially
 
+// Cookie-based save system
+const SAVE_COOKIE_NAME = 'stackMerge_save';
+const SAVE_COOKIE_EXPIRY_DAYS = 30;
+const MAX_COOKIE_SIZE = 3500; // Conservative limit to avoid issues
+
+// Fallback to localStorage if cookies fail
+let useLocalStorage = false;
+
+// Save game state to cookies or localStorage
+function saveGameState() {
+  try {
+    console.log('=== SAVING GAME STATE ===');
+    console.log('Current game state:', {
+      poles: poles,
+      score: score,
+      gold: gold,
+      blocksDropped: blocksDropped,
+      currentTargetBlockSize: currentTargetBlockSize,
+      currentStage: currentStage,
+      weights: weights,
+      probabilities: probabilities,
+      nextQueue: nextQueue,
+      bombConversionCost: bombConversionCost,
+      trashButtonCost: trashButtonCost,
+      bombConversionPresses: bombConversionPresses,
+      trashButtonPresses: trashButtonPresses
+    });
+    
+    const gameState = {
+      poles: poles,
+      score: score,
+      gold: gold,
+      blocksDropped: blocksDropped,
+      currentTargetBlockSize: currentTargetBlockSize,
+      currentStage: currentStage,
+      weights: weights,
+      probabilities: probabilities,
+      nextQueue: nextQueue,
+      bombConversionCost: bombConversionCost,
+      trashButtonCost: trashButtonCost,
+      bombConversionPresses: bombConversionPresses,
+      trashButtonPresses: trashButtonPresses,
+      timestamp: Date.now()
+    };
+    
+    const saveData = JSON.stringify(gameState);
+    console.log('Save data size:', saveData.length, 'characters');
+    console.log('Save data preview:', saveData.substring(0, 200) + '...');
+    
+    if (useLocalStorage) {
+      // Use localStorage fallback
+      console.log('📱 Using localStorage fallback...');
+      try {
+        localStorage.setItem(SAVE_COOKIE_NAME, saveData);
+        console.log('✅ Game state saved to localStorage');
+      } catch (localStorageError) {
+        console.error('❌ localStorage also failed:', localStorageError);
+      }
+      return;
+    }
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + SAVE_COOKIE_EXPIRY_DAYS);
+    
+    // Check if we need to split into multiple cookies
+    if (saveData.length > MAX_COOKIE_SIZE) {
+      console.log('📦 Save data is large, splitting into multiple cookies...');
+      
+      // Split the save data into chunks
+      const chunks = [];
+      for (let i = 0; i < saveData.length; i += MAX_COOKIE_SIZE) {
+        chunks.push(saveData.substring(i, i + MAX_COOKIE_SIZE));
+      }
+      
+      console.log(`Split into ${chunks.length} chunks of max ${MAX_COOKIE_SIZE} characters`);
+      
+      // Save chunk info in first cookie
+      const chunkInfo = {
+        totalChunks: chunks.length,
+        timestamp: Date.now(),
+        dataSize: saveData.length
+      };
+      
+      const infoCookie = `${SAVE_COOKIE_NAME}_info=${encodeURIComponent(JSON.stringify(chunkInfo))}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+      document.cookie = infoCookie;
+      console.log('Set chunk info cookie');
+      
+      // Save each chunk in separate cookies
+      chunks.forEach((chunk, index) => {
+        const chunkCookie = `${SAVE_COOKIE_NAME}_chunk_${index}=${encodeURIComponent(chunk)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+        document.cookie = chunkCookie;
+        console.log(`Set chunk ${index + 1}/${chunks.length}`);
+      });
+      
+      console.log('✅ Large save data split into multiple cookies');
+    } else {
+      // Single cookie approach - try multiple cookie formats
+      console.log('Setting single cookie:', SAVE_COOKIE_NAME);
+      console.log('Cookie expiry:', expiryDate.toUTCString());
+      
+      // Try different cookie formats to see which one works
+      const cookieFormats = [
+        // Format 1: Basic cookie
+        `${SAVE_COOKIE_NAME}=${encodeURIComponent(saveData)}; expires=${expiryDate.toUTCString()}; path=/`,
+        // Format 2: With SameSite
+        `${SAVE_COOKIE_NAME}=${encodeURIComponent(saveData)}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`,
+        // Format 3: Without expires (session cookie)
+        `${SAVE_COOKIE_NAME}=${encodeURIComponent(saveData)}; path=/`,
+        // Format 4: Minimal format
+        `${SAVE_COOKIE_NAME}=${encodeURIComponent(saveData)}`
+      ];
+      
+      cookieFormats.forEach((format, index) => {
+        console.log(`Trying cookie format ${index + 1}:`, format.substring(0, 100) + '...');
+        document.cookie = format;
+        
+        // Check if this format worked
+        setTimeout(() => {
+          const testCookies = document.cookie.split(';');
+          const testCookie = testCookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '='));
+          if (testCookie) {
+            console.log(`✅ Cookie format ${index + 1} worked!`);
+          } else {
+            console.log(`❌ Cookie format ${index + 1} failed`);
+          }
+        }, 50 * (index + 1));
+      });
+    }
+    
+    // Wait a moment for cookie to be set, then verify
+    setTimeout(() => {
+      const cookies = document.cookie.split(';');
+      console.log('All cookies after setting:', cookies);
+      
+      // Check for both single cookie and chunked cookies
+      const savedCookie = cookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '='));
+      const infoCookie = cookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '_info='));
+      
+      if (savedCookie) {
+        console.log('✅ Single cookie verified successfully');
+        console.log('Cookie length:', savedCookie.length);
+      } else if (infoCookie) {
+        console.log('✅ Chunked cookies verified successfully');
+        console.log('Info cookie found:', infoCookie);
+        
+        // Count chunk cookies
+        const chunkCookies = cookies.filter(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '_chunk_'));
+        console.log(`Found ${chunkCookies.length} chunk cookies`);
+      } else {
+        console.error('❌ Cookie verification failed - no save cookies found');
+        console.log('Available cookies:', cookies.map(c => c.trim().split('=')[0]));
+        
+        // Try to read the cookie directly
+        try {
+          const testCookie = document.cookie;
+          console.log('Raw document.cookie:', testCookie);
+        } catch (e) {
+          console.error('Error reading document.cookie:', e);
+        }
+        
+        // If cookies failed, try localStorage
+        console.log('🔄 Attempting localStorage fallback...');
+        try {
+          localStorage.setItem(SAVE_COOKIE_NAME, saveData);
+          console.log('✅ Fallback to localStorage successful');
+          useLocalStorage = true;
+        } catch (localStorageError) {
+          console.error('❌ localStorage also failed:', localStorageError);
+        }
+      }
+    }, 100);
+    
+    console.log('=== SAVE COMPLETE ===');
+  } catch (error) {
+    console.error('❌ Failed to save game state:', error);
+  }
+}
+
+// Restore game state from loaded data
+function restoreGameState(gameState) {
+  try {
+    console.log('Validating loaded game state...');
+    
+    // Validate the loaded data
+    if (!gameState.poles || !Array.isArray(gameState.poles) || gameState.poles.length !== 4) {
+      console.error('❌ Invalid save data: poles structure corrupted');
+      console.log('Poles:', gameState.poles);
+      console.log('Poles type:', typeof gameState.poles);
+      console.log('Poles is array:', Array.isArray(gameState.poles));
+      console.log('Poles length:', gameState.poles ? gameState.poles.length : 'undefined');
+      return false;
+    }
+    
+    // Check if save is too old (more than 30 days)
+    const saveAge = Date.now() - gameState.timestamp;
+    const maxAge = SAVE_COOKIE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+    console.log('Save age:', saveAge, 'ms');
+    console.log('Max age:', maxAge, 'ms');
+    console.log('Save timestamp:', new Date(gameState.timestamp).toISOString());
+    
+    if (saveAge > maxAge) {
+      console.log('❌ Save data is too old, starting fresh game');
+      clearGameSave();
+      return false;
+    }
+    
+    console.log('✅ Save data validation passed, restoring game state...');
+    
+    // Restore game state
+    const oldPoles = [...poles];
+    const oldScore = score;
+    const oldGold = gold;
+    
+    poles = gameState.poles;
+    score = gameState.score || 0;
+    gold = gameState.gold || 0;
+    blocksDropped = gameState.blocksDropped || 0;
+    currentTargetBlockSize = gameState.currentTargetBlockSize || STARTING_BLOCK_SIZE;
+    currentStage = gameState.currentStage || 1;
+    weights = gameState.weights || [1, 2];
+    probabilities = gameState.probabilities || [0.5, 0.5];
+    nextQueue = gameState.nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+    bombConversionCost = gameState.bombConversionCost || 50;
+    trashButtonCost = gameState.trashButtonCost || 25;
+    bombConversionPresses = gameState.bombConversionPresses || 0;
+    trashButtonPresses = gameState.trashButtonPresses || 0;
+    
+    console.log('Game state restored:');
+    console.log('- Poles changed from', oldPoles.length, 'to', poles.length);
+    console.log('- Score changed from', oldScore, 'to', score);
+    console.log('- Gold changed from', oldGold, 'to', gold);
+    console.log('- Current stage:', currentStage);
+    console.log('- Weights:', weights);
+    console.log('- Next queue length:', nextQueue.length);
+    
+    console.log('=== LOAD COMPLETE ===');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to restore game state:', error);
+    return false;
+  }
+}
+
+
+
+// Load game state from cookies or localStorage
+function loadGameState() {
+  try {
+    console.log('=== LOADING GAME STATE ===');
+    
+    // Check localStorage first if we're using it
+    if (useLocalStorage) {
+      console.log('📱 Loading from localStorage...');
+      try {
+        const saveData = localStorage.getItem(SAVE_COOKIE_NAME);
+        if (saveData) {
+          console.log('✅ Found save data in localStorage');
+          const gameState = JSON.parse(saveData);
+          return restoreGameState(gameState);
+        } else {
+          console.log('❌ No save data found in localStorage');
+          return false;
+        }
+      } catch (localStorageError) {
+        console.error('❌ localStorage load failed:', localStorageError);
+        return false;
+      }
+    }
+    
+    console.log('All cookies:', document.cookie);
+    
+    const cookies = document.cookie.split(';');
+    console.log('Parsed cookies:', cookies);
+    
+    // Check for both single cookie and chunked cookies
+    const saveCookie = cookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '='));
+    const infoCookie = cookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '_info='));
+    
+    console.log('Looking for cookie starting with:', SAVE_COOKIE_NAME + '=');
+    console.log('Found single save cookie:', saveCookie ? 'YES' : 'NO');
+    console.log('Found chunked save cookies:', infoCookie ? 'YES' : 'NO');
+    
+    let saveData;
+    
+    if (saveCookie) {
+      // Single cookie approach
+      console.log('📦 Loading from single cookie...');
+      console.log('Raw save cookie:', saveCookie);
+      const cookieValue = saveCookie.split('=')[1];
+      console.log('Cookie value (first 100 chars):', cookieValue ? cookieValue.substring(0, 100) + '...' : 'undefined');
+      
+      saveData = decodeURIComponent(cookieValue);
+      console.log('Decoded save data (first 200 chars):', saveData.substring(0, 200) + '...');
+      console.log('Save data length:', saveData.length);
+    } else if (infoCookie) {
+      // Chunked cookies approach
+      console.log('📦 Loading from chunked cookies...');
+      
+      // Parse chunk info
+      const infoValue = infoCookie.split('=')[1];
+      const chunkInfo = JSON.parse(decodeURIComponent(infoValue));
+      console.log('Chunk info:', chunkInfo);
+      
+      // Collect all chunks
+      const chunks = [];
+      for (let i = 0; i < chunkInfo.totalChunks; i++) {
+        const chunkCookie = cookies.find(cookie => cookie.trim().startsWith(SAVE_COOKIE_NAME + '_chunk_' + i + '='));
+        if (chunkCookie) {
+          const chunkValue = chunkCookie.split('=')[1];
+          chunks.push(decodeURIComponent(chunkValue));
+          console.log(`Loaded chunk ${i + 1}/${chunkInfo.totalChunks}`);
+        } else {
+          console.error(`❌ Missing chunk ${i + 1}/${chunkInfo.totalChunks}`);
+          return false;
+        }
+      }
+      
+      // Reconstruct save data
+      saveData = chunks.join('');
+      console.log('Reconstructed save data length:', saveData.length);
+      console.log('Save data preview:', saveData.substring(0, 200) + '...');
+    } else {
+      console.log('❌ No saved game found in cookies - starting fresh');
+      return false;
+    }
+    
+    const gameState = JSON.parse(saveData);
+    console.log('Parsed game state:', gameState);
+    
+    return restoreGameState(gameState);
+  } catch (error) {
+    console.error('❌ Failed to load game state:', error);
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
+    clearGameSave();
+    return false;
+  }
+}
+
+// Clear saved game data
+function clearGameSave() {
+  try {
+    console.log('=== CLEARING GAME SAVE ===');
+    
+    // Clear all possible save cookies
+    const cookiesToClear = [
+      SAVE_COOKIE_NAME,
+      SAVE_COOKIE_NAME + '_info'
+    ];
+    
+    // Clear chunk cookies (up to 10 chunks)
+    for (let i = 0; i < 10; i++) {
+      cookiesToClear.push(SAVE_COOKIE_NAME + '_chunk_' + i);
+    }
+    
+    console.log('Clearing cookies:', cookiesToClear);
+    
+    cookiesToClear.forEach(cookieName => {
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+    
+    // Verify cookies were removed
+    const remainingCookies = document.cookie.split(';');
+    const remainingSaveCookies = remainingCookies.filter(cookie => 
+      cookie.trim().startsWith(SAVE_COOKIE_NAME + '=')
+    );
+    
+    if (remainingSaveCookies.length === 0) {
+      console.log('✅ All save cookies successfully removed');
+    } else {
+      console.error('❌ Some save cookies still exist:', remainingSaveCookies);
+    }
+    
+    // Also clear localStorage if we're using it
+    if (useLocalStorage) {
+      try {
+        localStorage.removeItem(SAVE_COOKIE_NAME);
+        console.log('✅ localStorage save data cleared');
+      } catch (e) {
+        console.error('❌ Failed to clear localStorage:', e);
+      }
+    }
+    
+    console.log('=== CLEAR COMPLETE ===');
+  } catch (error) {
+    console.error('❌ Failed to clear game save:', error);
+  }
+}
+
+// Auto-save game state periodically and on important events
+function setupAutoSave() {
+  // Test cookie functionality first
+  console.log('=== TESTING COOKIE FUNCTIONALITY ===');
+  console.log('Current URL protocol:', window.location.protocol);
+  console.log('Current URL:', window.location.href);
+  console.log('Document cookie before test:', document.cookie);
+  
+  // Try to set a simple test cookie
+  document.cookie = 'test_cookie=hello';
+  console.log('Document cookie after setting test:', document.cookie);
+  
+  // Check if test cookie was set
+  const testCookie = document.cookie.includes('test_cookie');
+  console.log('Test cookie set successfully:', testCookie ? 'YES' : 'NO');
+  
+  if (!testCookie) {
+    console.error('❌ COOKIES ARE NOT WORKING - browser may be blocking them');
+    console.log('This could be due to:');
+    console.log('- Browser privacy settings');
+    console.log('- Incognito/private browsing mode');
+    console.log('- Browser extensions blocking cookies');
+    console.log('- HTTPS/HTTP mismatch');
+    console.log('- SameSite policy restrictions');
+    
+    // Check if it's a local file issue
+    if (window.location.protocol === 'file:') {
+      console.log('🚨 DETECTED LOCAL FILE PROTOCOL - Cookies are blocked by browser security');
+      console.log('This is expected behavior for file:// URLs');
+      console.log('Solutions:');
+      console.log('1. Use a local web server (http://localhost)');
+      console.log('2. Use localStorage fallback (automatic)');
+      console.log('3. Deploy to a web server');
+      console.log('');
+      console.log('💡 QUICK LOCAL SERVER SETUP:');
+      console.log('If you have Python installed:');
+      console.log('  python -m http.server 8000');
+      console.log('Then visit: http://localhost:8000');
+      console.log('');
+      console.log('If you have Node.js installed:');
+      console.log('  npx http-server');
+      console.log('Then visit: http://localhost:8080');
+    }
+    
+    // Automatically switch to localStorage
+    console.log('🔄 Automatically switching to localStorage fallback...');
+    useLocalStorage = true;
+    
+    // Test localStorage functionality
+    try {
+      localStorage.setItem('test_storage', 'hello');
+      const testValue = localStorage.getItem('test_storage');
+      if (testValue === 'hello') {
+        console.log('✅ localStorage working correctly');
+        localStorage.removeItem('test_storage');
+      } else {
+        console.error('❌ localStorage test failed');
+      }
+    } catch (e) {
+      console.error('❌ localStorage not available:', e);
+    }
+  } else {
+    console.log('✅ Basic cookie functionality working');
+    
+    // Clean up test cookie
+    document.cookie = 'test_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    console.log('Test cookie cleaned up');
+  }
+  
+  // Auto-save every 30 seconds during gameplay
+  setInterval(() => {
+    if (score > 0 || gold > 0) { // Only save if there's actual progress
+      console.log(`🔄 Auto-save interval triggered (using ${useLocalStorage ? 'localStorage' : 'cookies'})...`);
+      saveGameState();
+    }
+  }, 30000);
+  
+  // Save on page unload/visibility change
+  window.addEventListener('beforeunload', () => {
+    console.log('🔄 Page unloading - saving game state...');
+    saveGameState();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      console.log('🔄 Page hidden - saving game state...');
+      saveGameState();
+    }
+  });
+}
+
 // Number formatting utility function
 function formatNumber(num) {
   if (num < 1000) {
@@ -2649,6 +3130,11 @@ function updateScoreDisplay() {
   if (debugScore) {
     debugScore.textContent = score;
   }
+  
+  // Auto-save when score changes
+  if (score > 0) {
+    saveGameState();
+  }
 }
 
 function updateGoldDisplay() {
@@ -2682,6 +3168,11 @@ function updateGoldDisplay() {
   // Update debug gold display with exact value
   if (debugGold) {
     debugGold.textContent = gold;
+  }
+  
+  // Auto-save when gold changes
+  if (gold > 0) {
+    saveGameState();
   }
 }
 const MAX_HEIGHT = 10;
@@ -2786,6 +3277,10 @@ function checkForNewStack() {
   console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${stageMultiplier}x`);
   console.log(`Poles count remains at ${poles.length} (should always be 4)`);
   console.log(`New target block size: ${currentTargetBlockSize} (need to merge to ${currentTargetBlockSize * 2} for next stage)`);
+  
+  // Save game state after stage progression
+  console.log('🔄 Triggering save after stage progression...');
+  saveGameState();
 }
 
 function checkForNewBlockSize(mergedSize) {
@@ -2808,6 +3303,10 @@ function checkForNewBlockSize(mergedSize) {
     updateProbabilityDistribution();
     
     console.log(`New block size unlocked: ${mergedSize}`);
+    
+    // Save game state after unlocking new block size
+    console.log('🔄 Triggering save after unlocking new block size...');
+    saveGameState();
   }
 }
 
@@ -2990,6 +3489,10 @@ function handleBombConversion() {
       }, 300);
     }
     
+    // Save game state after bomb conversion
+    console.log('🔄 Triggering save after bomb conversion...');
+    saveGameState();
+    
     // Re-render to show the bomb
     renderNext();
     
@@ -3072,6 +3575,10 @@ function handleTrashButton() {
   
   // Update button state (cost changed, so force update)
   updateTrashButtonState();
+  
+  // Save game state after using trash button
+  console.log('🔄 Triggering save after using trash button...');
+  saveGameState();
 }
 
 function updateBombConversionButtonState() {
@@ -3545,6 +4052,11 @@ grantGoldBtn.addEventListener('click', () => {
   updateBombButtonIfGoldChanged();
   // Update trash button state
   updateTrashButtonIfGoldChanged();
+  
+  // Save game state after granting gold
+  console.log('🔄 Triggering save after granting gold...');
+  saveGameState();
+  
   console.log(`Granted 1000 gold. New balance: ${gold}`);
 });
 
@@ -3553,6 +4065,11 @@ grantScoreBtn.addEventListener('click', () => {
   score += 1000;
   // Update score display
   updateScoreDisplay();
+  
+  // Save game state after granting score
+  console.log('🔄 Triggering save after granting score...');
+  saveGameState();
+  
   console.log(`Granted 1000 score. New score: ${score}`);
 });
 
@@ -3858,6 +4375,10 @@ function placeOnPole(idx){
       score += nextPiece.w;
       updateScoreDisplay();
       
+      // Save game state after placing a block
+      console.log('🔄 Triggering save after block placement...');
+      saveGameState();
+      
       // Add pulse animation to the score display
       const scoreDisplay = document.querySelector('.score-value');
       if (scoreDisplay) {
@@ -4092,6 +4613,10 @@ async function animateMergeCascade(index){
     updateBombButtonIfGoldChanged();
     // Update trash button state
     updateTrashButtonIfGoldChanged();
+    
+    // Save game state after merge and gold earning
+    console.log('🔄 Triggering save after merge...');
+    saveGameState();
 
     if (isBombMerge){
       // Bomb merge - clear the entire stack
@@ -4183,6 +4708,10 @@ function showGameOver(){
   }
   
   // Note: Pole interactions are no longer disabled to allow players to examine the final state
+  
+  // Save final game state when game over is reached
+  console.log('🔄 Triggering final save at game over...');
+  saveGameState();
 }
 
 
@@ -4257,6 +4786,9 @@ function resetGame(){
   updateScoreDisplay();
   updateGoldDisplay();
   render();
+  
+  // Clear saved game after reset
+  clearGameSave();
 }
 
 // ------------------
@@ -4685,6 +5217,14 @@ function aiStep(){
   placeOnPole(pick);
 }
 
+// Try to load saved game state
+console.log('=== GAME INITIALIZATION ===');
+console.log('Attempting to load saved game state...');
+const gameLoaded = loadGameState();
+console.log('Load result:', gameLoaded ? 'SUCCESS' : 'FAILED - starting fresh game');
+
+
+
 // initial render
 render();
 
@@ -4695,6 +5235,11 @@ updateStackHeight();
 // Initialize displays with proper formatting
 updateScoreDisplay();
 updateGoldDisplay();
+
+// Set up auto-save system
+console.log('Setting up auto-save system...');
+setupAutoSave();
+console.log('Auto-save system initialized');
 
 // Safety check: ensure we start with exactly 4 poles
 ensureCorrectPoleCount();
