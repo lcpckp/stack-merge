@@ -130,6 +130,37 @@
     font-family: var(--font-family);
   }
   
+  /* Stage multiplier badge styling in top right corner of gold counter */
+  .stage-multiplier-badge {
+    position: absolute;
+    top: 4px;
+    left: calc(100% + 4px);
+    background: #dc2626;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: 2px solid var(--bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 1;
+    font-family: var(--font-family);
+    min-width: 20px;
+    text-align: left;
+    line-height: 1;
+  }
+  
+  /* Stage multiplier badge pulse animation */
+  .stage-multiplier-badge.pulse {
+    animation: stageBadgePulse 0.6s ease-out;
+  }
+  
+  @keyframes stageBadgePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  
   /* Score count pulse animation */
   .score-value.pulse {
     animation: scorePulse 0.3s ease-out;
@@ -1130,6 +1161,15 @@
     gap: 8px;
   }
   
+  /* Adjust stage multiplier badge for mobile */
+  .stage-multiplier-badge {
+    font-size: 10px;
+    padding: 3px 5px;
+    min-width: 18px;
+    top: 3px;
+    left: calc(100% + 3px);
+  }
+  
   .next {
     order: 2;
     width: 100%;
@@ -1622,6 +1662,15 @@
     font-size: 20px;
   }
   
+  /* Adjust stage multiplier badge for extra small mobile */
+  .stage-multiplier-badge {
+    font-size: 9px;
+    padding: 2px 4px;
+    min-width: 16px;
+    top: 2px;
+    left: calc(100% + 2px);
+  }
+  
   .trash-btn {
     width: 45px;
     height: 45px;
@@ -2046,10 +2095,10 @@
             <h3>Gold & Power-Ups</h3>
           </div>
                       <div class="help-content">
-              <p><strong>Earn gold with every merge!</strong></p>
-              <p>• Longer merge combos earn more gold.</p>
+              <p><strong>Earn gold by merging blocks</strong></p>
+              <p>• Each additional block in a cascade of merges earns more gold.</p>
               <p>• Use gold to buy power-ups.</p>
-              <p>• Power-ups double in cost each time they are used.</p>
+              <p>• <strong>Warning! </strong>Power-ups double in cost each time they are used, so try to increase your gold multiplier as soon as possible.</p>
               <p><strong>Power-ups:</strong></p>
                             <div style="display: flex; gap: 80px; margin: 16px 0; justify-content: center;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
@@ -2067,6 +2116,75 @@
                 </div>
               </div>
             </div>
+        </div>
+
+        <!-- Stage System Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🚀</span>
+            <h3>Stage Progression</h3>
+          </div>
+          <div class="help-content">
+            <p><strong>Advance through stages to unlock new block sizes and increase gold earnings!</strong></p>
+            
+            <div class="merge-example" style="justify-content: center; gap: 40px; padding: 20px;">
+              <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
+                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
+                    <div class="next-stage-indicator">
+                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">1024</div>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
+                  
+                  <div class="gold-display" style="margin: 0; justify-self: start;">
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">1.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; top: 4px; left: calc(100% + 4px); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">10x</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
+                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
+                    <div class="next-stage-indicator">
+                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">2048</div>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
+                  
+                  <div class="gold-display" style="margin: 0; justify-self: start;">
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">15.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; top: 4px; left: calc(100% + 4px); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">100x</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
+                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
+                    <div class="next-stage-indicator">
+                      <div class="next-stage-block" style="width: 120px; height: 50px; font-size: 24px;">4096</div>
+                    </div>
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
+                  
+                  <div class="gold-display" style="margin: 0; justify-self: start;">
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">555.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; top: 4px; left: calc(100% + 4px); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1000x</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
 
@@ -2194,8 +2312,31 @@ function updateScoreDisplay() {
 function updateGoldDisplay() {
   const goldDisplay = document.querySelector('.gold-value');
   if (goldDisplay) {
-    goldDisplay.innerHTML = `<div class="gold-emoji">💰</div><div class="gold-text">${formatNumber(gold)}</div>`;
+    const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
+    const oldMultiplier = goldDisplay.querySelector('.stage-multiplier-badge')?.textContent;
+    const newMultiplier = `${stageMultiplier}x`;
+    
+    // Only show badge for stage 2 and higher
+    const badgeHTML = currentStage >= 2 ? `<div class="stage-multiplier-badge" id="stageMultiplierBadge">${newMultiplier}</div>` : '';
+    
+    goldDisplay.innerHTML = `
+      <div class="gold-emoji">💰</div>
+      <div class="gold-text">${formatNumber(gold)}</div>
+      ${badgeHTML}
+    `;
+    
+    // Add pulse animation for stage progression if multiplier changed and badge exists
+    if (oldMultiplier && oldMultiplier !== newMultiplier && currentStage >= 2) {
+      const badge = goldDisplay.querySelector('.stage-multiplier-badge');
+      if (badge) {
+        badge.classList.add('pulse');
+        setTimeout(() => {
+          badge.classList.remove('pulse');
+        }, 600);
+      }
+    }
   }
+  
   // Update debug gold display with exact value
   if (debugGold) {
     debugGold.textContent = gold;
