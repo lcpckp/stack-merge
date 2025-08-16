@@ -2167,9 +2167,9 @@ function formatNumber(num) {
   } else if (num < 1000000) {
     return (num / 1000).toFixed(1) + 'k';
   } else if (num < 1000000000) {
-    return (num / 1000000).toFixed(1) + 'M';
+    return (num / 1000000).toFixed(1) + 'm';
   } else {
-    return (num / 1000000000).toFixed(1) + 'B';
+    return (num / 1000000000).toFixed(1) + 'b';
   }
 }
 
@@ -2518,10 +2518,10 @@ function handleBombConversion() {
     
     // Update button cost display
     if (bombCostEl) {
-      bombCostEl.textContent = bombConversionCost;
+      bombCostEl.textContent = formatNumber(bombConversionCost);
     }
     if (bombCostElMobile) {
-      bombCostElMobile.textContent = bombConversionCost;
+      bombCostElMobile.textContent = formatNumber(bombConversionCost);
     }
     
     // Update button state (cost changed, so force update)
@@ -2580,10 +2580,10 @@ function handleTrashButton() {
   // Update button cost display
   const trashCostEl = document.getElementById('trashCost');
   if (trashCostEl) {
-    trashCostEl.textContent = trashButtonCost;
+    trashCostEl.textContent = formatNumber(trashButtonCost);
   }
   if (trashCostElMobile) {
-    trashCostElMobile.textContent = trashButtonCost;
+    trashCostElMobile.textContent = formatNumber(trashButtonCost);
   }
   
   // Update button state (cost changed, so force update)
@@ -2773,12 +2773,18 @@ trashButtonMobile.addEventListener('click', handleTrashButton);
 updateBombConversionButtonState();
 updateTrashButtonState();
 
-// Initialize mobile cost displays
+// Initialize cost displays
+if (bombCostEl) {
+  bombCostEl.textContent = formatNumber(bombConversionCost);
+}
+if (trashCostEl) {
+  trashCostEl.textContent = formatNumber(trashButtonCost);
+}
 if (bombCostElMobile) {
-  bombCostElMobile.textContent = bombConversionCost;
+  bombCostElMobile.textContent = formatNumber(bombConversionCost);
 }
 if (trashCostElMobile) {
-  trashCostElMobile.textContent = trashButtonCost;
+  trashCostElMobile.textContent = formatNumber(trashButtonCost);
 }
 
 // Debug button wiring
@@ -3626,6 +3632,20 @@ function resetGame(){
   // Reset trash button state
   trashButtonCost = 25;
   trashButtonPresses = 0;
+  
+  // Update cost displays after reset
+  if (bombCostEl) {
+    bombCostEl.textContent = formatNumber(bombConversionCost);
+  }
+  if (trashCostEl) {
+    trashCostEl.textContent = formatNumber(trashButtonCost);
+  }
+  if (bombCostElMobile) {
+    bombCostElMobile.textContent = formatNumber(bombConversionCost);
+  }
+  if (trashCostElMobile) {
+    trashCostElMobile.textContent = formatNumber(trashButtonCost);
+  }
   
   // Reset weights and probabilities to initial state
   weights = [1, 2];
