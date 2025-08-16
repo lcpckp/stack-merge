@@ -1352,15 +1352,64 @@
     min-width: 0;
   }
   
-  /* Mobile button hover and active states */
+  /* Mobile button hover and active states - disabled on mobile */
   .mobile-button-row .bomb-conversion-btn:hover,
   .mobile-button-row .trash-btn:hover {
-    transform: translateY(-1px);
+    /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
+    transform: none;
+    border: 2px solid #DC2626; /* Keep original border */
+    background: var(--panel); /* Keep original background */
+    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25); /* Keep original shadow */
+  }
+  
+  .mobile-button-row .bomb-conversion-btn.affordable:hover {
+    /* Disable hover effects for affordable state on mobile */
+    transform: none;
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Keep affordable border */
+    background: var(--panel); /* Keep original background */
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1); /* Keep affordable shadow */
+  }
+  
+  .mobile-button-row .trash-btn.affordable:hover {
+    /* Disable hover effects for affordable state on mobile */
+    transform: none;
+    border: 2px solid rgba(255, 255, 255, 0.3); /* Keep affordable border */
+    background: var(--panel); /* Keep original background */
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1); /* Keep affordable shadow */
   }
   
   .mobile-button-row .bomb-conversion-btn:active,
   .mobile-button-row .trash-btn:active {
     transform: translateY(0);
+  }
+  
+  /* Disable hover effects on mobile devices for bomb and trash buttons */
+  @media (max-width: 768px) {
+    /* Disable hover effects for all bomb and trash buttons on mobile */
+    .bomb-conversion-btn:hover,
+    .trash-btn:hover {
+      /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
+      transform: none !important;
+      border: 2px solid #DC2626 !important; /* Keep original border */
+      background: var(--panel) !important; /* Keep original background */
+      box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25) !important; /* Keep original shadow */
+    }
+    
+    .bomb-conversion-btn.affordable:hover {
+      /* Disable hover effects for affordable state on mobile */
+      transform: none !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
+      background: var(--panel) !important; /* Keep original background */
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
+    }
+    
+    .trash-btn.affordable:hover {
+      /* Disable hover effects for affordable state on mobile */
+      transform: none !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
+      background: var(--panel) !important; /* Keep original background */
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
+    }
   }
   
   /* Responsive adjustments for very small mobile screens */
@@ -1680,9 +1729,139 @@
     overflow: hidden !important;
   }
 }
+
+/* Probability test results modal */
+.prob-test-modal { 
+  position: fixed; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  background: var(--panel); 
+  color: var(--text); 
+  width: min(600px, 90vw); 
+  border-radius: 16px; 
+  padding: 24px; 
+  box-shadow: 0 15px 45px rgba(0,0,0,0.4); 
+  font-family: var(--font-family);
+  z-index: 1001;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.prob-test-modal h3 { 
+  margin: 0 0 20px; 
+  font-size: 20px; 
+  text-align: center; 
+  color: #0ea5e9;
+  font-family: var(--font-family);
+}
+
+.prob-test-results {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #475569;
+}
+
+.prob-test-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.prob-test-table th,
+.prob-test-table td {
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prob-test-table th {
+  background: #334155;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.prob-test-table td {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.prob-test-table .block-value {
+  font-weight: 600;
+  color: #0ea5e9;
+}
+
+.prob-test-table .expected {
+  color: #10B981;
+}
+
+.prob-test-table .actual {
+  color: #F59E0B;
+}
+
+.prob-test-table .difference {
+  color: #EF4444;
+}
+
+.prob-test-summary {
+  text-align: center;
+  margin-top: 16px;
+  padding: 12px;
+  background: #334155;
+  border-radius: 6px;
+  border: 1px solid #475569;
+}
+
+.prob-test-summary .total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #10B981;
+}
+
+.prob-test-close {
+  background: #334155;
+  color: var(--text);
+  border: 1px solid #475569;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+  font-family: var(--font-family);
+  width: 100%;
+  margin-top: 16px;
+}
+
+.prob-test-close:hover {
+  background: #475569;
+}
+
+.prob-test-close:active {
+  background: #334155;
+}
+
 </style>
 </head>
 <body>
+  <!-- Probability test results modal (hidden by default) -->
+  <div id="probTestModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="probTestTitle">
+    <div class="modal prob-test-modal">
+      <h3 id="probTestTitle">Probability Distribution Test Results</h3>
+      
+      <div class="prob-test-results">
+        <div id="probTestContent">
+          <!-- Test results will be populated here -->
+        </div>
+      </div>
+      
+      <button id="probTestClose" class="prob-test-close">Close</button>
+    </div>
+  </div>
+
   <div class="topbar">
     <div class="title-section">
       <h1>Stack Merge</h1>
@@ -1969,6 +2148,9 @@
           <button id="grantScoreBtn" class="button primary">Grant 1000 Score</button>
           <button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
         </div>
+        <div class="button-row" style="margin-top: 8px;">
+          <button id="testProbBtn" class="button">Test Probabilities</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2019,16 +2201,26 @@ const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
 
 function getRandomWeight(){
+  // Validate probabilities before selecting
+  if (!validateProbabilityDistribution()) {
+    console.error('Probability validation failed, using uniform distribution');
+    const randomIndex = Math.floor(Math.random() * weights.length);
+    return weights[randomIndex];
+  }
+  
   let r = Math.random();
   let cum = 0;
+  
   for(let i=0;i<probabilities.length;i++){
     cum += probabilities[i];
     if (r < cum) {
-      console.log(`Random weight selected: ${weights[i]} (probability: ${probabilities[i].toFixed(4)})`);
+      console.log(`Random weight selected: ${weights[i]} (probability: ${probabilities[i].toFixed(4)}, cumulative: ${cum.toFixed(4)})`);
       return weights[i];
     }
   }
-  console.log(`Random weight fallback: ${weights[probabilities.length-1]}`);
+  
+  // Fallback - this should rarely happen if probabilities are correct
+  console.warn(`Random weight fallback: ${weights[probabilities.length-1]} (cumulative sum: ${cum.toFixed(6)})`);
   return weights[probabilities.length-1];
 }
 
@@ -2122,42 +2314,108 @@ function checkForNewBlockSize(mergedSize) {
 }
 
 function updateProbabilityDistribution() {
-  // Create a probability distribution with faster decay for higher value blocks
-  // Blocks 1, 2, and 4 should have equal probabilities, then faster decay for higher values
+  // Create a balanced probability distribution that scales properly with new blocks
+  // Lower tier blocks should be more common, higher tiers progressively rarer
   
   const numBlocks = weights.length;
   
-  // Base probabilities with special handling for the first three block sizes
+  if (numBlocks === 0) {
+    console.warn('No blocks available for probability distribution');
+    return;
+  }
+  
+  // Base probabilities with proper scaling
   const baseProbabilities = [];
   
   for (let i = 0; i < numBlocks; i++) {
     const blockSize = weights[i];
     
     if (i < 3) {
-      // First three block sizes (1, 2, 4) get equal probabilities
+      // First three block sizes (1, 2, 4) get equal, higher probabilities
+      baseProbabilities.push(0.25);
+    } else if (i < 6) {
+      // Next three block sizes (8, 16, 32) get medium probabilities
       baseProbabilities.push(0.15);
-          } else {
-        // For block sizes 8 and above, use exponential decay
-        // Start from the same level as the first three, then decrease
-        const decayFactor = 0.65; // Moderate decay - higher values appear less frequently than before
-        const probability = 0.15 * Math.pow(decayFactor, i - 2);
-        baseProbabilities.push(probability);
-      }
+    } else if (i < 9) {
+      // Next three block sizes (64, 128, 256) get lower probabilities
+      baseProbabilities.push(0.08);
+    } else {
+      // Highest tier blocks get very low probabilities
+      baseProbabilities.push(0.04);
+    }
   }
   
   // Normalize probabilities to sum to 1.0
   const totalProbability = baseProbabilities.reduce((sum, p) => sum + p, 0);
-  probabilities = baseProbabilities.map(p => p / totalProbability);
+  
+  if (totalProbability === 0) {
+    console.error('Total probability is 0, using uniform distribution');
+    probabilities = new Array(numBlocks).fill(1.0 / numBlocks);
+  } else {
+    probabilities = baseProbabilities.map(p => p / totalProbability);
+  }
+  
+  // Verify probabilities sum to 1.0 (with small floating point tolerance)
+  const actualSum = probabilities.reduce((sum, p) => sum + p, 0);
+  if (Math.abs(actualSum - 1.0) > 0.0001) {
+    console.warn(`Probability sum is ${actualSum.toFixed(6)}, expected 1.0. Normalizing...`);
+    // Force normalization
+    const correctedSum = probabilities.reduce((sum, p) => sum + p, 0);
+    probabilities = probabilities.map(p => p / correctedSum);
+  }
+  
+  // Final validation
+  validateProbabilityDistribution();
+  
+  // Log the current state for debugging
+  logProbabilityState();
   
   console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
-  console.log('Expected distribution: 1,2,4 should be equal, then faster decay for higher values');
+  console.log('Probability sum:', probabilities.reduce((sum, p) => sum + p, 0).toFixed(6));
   console.log('Current weights array:', weights);
-  console.log('Current probabilities array:', probabilities);
+}
+
+function validateProbabilityDistribution() {
+  // Validate that probabilities are mathematically correct
+  if (!probabilities || probabilities.length === 0) {
+    console.error('Probabilities array is empty or undefined');
+    return false;
+  }
+  
+  if (probabilities.length !== weights.length) {
+    console.error(`Mismatch: ${probabilities.length} probabilities vs ${weights.length} weights`);
+    return false;
+  }
+  
+  // Check for negative probabilities
+  const negativeProbs = probabilities.filter(p => p < 0);
+  if (negativeProbs.length > 0) {
+    console.error('Found negative probabilities:', negativeProbs);
+    return false;
+  }
+  
+  // Check that probabilities sum to 1.0 (with tolerance for floating point errors)
+  const sum = probabilities.reduce((s, p) => s + p, 0);
+  if (Math.abs(sum - 1.0) > 0.0001) {
+    console.error(`Probabilities sum to ${sum.toFixed(6)}, expected 1.0`);
+    return false;
+  }
+  
+  // Check that all probabilities are finite numbers
+  const invalidProbs = probabilities.filter(p => !isFinite(p));
+  if (invalidProbs.length > 0) {
+    console.error('Found invalid probabilities:', invalidProbs);
+    return false;
+  }
+  
+  console.log('Probability distribution validation passed ✓');
+  return true;
 }
 
 function updateBlockRange() {
-  // Add the next incremental block size to the weights array
-  const nextBlockSize = currentTargetBlockSize * 2;
+  // Add the next stage's target block size to the weights array
+  // This should be the current target block size, not double it
+  const nextBlockSize = currentTargetBlockSize;
   
   // Only add if it's not already in the weights array
   if (!weights.includes(nextBlockSize)) {
@@ -2251,6 +2509,10 @@ function handleBombConversion() {
     // Re-render to show the bomb
     renderNext();
     
+    // Also re-render the main game to ensure pole placement logic is updated
+    // This ensures that if bomb status affects any placement decisions, they're properly reflected
+    render();
+    
     // Increment press count and double the cost
     bombConversionCost *= 2;
     
@@ -2306,7 +2568,11 @@ function handleTrashButton() {
   }
   
   // Play the same animation as placing a block, but don't place it
-  animateNextQueueAdvance(true); // true = queue already modified
+  animateNextQueueAdvance(true).then(() => {
+    // After the queue animation completes, re-render to update pole placement logic
+    // This ensures that the new next block can be properly evaluated for placement
+    render();
+  }); // true = queue already modified
   
   // Increment press count and double the cost
   trashButtonCost *= 2;
@@ -2429,6 +2695,10 @@ let debugTarget = null;
 let debugMaxBlock = null;
 let debugBlocksDropped = null;
 let debugBombStatus = null;
+let debugStage = null;
+let debugAiToggle = null;
+let debugSpeedSlider = null;
+let debugSpeedLabel = null;
 let customBlockMode = false;
 let customBlockSize = 1;
 let customBlockBomb = false;
@@ -2470,12 +2740,13 @@ debugTarget = document.getElementById('debugTarget');
 debugMaxBlock = document.getElementById('debugMaxBlock');
 debugBlocksDropped = document.getElementById('debugBlocksDropped');
 debugBombStatus = document.getElementById('debugBombStatus');
+debugStage = document.getElementById('debugStage');
 const grantGoldBtn = document.getElementById('grantGoldBtn');
 const grantScoreBtn = document.getElementById('grantScoreBtn');
 
-  // Debug auto-play DOM refs
-  debugAiToggle = document.getElementById('debugAiToggle');
-  debugSpeedSlider = document.getElementById('debugSpeedSlider');
+// Debug auto-play DOM refs
+debugAiToggle = document.getElementById('debugAiToggle');
+debugSpeedSlider = document.getElementById('debugSpeedSlider');
 debugSpeedLabel = document.getElementById('debugSpeedLabel');
 
 
@@ -3358,7 +3629,8 @@ function resetGame(){
   
   // Reset weights and probabilities to initial state
   weights = [1, 2];
-  probabilities = [0.5, 0.5];
+  // Let updateProbabilityDistribution calculate the correct initial probabilities
+  updateProbabilityDistribution();
   
   nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
   placing = false;
@@ -3884,6 +4156,142 @@ function ensureCorrectPoleCount() {
 // Run safety check every 5 seconds
 setInterval(ensureCorrectPoleCount, 5000);
 
+function testProbabilityDistribution() {
+  console.log('=== Testing Probability Distribution ===');
+  console.log('Current weights:', weights);
+  console.log('Current probabilities:', probabilities);
+  
+  // Simulate 1000 random selections to test distribution
+  const results = {};
+  const iterations = 1000;
+  
+  for (let i = 0; i < iterations; i++) {
+    const weight = getRandomWeight();
+    results[weight] = (results[weight] || 0) + 1;
+  }
+  
+  // Create the results table HTML
+  let tableHTML = `
+    <table class="prob-test-table">
+      <thead>
+        <tr>
+          <th>Block</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  
+  let totalExpected = 0;
+  let totalActual = 0;
+  
+  for (const weight of weights) {
+    const count = results[weight] || 0;
+    const actualProb = count / iterations;
+    const expectedProb = probabilities[weights.indexOf(weight)];
+    const difference = Math.abs(actualProb - expectedProb);
+    
+    totalExpected += expectedProb;
+    totalActual += actualProb;
+    
+    tableHTML += `
+      <tr>
+        <td class="block-value">${weight}</td>
+        <td class="expected">${(expectedProb * 100).toFixed(2)}%</td>
+        <td class="actual">${(actualProb * 100).toFixed(2)}%</td>
+        <td class="difference">${(difference * 100).toFixed(2)}%</td>
+      </tr>
+    `;
+    
+    // Also log to console for debugging
+    console.log(`Block ${weight}: Expected ${(expectedProb * 100).toFixed(2)}%, Got ${(actualProb * 100).toFixed(2)}%, Diff: ${(difference * 100).toFixed(2)}%`);
+  }
+  
+  tableHTML += `
+      </tbody>
+    </table>
+    
+    <div class="prob-test-summary">
+      <div class="total">Total Probability: ${(totalExpected * 100).toFixed(2)}% (Expected) vs ${(totalActual * 100).toFixed(2)}% (Actual)</div>
+    </div>
+  `;
+  
+  // Populate the modal content
+  const contentDiv = document.getElementById('probTestContent');
+  if (contentDiv) {
+    contentDiv.innerHTML = tableHTML;
+  }
+  
+  // Show the modal
+  const modal = document.getElementById('probTestModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+  
+  console.log('=== End Test ===');
+}
+
+// Modal functionality
+function showProbabilityTestModal() {
+  const modal = document.getElementById('probTestModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+function hideProbabilityTestModal() {
+  const modal = document.getElementById('probTestModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+function logProbabilityState() {
+  console.log('=== Current Probability State ===');
+  console.log(`Total blocks available: ${weights.length}`);
+  console.log('Block | Weight | Probability | Cumulative');
+  console.log('------|--------|-------------|------------');
+  
+  let cumulative = 0;
+  for (let i = 0; i < weights.length; i++) {
+    cumulative += probabilities[i];
+    console.log(`${i.toString().padStart(5)} | ${weights[i].toString().padStart(6)} | ${(probabilities[i] * 100).toFixed(2).padStart(11)}% | ${(cumulative * 100).toFixed(2).padStart(10)}%`);
+  }
+  
+  console.log(`Total probability: ${(cumulative * 100).toFixed(2)}%`);
+  console.log('=====================================');
+}
+
+// Test probabilities button
+const testProbBtn = document.getElementById('testProbBtn');
+testProbBtn.addEventListener('click', testProbabilityDistribution);
+
+// Probability test modal close button
+const probTestClose = document.getElementById('probTestClose');
+if (probTestClose) {
+  probTestClose.addEventListener('click', hideProbabilityTestModal);
+}
+
+// Close probability test modal when clicking outside
+const probTestModal = document.getElementById('probTestModal');
+if (probTestModal) {
+  probTestModal.addEventListener('click', (e) => {
+    if (e.target === probTestModal) {
+      hideProbabilityTestModal();
+    }
+  });
+}
+
+// Add keyboard support for probability test modal
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (probTestModal && !probTestModal.classList.contains('hidden')) {
+      hideProbabilityTestModal();
+    }
+  }
+});
 </script>
 </body>
 </html>
