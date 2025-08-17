@@ -45,6 +45,7 @@
     right: calc(50% + 160px);
     display: flex;
     align-items: center;
+    gap: 16px;
   }
   
   /* Center section - absolutely centered title */
@@ -2431,12 +2432,12 @@
     <div class="title-section">
       <div class="left-section">
         <button id="addBtn" class="title-btn" title="New Game">➕</button>
+        <button id="helpBtn" class="title-btn" title="How to play">❔</button>
       </div>
       <div class="center-section">
         <h1>Stack Merge</h1>
       </div>
       <div class="right-section">
-        <button id="helpBtn" class="title-btn" title="How to play">❔</button>
         <button id="soundBtn" class="title-btn" title="Toggle sound">🔊</button>
         <button id="mergeSoundBtn" class="title-btn" title="Switch to musical merge sounds">🎵</button>
       </div>
@@ -2940,18 +2941,18 @@ class SoundManager {
       highPassFilter.connect(noiseGain);
       noiseGain.connect(gainNode);
       
-      // Volume envelope: Model M signature attack and decay
+      // Volume envelope: Model M signature attack and decay (toned down for mobile)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(1.5, this.audioContext.currentTime + 0.001); // Quick attack
+      gainNode.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001); // Reduced from 1.5 to 0.8
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12); // Long, resonant decay
       
-      // Separate gain control for tone vs noise
+      // Separate gain control for tone vs noise (toned down)
       toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      toneGain.gain.linearRampToValueAtTime(0.6, this.audioContext.currentTime + 0.001); // Strong tone for body
+      toneGain.gain.linearRampToValueAtTime(0.4, this.audioContext.currentTime + 0.001); // Reduced from 0.6 to 0.4
       toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(0.9, this.audioContext.currentTime + 0.001); // Strong noise for mechanical feel
+      noiseGain.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 0.001); // Reduced from 0.9 to 0.5
       noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       // Start sources
