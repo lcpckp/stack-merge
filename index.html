@@ -42,7 +42,7 @@
   /* Left section - positioned to the left of center */
   .title-section .left-section {
     position: absolute;
-    right: calc(50% + 160px);
+    right: calc(50% + 180px);
     display: flex;
     align-items: center;
     gap: 16px;
@@ -60,7 +60,7 @@
   /* Right section - positioned to the right of center */
   .title-section .right-section {
     position: absolute;
-    left: calc(50% + 160px);
+    left: calc(50% + 180px);
     display: flex;
     align-items: center;
     gap: 16px;
@@ -71,11 +71,11 @@
     background: var(--panel);
     color: var(--text);
     border: 1px solid #475569;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
@@ -151,10 +151,10 @@
   /* Mobile responsive sizing for title buttons */
   @media (max-width: 768px) {
     .title-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      font-size: 16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      font-size: 20px;
     }
     
     .title-section {
@@ -165,12 +165,12 @@
   /* Mobile responsive spacing for title sections */
   @media (max-width: 768px) {
     .title-section .left-section {
-      right: calc(50% + 100px);
+      right: calc(50% + 110px);
       gap: 8px; /* Reduced gap between buttons on mobile */
     }
     
     .title-section .right-section {
-      left: calc(50% + 100px);
+      left: calc(50% + 110px);
       gap: 8px; /* Reduced gap between buttons on mobile */
     }
   }
@@ -182,18 +182,41 @@
     }
     
     .title-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 5px;
-      font-size: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      font-size: 18px;
     }
     
     .title-section .left-section {
-      gap: 6px; /* Even smaller gap between buttons on very small mobile */
+      gap: 8px; /* Slightly larger gap for better touch targets */
     }
     
     .title-section .right-section {
-      gap: 6px; /* Even smaller gap between buttons on very small mobile */
+      gap: 8px; /* Slightly larger gap for better touch targets */
+    }
+  }
+  
+  /* Disable hover effects on mobile/touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .title-btn:hover {
+      background: var(--panel);
+      border-color: #475569;
+      transform: none;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    }
+    
+    .title-btn#soundBtn:hover {
+      transform: none;
+    }
+    
+    .title-btn#mergeSoundBtn:hover {
+      transform: none;
+    }
+    
+    .title-btn#mergeSoundBtn[title*="musical"]:hover {
+      opacity: 0.5;
+      filter: grayscale(0.8);
     }
   }
   
@@ -2946,18 +2969,17 @@ class SoundManager {
       highPassFilter.connect(noiseGain);
       noiseGain.connect(gainNode);
       
-      // Volume envelope: Model M signature attack and decay (further reduced for mobile)
+      // Volume envelope: Model M signature attack and decay (toned down for mobile)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 0.001); // Further reduced from 0.8 to 0.5
+      gainNode.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001); // Reduced from 1.5 to 0.8
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12); // Long, resonant decay
       
-      // Separate gain control for tone vs noise (further reduced)
-      toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      toneGain.gain.linearRampToValueAtTime(0.25, this.audioContext.currentTime + 0.001); // Further reduced from 0.4 to 0.25
+      // Separate gain control for tone vs noise (toned down)
+      toneGain.gain.linearRampToValueAtTime(0.4, this.audioContext.currentTime + 0.001); // Reduced from 0.6 to 0.4
       toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.001); // Further reduced from 0.5 to 0.3
+      noiseGain.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 0.001); // Reduced from 0.9 to 0.5
       noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       // Start sources
