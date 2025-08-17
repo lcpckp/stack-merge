@@ -808,58 +808,79 @@
     position: relative;
   }
   
-  /* Bomb conversion button styling */
-  .bomb-conversion-container {
+
+  
+  .bottom-actions { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px; 
+  }
+  
+  /* Powerup Shop - Grid Layout */
+  .powerup-shop {
     position: absolute;
     left: calc(100% + 20px);
     top: 0;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 16px;
   }
   
-  .bomb-conversion-btn {
+  .shop-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .powerup-btn {
     background: var(--panel);
     color: var(--text);
     border: 2px solid #DC2626;
-    width: 60px;
-    height: 60px;
+    min-width: 80px;
+    min-height: 80px;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25);
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     font-family: var(--font-family);
     pointer-events: auto;
+    gap: 8px;
+    position: relative;
+    padding: 0 12px;
   }
   
-  .bomb-conversion-btn:hover {
+  .powerup-btn:hover {
     border: 3px solid #0ea5e9;
     background: #334155;
     transform: translateY(-1px);
     box-shadow: 0 4px 0 rgba(220, 38, 38, 0.3);
   }
   
-  .bomb-conversion-btn:active {
+  .powerup-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 0 rgba(220, 38, 38, 0.25);
   }
   
-  .bomb-conversion-btn:disabled {
+  .powerup-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
     box-shadow: 0 2px 0 rgba(220, 38, 38, 0.2);
   }
   
-  .bomb-conversion-btn.affordable {
+  .powerup-btn.affordable {
     border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
   }
   
-  .bomb-conversion-btn.affordable:hover {
+  .powerup-btn.affordable:hover {
     border: 3px solid #0ea5e9;
     background: #334155;
     transform: translateY(-1px);
@@ -867,21 +888,21 @@
   }
   
   /* Undo mode styling - when a bomb is selected and can be undone */
-  .bomb-conversion-btn.undo-mode {
+  .powerup-btn.undo-mode {
     border: 2px solid #10B981;
     background: #065F46;
     box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25);
     animation: undoModePulse 2s ease-in-out infinite;
   }
   
-  .bomb-conversion-btn.undo-mode:hover {
+  .powerup-btn.undo-mode:hover {
     border: 3px solid #34D399;
     background: #047857;
     transform: translateY(-1px);
     box-shadow: 0 4px 0 rgba(16, 185, 129, 0.3);
   }
   
-  .bomb-conversion-btn.undo-mode .emoji {
+  .powerup-btn.undo-mode .powerup-emoji {
     content: "↩️";
   }
   
@@ -894,114 +915,85 @@
     }
   }
   
-  .bomb-conversion-btn .emoji {
+  .powerup-emoji {
     font-size: 32px;
     line-height: 1;
   }
   
-  .bomb-cost-text {
+  .powerup-cost {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 2px;
     font-family: var(--font-family);
+    font-size: 16px;
+    white-space: nowrap;
+    padding-right: 8px;
   }
   
-  .bomb-cost-text .emoji {
-    font-size: 24px;
+  .cost-emoji {
+    font-size: 18px;
   }
   
-  .bomb-cost-text .cost {
+  .cost-amount {
     color: #FCD34D;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
+    white-space: nowrap;
   }
   
-  /* Trash button styling */
-  .trash-button-container {
-    position: absolute;
-    left: calc(100% + 20px);
-    top: 80px;
+  /* Pulse animation for powerup buttons */
+  .powerup-btn.pulse {
+    animation: powerupBtnPulse 0.3s ease-out;
+  }
+  
+  @keyframes powerupBtnPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Mobile Powerup Shop - Flexible and Responsive */
+  .mobile-powerup-shop {
+    display: none;
+    order: 4;
+    margin-top: 16px;
+    margin-bottom: 0;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+  
+  .mobile-shop-grid {
     display: flex;
-    align-items: center;
     gap: 12px;
-  }
-  
-  .trash-btn {
-    background: var(--panel);
-    color: var(--text);
-    border: 2px solid #DC2626;
-    width: 60px;
-    height: 60px;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25);
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-family: var(--font-family);
-    pointer-events: auto;
-  }
-  
-  .trash-btn:hover {
-    border: 3px solid #0ea5e9;
-    background: #334155;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 0 rgba(107, 114, 128, 0.3);
-  }
-  
-  .trash-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 0 rgba(107, 114, 128, 0.25);
-  }
-  
-  .trash-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.2);
-  }
-  
-  .trash-btn.affordable {
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
-  }
-  
-  .trash-btn.affordable:hover {
-    border: 3px solid #0ea5e9;
-    background: #334155;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 0 rgba(14, 165, 233, 0.3);
-  }
-  
-  .trash-btn .emoji {
-    font-size: 32px;
-    line-height: 1;
-  }
-  
-  .trash-cost-text {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    font-family: var(--font-family);
   }
   
-  .trash-cost-text .emoji {
-    font-size: 24px;
+  /* Mobile button sizing - Flexible based on available space */
+  .mobile-powerup-shop .powerup-btn {
+    min-width: clamp(50px, 15vw, 70px);
+    height: clamp(45px, 12vw, 65px);
+    min-height: 45px;
+    padding: 0 clamp(6px, 2vw, 10px);
   }
   
-  .trash-cost-text .cost {
-    color: #FCD34D;
-    font-weight: 700;
-    font-size: 20px;
+  .mobile-powerup-shop .powerup-emoji {
+    font-size: clamp(20px, 5vw, 28px);
   }
   
-  .bottom-actions { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    gap: 18px;
-    margin-top: 18px; 
+  .mobile-powerup-shop .powerup-cost {
+    font-size: clamp(12px, 3.5vw, 16px);
+    white-space: nowrap;
+  }
+  
+  .mobile-powerup-shop .cost-emoji {
+    font-size: clamp(13px, 3.5vw, 18px);
+  }
+  
+  .mobile-powerup-shop .cost-amount {
+    font-size: clamp(12px, 3.5vw, 18px);
+    white-space: nowrap;
   }
   
 
@@ -1581,6 +1573,20 @@
   .new-game-modal {
     max-width: 300px;
     text-align: center;
+    /* Add similar outline to Game Over window but with green/blue theme */
+    border: 2px solid rgba(16, 185, 129, 0.8); /* Semi-transparent green border */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); /* Green-tinted shadow */
+    background: rgba(30, 41, 59, 0.95); /* Semi-transparent panel background like Game Over */
+    backdrop-filter: blur(8px); /* Add subtle blur effect like Game Over */
+    /* Add smooth transition for hover effects */
+    transition: all 0.3s ease;
+  }
+
+  /* Add hover effect to make the outline more prominent */
+  .new-game-modal:hover {
+    border-color: rgba(16, 185, 129, 1); /* Solid green on hover */
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); /* Enhanced shadow on hover */
   }
 
   .new-game-modal h2 {
@@ -1769,7 +1775,7 @@
     padding-bottom: 20px;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     display: flex;
   }
   
@@ -1779,55 +1785,16 @@
   
 
   
-  /* Create a mobile button row for bomb and trash buttons */
-  .mobile-button-row {
-    display: none;
-    order: 4;
-    margin-top: 16px;
-    margin-bottom: 0;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    padding: 0 20px;
-    box-sizing: border-box;
-    background: transparent;
-    border: none;
-  }
-  
-  .bomb-conversion-container {
-    position: static;
-    order: 4;
-    margin-top: 16px;
-    margin-bottom: 0;
-  }
-  
-  /* Position trash button for mobile */
-  .trash-button-container {
-    position: static;
-    order: 5;
-    margin-top: 16px;
-    margin-bottom: 0;
-  }
-  
-  /* Show mobile button row and hide individual containers on mobile */
-  .mobile-button-row {
-    display: flex;
-  }
-  
-  .bomb-conversion-container,
-  .trash-button-container {
+  /* Show mobile powerup shop and hide desktop powerup shop on mobile */
+  .powerup-shop {
     display: none;
   }
   
-  /* Consistent button sizing for mobile */
-  .bomb-conversion-btn, .trash-btn {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .bomb-conversion-btn .emoji, .trash-btn .emoji {
-    font-size: 28px;
+  .mobile-powerup-shop {
+    display: block;
+    order: 4;
+    margin-top: 8px;
+    margin-bottom: 0;
   }
   
   /* Adjust game grid for mobile */
@@ -1901,81 +1868,7 @@
     gap: 12px;
   }
   
-  .mobile-button-row .bomb-conversion-btn,
-  .mobile-button-row .trash-btn {
-    width: 55px;
-    height: 55px;
-    flex-shrink: 0;
-  }
-  
-  .mobile-button-row .bomb-conversion-btn .emoji,
-  .mobile-button-row .trash-btn .emoji {
-    font-size: 28px;
-  }
-  
-  .mobile-button-row .bomb-cost-text .emoji,
-  .mobile-button-row .trash-cost-text .emoji {
-    font-size: 20px;
-  }
-  
-  .mobile-button-row .bomb-cost-text .cost,
-  .mobile-button-row .trash-cost-text .cost {
-    font-size: 16px;
-  }
-  
-  /* Ensure mobile containers don't shrink */
-  .mobile-button-row .mobile-bomb-container,
-  .mobile-button-row .mobile-trash-container {
-    flex-shrink: 0;
-    min-width: 0;
-  }
-  
-  /* Mobile button hover and active states - disabled on mobile */
-  .mobile-button-row .bomb-conversion-btn:hover,
-  .mobile-button-row .trash-btn:hover {
-    /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
-    transform: none;
-    border: 2px solid #DC2626; /* Keep original border */
-    background: var(--panel); /* Keep original background */
-    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25); /* Keep original shadow */
-  }
-  
-  .mobile-button-row .bomb-conversion-btn.affordable:hover {
-    /* Disable hover effects for affordable state on mobile */
-    transform: none;
-    border: 2px solid rgba(255, 255, 255, 0.3); /* Keep affordable border */
-    background: var(--panel); /* Keep original background */
-    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1); /* Keep affordable shadow */
-  }
-  
-  /* Mobile undo mode styling - when a bomb is selected and can be undone */
-  .mobile-button-row .bomb-conversion-btn.undo-mode {
-    border: 2px solid #10B981;
-    background: #065F46;
-    box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25);
-    animation: undoModePulse 2s ease-in-out infinite;
-  }
-  
-  .mobile-button-row .bomb-conversion-btn.undo-mode:hover {
-    /* Disable hover effects for undo mode on mobile */
-    transform: none;
-    border: 2px solid #10B981; /* Keep undo border */
-    background: #065F46; /* Keep undo background */
-    box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25); /* Keep undo shadow */
-  }
-  
-  .mobile-button-row .trash-btn.affordable:hover {
-    /* Disable hover effects for affordable state on mobile */
-    transform: none;
-    border: 2px solid rgba(255, 255, 255, 0.3); /* Keep affordable border */
-    background: var(--panel); /* Keep original background */
-    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1); /* Keep affordable shadow */
-  }
-  
-  .mobile-button-row .bomb-conversion-btn:active,
-  .mobile-button-row .trash-btn:active {
-    transform: translateY(0);
-  }
+
   
   /* Disable hover effects on mobile devices for bomb and trash buttons */
   @media (max-width: 768px) {
@@ -2015,86 +1908,10 @@
   }
   
   /* Responsive adjustments for very small mobile screens */
-  @media (max-width: 480px) {
-    .mobile-button-row {
-      gap: 16px;
-      padding: 0 16px;
-    }
-    
-    .mobile-button-row .bomb-conversion-btn,
-    .mobile-button-row .trash-btn {
-      width: 50px;
-      height: 50px;
-    }
-    
-    .mobile-button-row .bomb-conversion-btn .emoji,
-    .mobile-button-row .trash-btn .emoji {
-      font-size: 24px;
-    }
-    
-    /* Further adjust bomb blocks for very small mobile */
-    .disc .bomb-emoji {
-      font-size: 26px;
-      top: -1px;
-      left: -13px;
-    }
-    
-    .disc .bomb-text {
-      font-size: 16px;
-    }
-  }
+
   
   /* Pulse animation for mobile buttons */
-  .mobile-button-row .bomb-conversion-btn.pulse,
-  .mobile-button-row .trash-btn.pulse {
-    animation: buttonPulse 0.3s ease;
-  }
-  
-  /* Desktop overrides - hide mobile buttons and show desktop buttons */
-  @media (min-width: 769px) {
-    .game-container .mobile-button-row {
-      display: none !important;
-    }
-    
-    .game-container .bomb-conversion-container,
-    .game-container .trash-button-container {
-      display: flex !important;
-      position: absolute !important;
-      left: calc(100% + 20px) !important;
-      align-items: center !important;
-      gap: 12px !important;
-    }
-    
-    .game-container .bomb-conversion-container {
-      top: 0 !important;
-    }
-    
-    .game-container .trash-button-container {
-      top: 80px !important;
-    }
-    
-    /* Ensure desktop buttons have proper sizing */
-    .game-container .bomb-conversion-btn,
-    .game-container .trash-btn {
-      width: 60px !important;
-      height: 60px !important;
-    }
-    
-    .game-container .bomb-conversion-btn .emoji,
-    .game-container .trash-btn .emoji {
-      font-size: 32px !important;
-    }
-    
-    .game-container .bomb-cost-text .emoji,
-    .game-container .trash-cost-text .emoji {
-      font-size: 24px !important;
-    }
-    
-    .game-container .bomb-cost-text .cost,
-    .game-container .trash-cost-text .cost {
-      font-size: 20px !important;
-    }
-  }
+
   
   /* Adjust bottom actions for mobile */
   .bottom-actions {
@@ -2242,23 +2059,9 @@
     transform: translateX(-50%);
   }
   
-  .trash-btn {
-    width: 45px;
-    height: 45px;
-  }
+
   
-  .trash-btn .emoji {
-    font-size: 20px;
-  }
-  
-  /* Consistent cost text sizing for extra small mobile */
-  .bomb-cost-text .emoji, .trash-cost-text .emoji {
-    font-size: 18px;
-  }
-  
-  .bomb-cost-text .cost, .trash-cost-text .cost {
-    font-size: 14px;
-  }
+
   
 
 }
@@ -2273,22 +2076,7 @@
   
 
   
-  /* Position trash button for landscape mobile */
-  .trash-button-container {
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 60px;
-    order: unset;
-    margin: 0;
-  }
-  
-  .bomb-conversion-container {
-    position: absolute;
-    right: calc(100% + 10px);
-    top: 0;
-    order: unset;
-    margin: 0;
-  }
+
   
   .pole {
     height: 250px;
@@ -2317,29 +2105,7 @@
   }
 }
 
-/* Final desktop override to ensure mobile buttons are hidden */
-@media (min-width: 769px) {
-  .mobile-button-row {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    position: absolute !important;
-    left: -9999px !important;
-  }
-  
-  /* Additional specificity to override any mobile styles */
-  body .game-container .mobile-button-row,
-  html body .game-container .mobile-button-row {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    position: absolute !important;
-    left: -9999px !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-  }
-}
+
 
 /* Probability test results modal */
 .prob-test-modal { 
@@ -2486,6 +2252,211 @@
   padding: 12px 24px;
   font-size: 16px;
 }
+
+/* Sound Control Modal Styles */
+.sound-control-modal { 
+  background: var(--panel); 
+  color: var(--text); 
+  width: min(500px, 90vw); 
+  border-radius: 16px; 
+  padding: 28px; 
+  box-shadow: 0 15px 45px rgba(0,0,0,0.4); 
+  font-family: var(--font-family);
+  z-index: 1001;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.sound-control-modal h2 { 
+  margin: 0 0 24px; 
+  font-size: 24px; 
+  text-align: center; 
+  color: #0ea5e9;
+  font-family: var(--font-family);
+}
+
+.sound-control-container {
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid #475569;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.sound-control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.sound-control-row:last-child {
+  margin-bottom: 0;
+}
+
+.sound-control-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  min-width: 120px;
+}
+
+.sound-control-emoji {
+  font-size: 20px;
+}
+
+.sound-control-slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: #0ea5e9;
+}
+
+.sound-control-value {
+  background: var(--panel);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 40px;
+  text-align: center;
+  font-family: var(--font-family);
+  border: 1px solid #475569;
+  flex-shrink: 0;
+}
+
+.sound-control-mute {
+  background: #334155;
+  color: var(--text);
+  border: 1px solid #475569;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+  min-width: 80px;
+}
+
+.sound-control-mute:hover {
+  background: #475569;
+  border-color: #64748b;
+}
+
+.sound-control-mute:active {
+  background: #334155;
+}
+
+.sound-control-mute.muted {
+  background: #dc2626;
+  border-color: #ef4444;
+}
+
+.sound-control-mute.muted:hover {
+  background: #b91c1c;
+  border-color: #dc2626;
+}
+
+.sound-control-close {
+  background: #334155;
+  color: var(--text);
+  border: 1px solid #475569;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+  width: 100%;
+  margin-top: 24px;
+}
+
+.sound-control-close:hover {
+  background: #475569;
+}
+
+.sound-control-close:active {
+  background: #334155;
+}
+
+/* Mobile responsive design for sound control modal */
+@media (max-width: 768px) {
+  .sound-control-modal {
+    width: 95vw;
+    padding: 24px;
+    margin: 20px;
+  }
+  
+  .sound-control-modal h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .sound-control-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .sound-control-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .sound-control-label {
+    min-width: auto;
+    justify-content: center;
+  }
+  
+  .sound-control-slider {
+    width: 100%;
+  }
+  
+  .sound-control-value {
+    align-self: center;
+  }
+  
+  .sound-control-mute {
+    align-self: center;
+    min-width: 100px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  .sound-control-modal {
+    padding: 20px;
+    margin: 16px;
+  }
+  
+  .sound-control-modal h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+  
+  .sound-control-container {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  
+  .sound-control-row {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  
+  .sound-control-label {
+    font-size: 15px;
+  }
+  
+  .sound-control-emoji {
+    font-size: 18px;
+  }
+}
 </style>
 </head>
 <body>
@@ -2514,7 +2485,7 @@
         <h1>Stack Merge</h1>
       </div>
       <div class="right-section">
-        <button id="soundBtn" class="title-btn" title="Toggle sound">🔊</button>
+        <button id="soundBtn" class="title-btn" title="Sound Controls">🔊</button>
         <button id="mergeSoundBtn" class="title-btn" title="Switch to musical merge sounds">🎵</button>
       </div>
     </div>
@@ -2557,51 +2528,121 @@
     </div>
   </div>
 
-  <div class="game-container">
-    <div class="game" id="game" role="application" aria-label="Stacks"></div>
-    
-    <!-- Bomb conversion button positioned to the right of stacks -->
-    <div class="bomb-conversion-container">
-      <button id="bombConversionBtn" class="bomb-conversion-btn" title="Convert next block to bomb (press again to undo)">
-        <span class="emoji">💣</span>
-      </button>
-      <div class="bomb-cost-text">
-        <span class="emoji">💰</span>
-        <span class="cost" id="bombCost">25</span>
-      </div>
-    </div>
-    
-    <!-- Trash button positioned below bomb button -->
-    <div class="trash-button-container">
-      <button id="trashButton" class="trash-btn" title="Remove next block from queue">
-        <span class="emoji">🗑️</span>
-      </button>
-      <div class="trash-cost-text">
-        <span class="emoji">💰</span>
-        <span class="cost" id="trashCost">25</span>
-      </div>
-    </div>
-    
-    <!-- Mobile button row for bomb and trash buttons -->
-    <div class="mobile-button-row">
-      <div class="mobile-bomb-container">
-        <button id="bombConversionBtnMobile" class="bomb-conversion-btn" title="Convert next block to bomb (press again to undo)">
-          <span class="emoji">💣</span>
-        </button>
-        <div class="bomb-cost-text">
-          <span class="emoji">💰</span>
-          <span class="cost" id="bombCostMobile">25</span>
+  <!-- Sound Control Modal -->
+  <div id="soundControlModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="soundControlTitle">
+    <div class="modal sound-control-modal">
+      <h2 id="soundControlTitle">Sound Controls</h2>
+      
+      <div class="sound-control-container">
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">🔊</span>
+            <span>Master Mute</span>
+          </div>
+          <button id="masterMuteBtn" class="sound-control-mute">Mute</button>
+        </div>
+        
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">📦</span>
+            <span>Drops</span>
+          </div>
+          <input type="range" id="dropVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
+          <div class="sound-control-value" id="dropVolumeValue">3</div>
+        </div>
+        
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">🔗</span>
+            <span>Merges</span>
+          </div>
+          <input type="range" id="mergeVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
+          <div class="sound-control-value" id="mergeVolumeValue">3</div>
+        </div>
+        
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">💰</span>
+            <span>Gold Coins</span>
+          </div>
+          <input type="range" id="coinVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
+          <div class="sound-control-value" id="coinVolumeValue">3</div>
+        </div>
+        
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">💥</span>
+            <span>Bombs</span>
+          </div>
+          <input type="range" id="bombVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
+          <div class="sound-control-value" id="bombVolumeValue">3</div>
+        </div>
+        
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">🚀</span>
+            <span>Other</span>
+          </div>
+          <input type="range" id="otherVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
+          <div class="sound-control-value" id="otherVolumeValue">3</div>
         </div>
       </div>
       
-      <div class="mobile-trash-container">
-        <button id="trashButtonMobile" class="trash-btn" title="Remove next block from queue">
-          <span class="emoji">🗑️</span>
+      <button id="soundControlClose" class="sound-control-close">Close</button>
+      
+      <div style="margin-top: 16px; text-align: center; display: none;">
+        <button id="testAllSoundsBtn" class="sound-control-mute" style="background: #0ea5e9; border-color: #0284c7; min-width: 120px;">
+          Test All Sounds
         </button>
-        <div class="trash-cost-text">
-          <span class="emoji">💰</span>
-          <span class="cost" id="trashCostMobile">25</span>
-        </div>
+        <button id="debugVolumeBtn" class="sound-control-mute" style="background: #dc2626; border-color: #b91c1c; min-width: 120px; margin-top: 8px;">
+          Debug Volumes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <div class="game" id="game" role="application" aria-label="Stacks"></div>
+    
+    <!-- Powerup Shop - Grid Layout -->
+    <div class="powerup-shop">
+      <div class="shop-grid">
+        <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)">
+          <span class="powerup-emoji">💣</span>
+          <div class="powerup-cost">
+            <span class="cost-emoji">💰</span>
+            <span class="cost-amount" id="bombCost">25</span>
+          </div>
+        </button>
+        
+        <button id="trashButton" class="powerup-btn" title="Remove next block from queue">
+          <span class="powerup-emoji">🗑️</span>
+          <div class="powerup-cost">
+            <span class="cost-emoji">💰</span>
+            <span class="cost-amount" id="trashCost">25</span>
+          </div>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Powerup Shop -->
+    <div class="mobile-powerup-shop">
+      <div class="mobile-shop-grid">
+        <button id="bombConversionBtnMobile" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)">
+          <span class="powerup-emoji">💣</span>
+          <div class="powerup-cost">
+            <span class="cost-emoji">💰</span>
+            <span class="cost-amount" id="bombCostMobile">25</span>
+          </div>
+        </button>
+        
+        <button id="trashButtonMobile" class="powerup-btn" title="Remove next block from queue">
+          <span class="powerup-emoji">🗑️</span>
+          <div class="powerup-cost">
+            <span class="cost-emoji">💰</span>
+            <span class="cost-amount" id="trashCostMobile">25</span>
+          </div>
+        </button>
       </div>
     </div>
   </div>
@@ -2897,7 +2938,10 @@
         <div class="button-row">
           <button id="debugAiToggle" class="button primary">Auto Play: Off</button>
           <button id="grantScoreBtn" class="button primary">Grant 1000 Score</button>
-          <button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
+<button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
+<button id="testCoinSoundsBtn" class="button">Test Coin Sounds</button>
+<button id="testStageUpBtn" class="button">Test Stage Up</button>
+<button id="checkCoinStatusBtn" class="button">Check Coin Status</button>
         </div>
         <div class="button-row" style="margin-top: 8px;">
           <button id="testProbBtn" class="button">Test Probabilities</button>
@@ -2916,6 +2960,15 @@ class SoundManager {
     this.usePopMergeSounds = true; // true = pop sounds (default), false = musical sounds
     this.volume = 0.3; // Default volume (30%)
     this.initialized = false;
+    
+    // Individual sound type volumes (0-5 scale, converted to 0.0-1.0 internally)
+    this.soundVolumes = {
+      drop: 3,      // Drop sounds
+      merge: 3,     // Merge sounds
+      coin: 3,      // Gold coin sounds
+      bomb: 3,      // Bomb explosion sounds
+      other: 3      // Other sounds (stage up, etc.)
+    };
     
     // Initialize audio context on first user interaction
     this.initAudioContext = this.initAudioContext.bind(this);
@@ -2945,6 +2998,18 @@ class SoundManager {
       this.initialized = true;
       console.log('🎵 Sound system initialized successfully');
       
+      // Preload bomb audio for better performance
+      this.preloadBombAudio();
+      
+      // Preload purchase audio for better performance
+      this.preloadPurchaseAudio();
+      
+      // Preload stage up audio for better performance
+      this.preloadStageUpAudio();
+      
+      // Preload coin audio for better performance
+      this.preloadCoinAudio();
+      
       // Remove init listeners since we're now initialized
       this.removeAudioInitListeners();
     } catch (error) {
@@ -2963,10 +3028,17 @@ class SoundManager {
   playDropSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('drop');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
       gainNode.connect(this.masterGain);
+      
+      // Apply individual sound type volume
+      gainNode.gain.value = actualVolume;
       
       // Create an authentic IBM Model M mechanical keyboard sound
       const mainOsc = this.audioContext.createOscillator();
@@ -3017,17 +3089,17 @@ class SoundManager {
       highPassFilter.connect(noiseGain);
       noiseGain.connect(gainNode);
       
-      // Volume envelope: Model M signature attack and decay (toned down for mobile)
+      // Volume envelope: Model M signature attack and decay (scaled by volume)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001); // Reduced from 1.5 to 0.8
+      gainNode.gain.linearRampToValueAtTime(actualVolume, this.audioContext.currentTime + 0.001); // Use actual volume
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12); // Long, resonant decay
       
-      // Separate gain control for tone vs noise (toned down)
-      toneGain.gain.linearRampToValueAtTime(0.4, this.audioContext.currentTime + 0.001); // Reduced from 0.6 to 0.4
+      // Separate gain control for tone vs noise (scaled by volume)
+      toneGain.gain.linearRampToValueAtTime(actualVolume * 0.5, this.audioContext.currentTime + 0.001); // Scale tone by volume
       toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + 0.001); // Reduced from 0.9 to 0.5
+      noiseGain.gain.linearRampToValueAtTime(actualVolume * 0.625, this.audioContext.currentTime + 0.001); // Scale noise by volume
       noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
       
       // Start sources
@@ -3066,24 +3138,31 @@ class SoundManager {
   playMergeSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('merge');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
     // Choose between musical and pop-like sounds based on user preference
     if (this.usePopMergeSounds) {
       console.log('💨 Playing pop merge sound');
-      this.playPopMergeSound(blockValue);
+      this.playPopMergeSound(blockValue, actualVolume);
     } else {
       console.log('🎵 Playing musical merge sound');
-      this.playMusicalMergeSound(blockValue);
+      this.playMusicalMergeSound(blockValue, actualVolume);
     }
   }
   
   // Generate a beautiful, physical bell sound like Christmas music
-  playMusicalMergeSound(blockValue = 1) {
+  playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
       gainNode.connect(this.masterGain);
+      
+      // Apply individual sound type volume
+      gainNode.gain.value = volume;
       
       // Calculate frequency based on block value using a beautiful major scale
       // Map block values to create a Christmas bell-like progression
@@ -3154,7 +3233,7 @@ class SoundManager {
           1152921504606846976: 14080.00, // A9 (octave up - half-step progression)
           2305843009213693952: 14917.24, // A#9/Bb9 (half-step up)
           4611686018427387904: 15804.27, // B9 (half-step up)
-          9223372036854775808: 16744.00  // C10 (half-step up - final progression)
+          9223372036854775808: 16744.00, // C10 (half-step up - final progression)
         };
         
         // Return the mapped frequency or fallback to a calculated frequency for very large values
@@ -3194,18 +3273,18 @@ class SoundManager {
       harmonicOsc1.connect(harmonicGain1);
       harmonicGain1.connect(gainNode);
       
-      // Volume envelope: crystal clear bell with natural decay
+      // Volume envelope: crystal clear bell with natural decay (scaled by volume)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.001); // Instant, clear attack (quieter)
+      gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.001); // Use volume parameter
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0); // Natural bell decay
       
-      // Separate gain control for clear bell balance
+      // Separate gain control for clear bell balance (scaled by volume)
       mainGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      mainGain.gain.linearRampToValueAtTime(0.9, this.audioContext.currentTime + 0.001);
+      mainGain.gain.linearRampToValueAtTime(volume * 0.9, this.audioContext.currentTime + 0.001); // Scale main tone by volume
       mainGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
       
       harmonicGain1.gain.setValueAtTime(0, this.audioContext.currentTime);
-      harmonicGain1.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.001);
+      harmonicGain1.gain.linearRampToValueAtTime(volume * 0.3, this.audioContext.currentTime + 0.001); // Scale harmonic by volume
       harmonicGain1.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
       
       // Start both oscillators
@@ -3239,13 +3318,16 @@ class SoundManager {
   }
   
   // Generate a satisfying pop merge sound effect with frequency variation based on block value
-  playPopMergeSound(blockValue = 1) {
+  playPopMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
       gainNode.connect(this.masterGain);
+      
+      // Apply individual sound type volume
+      gainNode.gain.value = volume;
       
       // Calculate frequency based on block value - higher blocks = higher pitch
       const getPopFrequency = (value) => {
@@ -3303,18 +3385,18 @@ class SoundManager {
       highPassFilter.connect(noiseGain);
       noiseGain.connect(gainNode);
       
-      // Volume envelope: very quick attack, fast decay for pop
+      // Volume envelope: very quick attack, fast decay for pop (scaled by volume)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(1.2, this.audioContext.currentTime + 0.001); // Extremely quick attack (MAXIMUM VOLUME)
+      gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.001); // Use volume parameter
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06); // Faster decay for more percussive
       
-      // Separate gain control for tone vs noise
+      // Separate gain control for tone vs noise (scaled by volume)
       toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      toneGain.gain.linearRampToValueAtTime(0.15, this.audioContext.currentTime + 0.001); // Much lower tone volume
+      toneGain.gain.linearRampToValueAtTime(volume * 0.15, this.audioContext.currentTime + 0.001); // Scale tone by volume
       toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
       
       noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001); // Higher noise volume for impact
+      noiseGain.gain.linearRampToValueAtTime(volume * 0.8, this.audioContext.currentTime + 0.001); // Scale noise by volume
       noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
       
       // Start both sources
@@ -3355,6 +3437,7 @@ class SoundManager {
     if (this.masterGain) {
       this.masterGain.gain.value = this.volume;
     }
+    this.saveSoundSettings();
   }
   
   // Toggle mute state
@@ -3363,6 +3446,7 @@ class SoundManager {
     if (this.masterGain) {
       this.masterGain.gain.value = this.isMuted ? 0 : this.volume;
     }
+    this.saveSoundSettings();
     return this.isMuted;
   }
   
@@ -3380,6 +3464,7 @@ class SoundManager {
   toggleMergeSoundType() {
     this.usePopMergeSounds = !this.usePopMergeSounds;
     console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'pop' : 'musical'} merge sounds`);
+    this.saveSoundSettings();
     return this.usePopMergeSounds;
   }
   
@@ -3387,204 +3472,449 @@ class SoundManager {
   getMergeSoundType() {
     return this.usePopMergeSounds;
   }
-
-  // Generate a percussive bomb explosion sound effect for bomb merges
-  playBombSound(pitchMultiplier = 1.0, volumeMultiplier = 1.0) {
-    if (!this.initialized || this.isMuted) return;
+  
+  // Set individual sound type volume (0-5 scale)
+  setSoundVolume(soundType, volume) {
+    console.log(`🎚️ setSoundVolume called with: ${soundType} = ${volume}`);
     
-    try {
-      // Create gain node for volume control
-      const gainNode = this.audioContext.createGain();
-      gainNode.connect(this.masterGain);
+    if (this.soundVolumes.hasOwnProperty(soundType)) {
+      const oldVolume = this.soundVolumes[soundType];
+      this.soundVolumes[soundType] = Math.max(0, Math.min(5, Math.round(volume)));
+      console.log(`🔊 Set ${soundType} volume from ${oldVolume} to ${this.soundVolumes[soundType]}`);
+      this.saveSoundSettings();
       
-      // Phase 1: Sharp initial blast (0-0.15s)
-      const blastOsc = this.audioContext.createOscillator();
-      const blastGain = this.audioContext.createGain();
-      blastOsc.type = 'sawtooth';
-      blastOsc.frequency.setValueAtTime(150 * pitchMultiplier, this.audioContext.currentTime);
-      blastOsc.frequency.exponentialRampToValueAtTime(80 * pitchMultiplier, this.audioContext.currentTime + 0.15);
-      blastOsc.connect(blastGain);
-      blastGain.connect(gainNode);
+      // Log current state of all volumes
+      console.log('📊 Current sound volumes:', this.soundVolumes);
+    } else {
+      console.warn(`⚠️ Unknown sound type: ${soundType}`);
+    }
+  }
+  
+  // Get individual sound type volume (0-5 scale)
+  getSoundVolume(soundType) {
+    // Check if the sound type exists and has a value (including 0)
+    if (this.soundVolumes.hasOwnProperty(soundType)) {
+      return this.soundVolumes[soundType];
+    }
+    // Only return default 3 if the sound type doesn't exist at all
+    return 3;
+  }
+  
+  // Get all sound volumes
+  getAllSoundVolumes() {
+    return { ...this.soundVolumes };
+  }
+  
+  // Set all sound volumes at once
+  setAllSoundVolumes(volumes) {
+    console.log('🎚️ setAllSoundVolumes called with:', volumes);
+    
+    Object.keys(volumes).forEach(soundType => {
+      if (this.soundVolumes.hasOwnProperty(soundType)) {
+        const oldVolume = this.soundVolumes[soundType];
+        const newVolume = Math.max(0, Math.min(5, Math.round(volumes[soundType])));
+        this.soundVolumes[soundType] = newVolume;
+        console.log(`🔊 ${soundType}: ${oldVolume} → ${newVolume} (input: ${volumes[soundType]})`);
+      }
+    });
+    
+    console.log('🔊 Final sound volumes after update:', this.soundVolumes);
+  }
+  
+  // Convert volume scale (0-5) to actual volume (0.0-2.0 for drop/merge, 0.0-1.0 for others)
+  getActualVolume(soundType) {
+    console.log(`🔍 getActualVolume called for: ${soundType}`);
+    
+    // If the sound type has a specific volume, use it
+    if (this.soundVolumes.hasOwnProperty(soundType)) {
+      const volume = this.soundVolumes[soundType];
+      let actualVolume;
       
-      // Phase 2: Deep percussive impact (0-0.45s)
-      const impactOsc = this.audioContext.createOscillator();
-      const impactGain = this.audioContext.createGain();
-      impactOsc.type = 'sine';
-      impactOsc.frequency.setValueAtTime(40 * pitchMultiplier, this.audioContext.currentTime);
-      impactOsc.frequency.exponentialRampToValueAtTime(25 * pitchMultiplier, this.audioContext.currentTime + 0.45);
-      impactOsc.connect(impactGain);
-      impactGain.connect(gainNode);
-      
-      // Phase 3: Explosive noise burst (0-0.3s)
-      const noiseSource = this.audioContext.createBufferSource();
-      const noiseGain = this.audioContext.createGain();
-      const noiseBuffer = this.audioContext.createBuffer(1, 512, this.audioContext.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      
-      // Create sharp, percussive explosion noise
-      for (let i = 0; i < noiseData.length; i++) {
-        const envelope = Math.exp(-i * 0.04); // Faster decay for more percussive sound
-        noiseData[i] = (Math.random() * 2 - 1) * envelope * 1.8;
+      // Drop and merge sounds get enhanced volume range (0.0-2.0) for more impact
+      if (soundType === 'drop' || soundType === 'merge') {
+        actualVolume = volume === 0 ? 0 : (volume / 5) * 2.0; // 0 = mute, 1-5 = 0.4 to 2.0
+      } else {
+        actualVolume = volume === 0 ? 0 : volume / 5; // 0 = mute, 1-5 = 0.2 to 1.0
       }
       
-      noiseSource.buffer = noiseBuffer;
-      noiseSource.connect(noiseGain);
-      noiseGain.connect(gainNode);
-      
-      // Phase 4: Low rumble sustain (0-0.6s)
-      const rumbleOsc = this.audioContext.createOscillator();
-      const rumbleGain = this.audioContext.createGain();
-      rumbleOsc.type = 'sine';
-      rumbleOsc.frequency.setValueAtTime(35 * pitchMultiplier, this.audioContext.currentTime);
-      rumbleOsc.frequency.exponentialRampToValueAtTime(20 * pitchMultiplier, this.audioContext.currentTime + 0.6);
-      rumbleOsc.connect(rumbleGain);
-      rumbleGain.connect(gainNode);
-      
-      // Create filters for bomb character
-      const lowPassFilter = this.audioContext.createBiquadFilter();
-      lowPassFilter.type = 'lowpass';
-      lowPassFilter.frequency.setValueAtTime(600 * pitchMultiplier, this.audioContext.currentTime);
-      lowPassFilter.frequency.exponentialRampToValueAtTime(200 * pitchMultiplier, this.audioContext.currentTime + 0.8);
-      lowPassFilter.Q.setValueAtTime(0.3, this.audioContext.currentTime);
-      
-      const highPassFilter = this.audioContext.createBiquadFilter();
-      highPassFilter.type = 'highpass';
-      highPassFilter.frequency.setValueAtTime(30 * pitchMultiplier, this.audioContext.currentTime);
-      highPassFilter.Q.setValueAtTime(0.4, this.audioContext.currentTime);
-      
-      // Apply filters to noise
-      noiseSource.connect(lowPassFilter);
-      lowPassFilter.connect(highPassFilter);
-      highPassFilter.connect(noiseGain);
-      
-      // Master volume envelope: sharp attack, quick decay
-      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(1.0 * volumeMultiplier, this.audioContext.currentTime + 0.001); // Instant attack
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6); // Quick decay
-      
-      // Phase-specific gain control for percussive timing
-      // Blast phase (0-0.15s) - sharp and bright
-      blastGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      blastGain.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001);
-      blastGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
-      
-      // Impact phase (0-0.45s) - strong initial hit
-      impactGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      impactGain.gain.linearRampToValueAtTime(1.0, this.audioContext.currentTime + 0.001);
-      impactGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.45);
-      
-      // Noise phase (0-0.3s) - explosive burst
-      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(0.7, this.audioContext.currentTime + 0.001);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
-      
-      // Rumble phase (0-0.6s) - sustained low end
-      rumbleGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      rumbleGain.gain.linearRampToValueAtTime(0.6, this.audioContext.currentTime + 0.05);
-      rumbleGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6);
-      
-      // Start all sources
-      blastOsc.start(this.audioContext.currentTime);
-      impactOsc.start(this.audioContext.currentTime);
-      noiseSource.start(this.audioContext.currentTime);
-      rumbleOsc.start(this.audioContext.currentTime);
-      
-      // Stop sources at appropriate times
-      blastOsc.stop(this.audioContext.currentTime + 0.15);
-      impactOsc.stop(this.audioContext.currentTime + 0.45);
-      noiseSource.stop(this.audioContext.currentTime + 0.3);
-      rumbleOsc.stop(this.audioContext.currentTime + 0.6);
-      
-      // Clean up nodes after playback
-      const cleanup = () => {
-        blastOsc.disconnect();
-        impactOsc.disconnect();
-        noiseSource.disconnect();
-        rumbleOsc.disconnect();
-        lowPassFilter.disconnect();
-        highPassFilter.disconnect();
-        blastGain.disconnect();
-        impactGain.disconnect();
-        noiseGain.disconnect();
-        rumbleGain.disconnect();
-        gainNode.disconnect();
+      console.log(`✅ ${soundType} has specific volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
+      return actualVolume;
+    }
+    
+    // If no specific volume is set, fall back to "Other" volume
+    const fallbackVolume = this.soundVolumes.other || 3;
+    let fallbackActual;
+    
+    if (soundType === 'drop' || soundType === 'merge') {
+      fallbackActual = fallbackVolume === 0 ? 0 : (fallbackVolume / 5) * 2.0;
+    } else {
+      fallbackActual = fallbackVolume === 0 ? 0 : fallbackVolume / 5;
+    }
+    
+    console.log(`🔄 ${soundType} using fallback volume: ${fallbackVolume} → ${fallbackActual} (${Math.round(fallbackActual * 100)}%)`);
+    return fallbackActual;
+  }
+  
+  // Save sound settings to localStorage
+  saveSoundSettings() {
+    try {
+      const settings = {
+        isMuted: this.isMuted,
+        volume: this.volume,
+        usePopMergeSounds: this.usePopMergeSounds,
+        soundVolumes: this.soundVolumes,
+        timestamp: Date.now()
       };
-      
-      // Set timeout to ensure cleanup happens
-      setTimeout(cleanup, 700);
-      
+      localStorage.setItem('stackMerge_soundSettings', JSON.stringify(settings));
+      console.log('💾 Sound settings saved to localStorage');
+    } catch (error) {
+      console.error('❌ Failed to save sound settings:', error);
+    }
+  }
+  
+  // Load sound settings from localStorage
+  loadSoundSettings() {
+    try {
+      const saved = localStorage.getItem('stackMerge_soundSettings');
+      if (saved) {
+        const settings = JSON.parse(saved);
+        
+        // Load settings with validation
+        if (typeof settings.isMuted === 'boolean') this.isMuted = settings.isMuted;
+        if (typeof settings.volume === 'number') this.volume = Math.max(0, Math.min(1, settings.volume));
+        if (typeof settings.usePopMergeSounds === 'boolean') this.usePopMergeSounds = settings.usePopMergeSounds;
+        
+        // Load individual sound volumes
+        if (settings.soundVolumes && typeof settings.soundVolumes === 'object') {
+          Object.keys(settings.soundVolumes).forEach(soundType => {
+            if (this.soundVolumes.hasOwnProperty(soundType)) {
+              const vol = settings.soundVolumes[soundType];
+              if (typeof vol === 'number' && vol >= 0 && vol <= 5) {
+                this.soundVolumes[soundType] = Math.round(vol);
+              }
+            }
+          });
+        }
+        
+        console.log('📂 Sound settings loaded from localStorage:', settings);
+        return true;
+      }
+    } catch (error) {
+      console.error('❌ Failed to load sound settings:', error);
+    }
+    return false;
+  }
 
+  // Preload bomb audio for better performance
+  bombAudio = null;
+  
+  // Preload coin audio files for better performance
+  coinAudios = null;
+  
+  // Preload stage up audio for better performance
+  stageUpAudio = null;
+  
+  // Preload purchase audio for better performance
+  purchaseAudio = null;
+  
+  // Load and play the bomb explosion sound effect from audio file
+  playBombSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('bomb');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    try {
+      // Create audio element for the bomb sound if not already created
+      if (!this.bombAudio) {
+        this.bombAudio = new Audio('sounds/bomb.mp3');
+        this.bombAudio.preload = 'auto'; // Preload the audio
+      }
+      
+      // Apply individual sound type volume
+      this.bombAudio.volume = actualVolume;
+      
+      // Reset audio to beginning and play
+      this.bombAudio.currentTime = 0;
+      this.bombAudio.play().catch(error => {
+        console.error('❌ Failed to play bomb audio file:', error);
+      });
+      
+      console.log('💥 Bomb explosion sound played successfully');
       
     } catch (error) {
       console.error('❌ Failed to play bomb sound:', error);
     }
   }
-
-  // Generate a beautiful chime/ring sound effect for stage progression
-  playStageProgressionSound(pitchMultiplier = 1.0) {
-
+  
+  // Load and play the purchase sound effect from audio file
+  playPurchaseSound() {
     if (!this.initialized || this.isMuted) return;
     
+    // Check individual sound type volume - use 'other' category as requested
+    const actualVolume = this.getActualVolume('other');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
     try {
-      // Create gain node for volume control
-      const gainNode = this.audioContext.createGain();
-      gainNode.connect(this.masterGain);
+      // Create audio element for the purchase sound if not already created
+      if (!this.purchaseAudio) {
+        this.purchaseAudio = new Audio('sounds/purchase.wav');
+        this.purchaseAudio.preload = 'auto'; // Preload the audio
+      }
       
-      // Create a single, pure oscillator for clean tone
-      const osc = this.audioContext.createOscillator();
-      osc.type = 'sine'; // Pure sine wave for clean, pleasant sound
+      // Apply individual sound type volume
+      this.purchaseAudio.volume = actualVolume;
       
-      // Calculate frequency based on pitch multiplier (ascending major scale)
-      // Base frequency is C4 (261.63 Hz), ascending through major scale
-      const baseFreq = 261.63; // C4
-      const frequency = baseFreq * pitchMultiplier;
+      // Reset audio to beginning and play
+      this.purchaseAudio.currentTime = 0;
+      this.purchaseAudio.play().catch(error => {
+        console.error('❌ Failed to play purchase audio file:', error);
+      });
       
-      osc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
-      
-      // Connect the oscillator directly to the gain node
-      osc.connect(gainNode);
-      
-      // Create a gentle high-pass filter to remove harsh low frequencies
-      const highPassFilter = this.audioContext.createBiquadFilter();
-      highPassFilter.type = 'highpass';
-      highPassFilter.frequency.setValueAtTime(200, this.audioContext.currentTime);
-      highPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime);
-      
-      // Apply filter to the output
-      gainNode.connect(highPassFilter);
-      highPassFilter.connect(this.masterGain);
-      
-      // Volume envelope: very gentle attack, quick decay for pleasant sound
-      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.4 * pitchMultiplier, this.audioContext.currentTime + 0.05); // Gentle attack, scaled by pitch
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6); // Quick, pleasant decay
-      
-      // Harmonic-specific gain control removed - using single oscillator approach
-      
-      // Start and stop the oscillator
-      osc.start(this.audioContext.currentTime);
-      osc.stop(this.audioContext.currentTime + 0.6);
-      
-      // Clean up nodes after playback
-      const cleanup = () => {
-        osc.disconnect();
-        highPassFilter.disconnect();
-        gainNode.disconnect();
-      };
-      
-      // Set timeout to ensure cleanup happens
-      setTimeout(cleanup, 700);
-      
-
+      console.log('💰 Purchase sound played successfully');
       
     } catch (error) {
-      console.error('❌ Failed to play stage progression sound:', error);
+      console.error('❌ Failed to play purchase sound:', error);
+    }
+  }
+  
+  // Preload bomb audio for better performance
+  preloadBombAudio() {
+    try {
+      this.bombAudio = new Audio('sounds/bomb.mp3');
+      this.bombAudio.preload = 'auto';
+      console.log('💥 Bomb audio preloaded successfully');
+    } catch (error) {
+      console.error('❌ Failed to preload bomb audio:', error);
+    }
+  }
+  
+  // Preload purchase audio for better performance
+  preloadPurchaseAudio() {
+    try {
+      this.purchaseAudio = new Audio('sounds/purchase.wav');
+      this.purchaseAudio.preload = 'auto';
+      console.log('💰 Purchase audio preloaded successfully');
+    } catch (error) {
+      console.error('❌ Failed to preload purchase audio:', error);
+    }
+  }
+  
+  // Preload stage up audio for better performance
+  preloadStageUpAudio() {
+    try {
+      this.stageUpAudio = new Audio('sounds/stage_up.mp3');
+      this.stageUpAudio.preload = 'auto';
+      console.log('🎯 Stage up audio preloaded successfully');
+    } catch (error) {
+      console.error('❌ Failed to preload stage up audio:', error);
+    }
+  }
+  
+  // Preload coin audio files for better performance
+  preloadCoinAudio() {
+    try {
+      this.coinAudios = [];
+      for (let i = 1; i <= 7; i++) {
+        const coinAudio = new Audio(`sounds/coin${i}.wav`);
+        coinAudio.preload = 'auto';
+        
+        // Force load the audio by setting source and triggering load
+        coinAudio.load();
+        
+        // Add error handling for individual files
+        coinAudio.addEventListener('error', (e) => {
+          console.error(`❌ Failed to load coin${i}.wav:`, e);
+        });
+        
+        this.coinAudios.push(coinAudio);
+      }
+      console.log('🪙 Coin audio files preloaded successfully (7 sounds)');
+    } catch (error) {
+      console.error('❌ Failed to preload coin audio:', error);
+      // Set empty array so playCoinSound doesn't crash
+      this.coinAudios = [];
+    }
+  }
+  
+  // Play a random coin sound effect when gold is earned
+  playCoinSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('coin');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context:', error);
+      });
+    }
+    
+    try {
+      // Pick a random coin sound (1-7 for 7 sounds)
+      const randomIndex = Math.floor(Math.random() * 7) + 1;
+      
+      // Create a fresh audio element for this specific sound to allow overlapping playback
+      const coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
+      coinAudio.volume = actualVolume; // Apply individual sound type volume
+      
+      // Add error handling and retry logic
+      coinAudio.addEventListener('error', (e) => {
+        console.error(`❌ Audio error for coin${randomIndex}:`, e);
+      });
+      
+      // Ensure audio is loaded before playing
+      coinAudio.addEventListener('canplaythrough', () => {
+        // Play the sound once it's ready
+        coinAudio.play().then(() => {
+          console.log(`🪙 Coin sound ${randomIndex} played successfully`);
+        }).catch(error => {
+          console.error(`❌ Failed to play coin audio ${randomIndex}:`, error);
+          // Try alternative approach if direct play fails
+          this.playCoinSoundFallback(randomIndex);
+        });
+      });
+      
+      // Set a timeout in case the audio doesn't load
+      setTimeout(() => {
+        if (coinAudio.readyState < 2) { // HAVE_CURRENT_DATA
+          console.warn(`⚠️ Coin audio ${randomIndex} taking too long to load, trying fallback`);
+          this.playCoinSoundFallback(randomIndex);
+        }
+      }, 100);
+      
+      // Try to play immediately as well
+      coinAudio.play().catch(error => {
+        console.log(`ℹ️ Immediate play failed for coin${randomIndex}, waiting for load...`);
+      });
+      
+    } catch (error) {
+      console.error('❌ Failed to create coin sound:', error);
+      // Try fallback with a different random sound
+      this.playCoinSoundFallback(Math.floor(Math.random() * 7) + 1);
+    }
+  }
+  
+  // Fallback method using preloaded audio if fresh creation fails
+  playCoinSoundFallback(soundIndex) {
+    if (!this.coinAudios || this.coinAudios.length === 0) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('coin');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Validate sound index is within range (1-7)
+    if (soundIndex < 1 || soundIndex > 7) {
+      console.warn(`⚠️ Invalid coin sound index: ${soundIndex}, using random fallback`);
+      soundIndex = Math.floor(Math.random() * 7) + 1;
+    }
+    
+    try {
+      const coinAudio = this.coinAudios[soundIndex - 1]; // Convert to 0-based index
+      if (coinAudio) {
+        // Apply individual sound type volume
+        coinAudio.volume = actualVolume;
+        coinAudio.currentTime = 0;
+        coinAudio.play().catch(error => {
+          console.error(`❌ Fallback also failed for coin sound ${soundIndex}:`, error);
+        });
+        console.log(`🪙 Coin sound ${soundIndex} played via fallback`);
+      } else {
+        console.warn(`⚠️ No preloaded audio found for coin sound ${soundIndex}`);
+      }
+    } catch (error) {
+      console.error(`❌ Fallback method failed for coin sound ${soundIndex}:`, error);
+    }
+  }
+  
+  // Test method to verify all coin sounds are working (for debugging)
+  testAllCoinSounds() {
+    if (!this.initialized || this.isMuted) return;
+    
+    console.log('🧪 Testing all coin sounds...');
+    for (let i = 1; i <= 7; i++) {
+      setTimeout(() => {
+        this.playCoinSound();
+      }, i * 200); // Play each sound 200ms apart
+    }
+  }
+  
+  // Test method to verify stage up sound is working (for debugging)
+  testStageUpSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    console.log('🧪 Testing stage up sound...');
+    this.playStageProgressionSound();
+  }
+  
+  // Verify coin sound loading status (for debugging)
+  getCoinSoundStatus() {
+    if (!this.coinAudios) return { loaded: false, count: 0, status: 'Not initialized' };
+    
+    const status = {
+      loaded: true,
+      count: this.coinAudios.length,
+      expected: 7,
+      readyStates: [],
+      errors: []
+    };
+    
+    this.coinAudios.forEach((audio, index) => {
+      const soundNumber = index + 1;
+      status.readyStates.push({
+        sound: `coin${soundNumber}`,
+        readyState: audio.readyState,
+        error: audio.error
+      });
+      
+      if (audio.error) {
+        status.errors.push(`coin${soundNumber}: ${audio.error.message}`);
+      }
+    });
+    
+    return status;
+  }
+
+  // Load and play the stage up sound effect from audio file
+  playStageProgressionSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('other');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    try {
+      // Create audio element for the stage up sound if not already created
+      if (!this.stageUpAudio) {
+        this.stageUpAudio = new Audio('sounds/stage_up.mp3');
+        this.stageUpAudio.preload = 'auto'; // Preload the audio
+      }
+      
+      // Apply individual sound type volume
+      this.stageUpAudio.volume = actualVolume;
+      
+      // Reset audio to beginning and play
+      this.stageUpAudio.currentTime = 0;
+      this.stageUpAudio.play().catch(error => {
+        console.error('❌ Failed to play stage up audio file:', error);
+      });
+      
+      console.log('🎯 Stage up sound played successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to play stage up sound:', error);
     }
   }
 }
 
 // Initialize sound manager
 const soundManager = new SoundManager();
+
+// Load saved sound settings
+soundManager.loadSoundSettings();
 
 // weights and probabilities - will be dynamically updated based on stage
 let weights = [1, 2]; // Start with 1 and 2, unlock others as player progresses
@@ -3619,6 +3949,11 @@ function saveGameState() {
       bombSelected: bombSelected,
       previousBombCost: previousBombCost
     });
+    console.log('🔊 Sound settings being saved:', {
+      usePopMergeSounds: soundManager.getMergeSoundType(),
+      soundVolumes: soundManager.getAllSoundVolumes(),
+      isMuted: soundManager.getMuteState()
+    });
     console.log('💾 Saving button costs - Bomb:', bombConversionCost, 'Trash:', trashButtonCost);
     console.log('💾 Saving bomb state - Selected:', bombSelected, 'Previous Cost:', previousBombCost);
     
@@ -3639,6 +3974,8 @@ function saveGameState() {
       bombSelected: bombSelected,
       previousBombCost: previousBombCost,
       usePopMergeSounds: soundManager.getMergeSoundType(),
+      soundVolumes: soundManager.getAllSoundVolumes(),
+      isMuted: soundManager.getMuteState(),
       timestamp: Date.now()
     };
     
@@ -3838,12 +4175,31 @@ function restoreGameState(gameState) {
       soundManager.usePopMergeSounds = gameState.usePopMergeSounds;
     }
     
+    // Restore sound volumes from saved state
+    if (gameState.soundVolumes && typeof gameState.soundVolumes === 'object') {
+      soundManager.setAllSoundVolumes(gameState.soundVolumes);
+    }
+    
+    // Restore master mute state from saved state
+    if (gameState.isMuted !== undefined) {
+      soundManager.isMuted = gameState.isMuted;
+      console.log('🔇 Restored master mute state:', gameState.isMuted);
+    }
+    
     // Always update the merge sound button to reflect current state (including default)
     const mergeSoundBtn = document.getElementById('mergeSoundBtn');
     if (mergeSoundBtn) {
       const usePopSounds = soundManager.getMergeSoundType();
       mergeSoundBtn.textContent = '🎵'; // Always show music note
       mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+    }
+    
+    // Update sound button to reflect restored mute state
+    const soundBtn = document.getElementById('soundBtn');
+    if (soundBtn) {
+      const isMuted = soundManager.getMuteState();
+      soundBtn.textContent = isMuted ? '🔇' : '🔊';
+      soundBtn.title = 'Sound Controls';
     }
     
     console.log('🔄 Restored button costs - Bomb:', oldBombCost, '→', bombConversionCost, 'Trash:', oldTrashCost, '→', trashButtonCost);
@@ -3859,6 +4215,11 @@ function restoreGameState(gameState) {
     console.log('- Trash button cost:', trashButtonCost);
     console.log('- Bomb selected:', bombSelected);
     console.log('- Previous bomb cost:', previousBombCost);
+    console.log('🔊 Sound settings restored:', {
+      usePopMergeSounds: soundManager.getMergeSoundType(),
+      soundVolumes: soundManager.getAllSoundVolumes(),
+      isMuted: soundManager.getMuteState()
+    });
     
     // Update cost displays after restoring game state
     if (bombCostEl) {
@@ -4506,21 +4867,13 @@ function handleBombConversion() {
   if (bombSelected && currentBlock.bomb) {
     // Undo bomb selection
     currentBlock.bomb = false;
-    gold += previousBombCost; // Refund the gold that was actually spent
+    // Note: No gold to refund since payment hasn't been made yet
     bombConversionCost = previousBombCost; // Restore previous cost
     bombSelected = false;
     
-    console.log(`Undid bomb selection, refunded ${previousBombCost} gold, restored cost to ${previousBombCost}`);
+    console.log(`Undid bomb selection, restored cost to ${previousBombCost}`);
     
-    // Update gold display
-    updateGoldDisplay();
-    const goldDisplay = document.querySelector('.gold-value');
-    if (goldDisplay) {
-      goldDisplay.classList.add('pulse');
-      setTimeout(() => {
-        goldDisplay.classList.remove('pulse');
-      }, 300);
-    }
+    // No need to update gold display since no gold was deducted
     
     // Re-render to show the regular block
     renderNext();
@@ -4569,10 +4922,8 @@ function handleBombConversion() {
   // Store the current cost before converting
   previousBombCost = bombConversionCost;
   
-  // Deduct gold
-  gold -= bombConversionCost;
-  
-  // Convert the current next block to a bomb
+  // Convert the current next block to a bomb (don't deduct gold yet)
+  // Gold will be deducted when the bomb block is actually placed
   if (currentBlock) {
     currentBlock.bomb = true;
     bombSelected = true; // Mark that a bomb is selected
@@ -4595,18 +4946,8 @@ function handleBombConversion() {
     // This ensures that if bomb status affects any placement decisions, they're properly reflected
     render();
     
-    // Increment press count and double the cost
-    bombConversionCost *= 2;
-    
-    // Update button cost display
-    if (bombCostEl) {
-      bombCostEl.textContent = formatNumber(bombConversionCost);
-    }
-    if (bombCostElMobile) {
-      bombCostElMobile.textContent = formatNumber(bombConversionCost);
-    }
-    
-    // Update button state (cost changed, so force update)
+    // Note: Cost will increase when the bomb block is actually placed, not when selected
+    // Update button state
     updateBombConversionButtonState();
     
     // Save game state after bomb conversion and cost increase
@@ -4635,6 +4976,9 @@ function handleTrashButton() {
   
   // Deduct gold
   gold -= trashButtonCost;
+  
+  // Play purchase sound for the trash button usage
+  soundManager.playPurchaseSound();
   
   // Remove the current next block from the queue
   const removedBlock = nextQueue.shift();
@@ -4689,7 +5033,7 @@ function updateBombConversionButtonState() {
       bombConversionBtn.classList.remove('affordable');
       bombConversionBtn.classList.add('undo-mode');
       bombConversionBtn.title = "Press again to undo bomb selection";
-      bombConversionBtn.querySelector('.emoji').textContent = "↩️";
+              bombConversionBtn.querySelector('.powerup-emoji').textContent = "↩️";
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -4700,7 +5044,7 @@ function updateBombConversionButtonState() {
         bombConversionBtn.classList.remove('affordable');
         bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Next block is already a bomb";
-        bombConversionBtn.querySelector('.emoji').textContent = "💣";
+        bombConversionBtn.querySelector('.powerup-emoji').textContent = "💣";
       } else {
         // Next block is not a bomb, check if player has enough gold
         const hasEnoughGold = gold >= bombConversionCost;
@@ -4716,7 +5060,7 @@ function updateBombConversionButtonState() {
         }
         bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
-        bombConversionBtn.querySelector('.emoji').textContent = "💣";
+        bombConversionBtn.querySelector('.powerup-emoji').textContent = "💣";
       }
     }
     
@@ -4732,7 +5076,7 @@ function updateBombConversionButtonState() {
       bombConversionBtnMobile.classList.remove('affordable');
       bombConversionBtnMobile.classList.add('undo-mode');
       bombConversionBtnMobile.title = "Press again to undo bomb selection";
-      bombConversionBtnMobile.querySelector('.emoji').textContent = "↩️";
+              bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "↩️";
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -4743,7 +5087,7 @@ function updateBombConversionButtonState() {
         bombConversionBtnMobile.classList.remove('affordable');
         bombConversionBtnMobile.classList.remove('undo-mode');
         bombConversionBtnMobile.title = "Next block is already a bomb";
-        bombConversionBtnMobile.querySelector('.emoji').textContent = "💣";
+        bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "💣";
       } else {
         // Next block is not a bomb, check if player has enough gold
         const hasEnoughGold = gold >= bombConversionCost;
@@ -4756,7 +5100,7 @@ function updateBombConversionButtonState() {
         }
         bombConversionBtnMobile.classList.remove('undo-mode');
         bombConversionBtnMobile.title = "Convert next block to bomb (press again to undo)";
-        bombConversionBtnMobile.querySelector('.emoji').textContent = "💣";
+        bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "💣";
       }
     }
   }
@@ -4900,9 +5244,7 @@ helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHe
 
 // Sound button event listener
 soundBtn.addEventListener('click', () => {
-  const isMuted = soundManager.toggleMute();
-  soundBtn.textContent = isMuted ? '🔇' : '🔊';
-  soundBtn.title = isMuted ? 'Unmute sound' : 'Mute sound';
+  openSoundControlModal();
 });
 
 // Merge sound button event listener
@@ -4918,6 +5260,13 @@ if (mergeSoundBtn) {
   const usePopSounds = soundManager.getMergeSoundType();
   mergeSoundBtn.textContent = '🎵'; // Always show music note
   mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+}
+
+// Set initial sound button state
+if (soundBtn) {
+  const isMuted = soundManager.getMuteState();
+  soundBtn.textContent = isMuted ? '🔇' : '🔊';
+  soundBtn.title = 'Sound Controls';
 }
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) closeHelp(); });
 
@@ -4976,6 +5325,143 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Sound Control Modal Functions
+function openSoundControlModal() {
+  const modal = document.getElementById('soundControlModal');
+  if (modal) {
+    console.log('🎚️ Opening sound control modal...');
+    console.log('🔊 Current sound volumes before UI update:', soundManager.getAllSoundVolumes());
+    
+    // Update UI with current sound settings
+    updateSoundControlUI();
+    
+    console.log('🔊 Sound volumes after UI update:', soundManager.getAllSoundVolumes());
+    modal.classList.remove('hidden');
+  }
+}
+
+function closeSoundControlModal() {
+  const modal = document.getElementById('soundControlModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+function updateSoundControlUI() {
+  // Update master mute button
+  const masterMuteBtn = document.getElementById('masterMuteBtn');
+  if (masterMuteBtn) {
+    const isMuted = soundManager.getMuteState();
+    masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+    masterMuteBtn.classList.toggle('muted', isMuted);
+  }
+  
+  // Update volume sliders and values
+  const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
+  soundTypes.forEach(soundType => {
+    const slider = document.getElementById(`${soundType}VolumeSlider`);
+    const value = document.getElementById(`${soundType}VolumeValue`);
+    
+    if (slider && value) {
+      const currentVolume = soundManager.getSoundVolume(soundType);
+      console.log(`🎚️ UI Update: ${soundType} slider set to ${currentVolume}`);
+      slider.value = currentVolume;
+      value.textContent = currentVolume;
+    }
+  });
+}
+
+function initializeSoundControlModal() {
+  // Master mute button
+  const masterMuteBtn = document.getElementById('masterMuteBtn');
+  if (masterMuteBtn) {
+    masterMuteBtn.addEventListener('click', () => {
+      const isMuted = soundManager.toggleMute();
+      masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+      masterMuteBtn.classList.toggle('muted', isMuted);
+      
+      // Update sound button in title bar
+      const soundBtn = document.getElementById('soundBtn');
+      if (soundBtn) {
+        soundBtn.textContent = isMuted ? '🔇' : '🔊';
+        soundBtn.title = 'Sound Controls';
+      }
+      
+      // Save game state to cookies to persist the mute change
+      saveGameState();
+    });
+  }
+  
+  // Volume sliders
+  const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
+  soundTypes.forEach(soundType => {
+    const slider = document.getElementById(`${soundType}VolumeSlider`);
+    const value = document.getElementById(`${soundType}VolumeValue`);
+    
+    if (slider && value) {
+      slider.addEventListener('input', (e) => {
+        const newVolume = parseInt(e.target.value);
+        console.log(`🎚️ ${soundType} volume slider changed to: ${newVolume}`);
+        soundManager.setSoundVolume(soundType, newVolume);
+        value.textContent = newVolume;
+        
+        // Test the volume change immediately
+        testVolumeChange(soundType, newVolume);
+        
+        // Save game state to cookies to persist the volume change
+        saveGameState();
+      });
+    }
+  });
+  
+  // Close button
+  const closeBtn = document.getElementById('soundControlClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeSoundControlModal);
+  }
+  
+  // Test all sounds button
+  const testAllSoundsBtn = document.getElementById('testAllSoundsBtn');
+  if (testAllSoundsBtn) {
+    testAllSoundsBtn.addEventListener('click', () => {
+      console.log('🧪 Testing all sounds with current volume settings...');
+      
+      // Test each sound type
+      const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
+      soundTypes.forEach((soundType, index) => {
+        setTimeout(() => {
+          testVolumeChange(soundType, soundManager.getSoundVolume(soundType));
+        }, index * 500); // Play each sound 500ms apart
+      });
+    });
+  }
+  
+  // Debug volumes button
+  const debugVolumeBtn = document.getElementById('debugVolumeBtn');
+  if (debugVolumeBtn) {
+    debugVolumeBtn.addEventListener('click', () => {
+      debugVolumeHandling();
+    });
+  }
+  
+  // Close modal when clicking outside
+  const modal = document.getElementById('soundControlModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeSoundControlModal();
+      }
+    });
+  }
+  
+  // Close modal with Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      closeSoundControlModal();
+    }
+  });
+}
+
 // Initialize button states
 updateBombConversionButtonState();
 updateTrashButtonState();
@@ -5009,7 +5495,79 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Debug button revealed!');
     }
   });
+  
+  // Initialize sound control modal after DOM is loaded
+  initializeSoundControlModal();
 });
+
+// Test function to verify volume changes are working
+function testVolumeChange(soundType, volume) {
+  console.log(`🧪 Testing ${soundType} volume change to ${volume}`);
+  
+  // Get the actual volume value that would be used
+  const actualVolume = soundManager.getActualVolume(soundType);
+  console.log(`🔊 ${soundType} actual volume: ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
+  
+  // Test playing a sound if the volume is not 0
+  if (actualVolume > 0) {
+    console.log(`🎵 ${soundType} volume is not muted, sound should play`);
+    
+    // Play a test sound based on the sound type
+    switch (soundType) {
+      case 'drop':
+        console.log('📦 Testing drop sound...');
+        soundManager.playDropSound(1);
+        break;
+      case 'merge':
+        console.log('🔗 Testing merge sound...');
+        soundManager.playMergeSound(2);
+        break;
+      case 'coin':
+        console.log('💰 Testing coin sound...');
+        soundManager.playCoinSound();
+        break;
+      case 'bomb':
+        console.log('💥 Testing bomb sound...');
+        soundManager.playBombSound();
+        break;
+      case 'other':
+        console.log('🚀 Testing stage up sound...');
+        soundManager.playStageProgressionSound();
+        break;
+    }
+  } else {
+    console.log(`🔇 ${soundType} volume is muted (0), sound should NOT play`);
+  }
+}
+
+// Debug function to test volume handling
+function debugVolumeHandling() {
+  console.log('🔍 Debugging volume handling...');
+  
+  // Test setting a volume to 0
+  console.log('🧪 Setting drop volume to 0...');
+  soundManager.setSoundVolume('drop', 0);
+  
+  // Test getting the volume back
+  const retrievedVolume = soundManager.getSoundVolume('drop');
+  console.log(`📊 Retrieved drop volume: ${retrievedVolume} (should be 0)`);
+  
+  // Test the actual volume calculation
+  const actualVolume = soundManager.getActualVolume('drop');
+  console.log(`🔊 Actual drop volume: ${actualVolume} (should be 0)`);
+  
+  // Test setting it back to 3
+  console.log('🧪 Setting drop volume back to 3...');
+  soundManager.setSoundVolume('drop', 3);
+  
+  const retrievedVolume2 = soundManager.getSoundVolume('drop');
+  console.log(`📊 Retrieved drop volume: ${retrievedVolume2} (should be 3)`);
+  
+  const actualVolume2 = soundManager.getActualVolume('drop');
+  console.log(`🔊 Actual drop volume: ${actualVolume2} (should be 0.6)`);
+  
+  console.log('🔍 Volume handling debug complete');
+}
 
 function toggleAI(enable){
   if(enable === aiEnabled) return;
@@ -5169,6 +5727,8 @@ function closeNewGameModal() {
 
 function handleNewGameConfirmation() {
   closeNewGameModal();
+  // Play stage up sound effect when starting a new game
+  soundManager.playStageProgressionSound();
   resetGame(true);
 }
 
@@ -5248,11 +5808,36 @@ grantGoldBtn.addEventListener('click', () => {
   // Update trash button state
   updateTrashButtonIfGoldChanged();
   
+  // Play coin sound effect for earning gold
+  soundManager.playCoinSound();
+  
   // Save game state after granting gold
   console.log('🔄 Triggering save after granting gold...');
   saveGameState();
   
   console.log(`Granted 1000 gold. New balance: ${gold}`);
+});
+
+// Test coin sounds button
+document.getElementById('testCoinSoundsBtn').addEventListener('click', () => {
+  soundManager.testAllCoinSounds();
+});
+
+// Test stage up sound button
+document.getElementById('testStageUpBtn').addEventListener('click', () => {
+  soundManager.testStageUpSound();
+});
+
+// Check coin sound status button
+document.getElementById('checkCoinStatusBtn').addEventListener('click', () => {
+  const status = soundManager.getCoinSoundStatus();
+  console.log('🪙 Coin Sound Status:', status);
+  
+  if (status.loaded && status.count === status.expected) {
+    console.log('✅ All coin sounds loaded successfully!');
+  } else {
+    console.warn('⚠️ Coin sound loading issues detected');
+  }
 });
 
 // Score grant button
@@ -5671,6 +6256,42 @@ function placeOnPole(idx){
     
     try {
       poles[idx].push(nextPiece);
+      
+      // Check if this is a purchased bomb that needs payment
+      if (bombSelected && nextPiece.bomb) {
+        // Deduct gold for the bomb usage
+        gold -= bombConversionCost;
+        
+        // Play purchase sound for the bomb usage
+        soundManager.playPurchaseSound();
+        
+        // Increment press count and double the cost for next time
+        bombConversionCost *= 2;
+        
+        // Update button cost display
+        if (bombCostEl) {
+          bombCostEl.textContent = formatNumber(bombConversionCost);
+        }
+        if (bombCostElMobile) {
+          bombCostElMobile.textContent = formatNumber(bombConversionCost);
+        }
+        
+        // Reset bomb selection since it's now placed
+        bombSelected = false;
+        
+        // Update gold display
+        updateGoldDisplay();
+        
+        // Update button states
+        updateBombConversionButtonState();
+        updateBombButtonIfGoldChanged();
+        
+        console.log(`Bomb placed! Deducted ${bombConversionCost / 2} gold, new cost: ${bombConversionCost}`);
+        
+        // Save game state after bomb payment
+        saveGameState();
+      }
+      
       // scoring: add only the dropped piece's weight
       score += nextPiece.w;
       updateScoreDisplay();
@@ -5911,6 +6532,9 @@ async function animateMergeCascade(index){
     
     // Show gold earned animation
     showGoldEarned(goldEarned);
+    
+    // Play coin sound effect for earning gold
+    soundManager.playCoinSound();
     
     // Update bomb conversion button state
     updateBombButtonIfGoldChanged();
@@ -6207,8 +6831,8 @@ async function animateStageProgression(index, mergedIndex, weight){
     const targetDisc = allDiscs[targetIndex];
     if (targetDisc) {
       targetDisc.classList.add('bomb-explosion');
-              // Play stage progression chime sound instead of bomb sound (base pitch)
-        soundManager.playStageProgressionSound(1.0);
+      // Play stage up sound effect for the stage progression
+      soundManager.playStageProgressionSound();
     }
     
     // Then apply the shockwave effect to other blocks with decreasing intensity
@@ -6223,9 +6847,7 @@ async function animateStageProgression(index, mergedIndex, weight){
       
       setTimeout(() => {
         disc.classList.add('bomb-ripple');
-        // Play stage progression chime sound for each block as it gets destroyed with ascending pitch
-        const pitchMultiplier = 1.0 + (distanceFromTarget * 0.25); // Ascend by 25% per block (major scale)
-        soundManager.playStageProgressionSound(pitchMultiplier);
+        // No more individual sound effects - just visual ripple effect
       }, delay);
     }
     
@@ -6265,32 +6887,7 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
     return;
   }
 
-  // Calculate gold reward for bomb clear based on number of blocks cleared and current stage
-  const blocksCleared = discs.length;
-  // Gold increases by 1 for each block cleared (like cascade merges), multiplied by current stage
-  // Stage 1: 1x multiplier, Stage 2+: 10x multiplier
-  const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
-  const totalGoldEarned = (blocksCleared * (blocksCleared + 1) / 2) * stageMultiplier;
-  
-  // Add total gold to player's balance
-  gold += totalGoldEarned;
-  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${formatNumber(totalGoldEarned)} gold (sum of 1 to ${blocksCleared} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)})`);
-  
-  // Show individual gold animations for each block cleared (like cascade merges)
-  for (let i = 0; i < blocksCleared; i++) {
-    const blockGoldEarned = (i + 1) * stageMultiplier; // Gold increases by 1 for each block, multiplied by current stage
-    setTimeout(() => {
-      showGoldEarned(blockGoldEarned);
-    }, i * 100); // Stagger each animation by 100ms for visual effect
-  }
-  
-  // Update gold display
-  updateGoldDisplay();
-  
-  // Update bomb conversion button state
-  updateBombButtonIfGoldChanged();
-  // Update trash button state
-  updateTrashButtonIfGoldChanged();
+  // Bombs no longer give gold rewards when clearing stacks
 
 
 
@@ -6321,8 +6918,8 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
     const bombDisc = allDiscs[bombIndex];
     if (bombDisc) {
       bombDisc.classList.add('bomb-explosion');
-      // Play bomb sound effect for the initial bomb explosion (full pitch and volume)
-      soundManager.playBombSound(1.0, 1.0);
+      // Play bomb sound effect for the initial bomb explosion
+      soundManager.playBombSound();
     }
     
     // Then apply the shockwave effect to other blocks with decreasing intensity
@@ -6337,10 +6934,7 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
       
       setTimeout(() => {
         disc.classList.add('bomb-ripple');
-        // Play bomb sound effect for each block as it gets destroyed with decreasing pitch and volume
-        const pitchMultiplier = Math.max(0.3, 1.0 - (distanceFromBomb * 0.15)); // Decrease pitch by 15% per block
-        const volumeMultiplier = Math.max(0.2, 1.0 - (distanceFromBomb * 0.25)); // Decrease volume by 25% per block
-        soundManager.playBombSound(pitchMultiplier, volumeMultiplier);
+        // No more individual sound effects - just visual ripple effect
       }, delay);
     }
     
