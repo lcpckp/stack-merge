@@ -1111,7 +1111,61 @@
     }
   }
 
-  /* Bomb shockwave ripple effect */
+  /* Bomb explosion effect - for the bomb block itself */
+  .disc.bomb-explosion {
+    animation: bombExplosion calc(0.5s * var(--animation-speed, 1)) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    filter: brightness(1.5) saturate(1.8);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.4);
+    z-index: 15;
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.bomb-explosion[style*="--animation-speed: 0"] { animation: none; transform: scale(0.8); opacity: 0; filter: brightness(0.8) saturate(0.9); }
+  @keyframes bombExplosion {
+    0% { 
+      transform: scale(1); 
+      opacity: 1; 
+      filter: brightness(1) saturate(1);
+      box-shadow: 0 0 0px rgba(220, 38, 38, 0);
+    }
+    15% { 
+      transform: scale(1.6); 
+      opacity: 1; 
+      filter: brightness(2.0) saturate(2.2);
+      box-shadow: 0 0 30px rgba(220, 38, 38, 0.8), 0 0 60px rgba(220, 38, 38, 0.5);
+    }
+    35% { 
+      transform: scale(1.3); 
+      opacity: 0.7; 
+      filter: brightness(1.6) saturate(1.8);
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.6), 0 0 50px rgba(220, 38, 38, 0.4);
+    }
+    70% { 
+      transform: scale(0.9); 
+      opacity: 0.3; 
+      filter: brightness(1.2) saturate(1.3);
+      box-shadow: 0 0 15px rgba(220, 38, 38, 0.3), 0 0 30px rgba(220, 38, 38, 0.2);
+    }
+    100% { 
+      transform: scale(0.8); 
+      opacity: 0; 
+      filter: brightness(0.8) saturate(0.9);
+      box-shadow: 0 0 60px rgba(220, 38, 38, 0);
+    }
+  }
+
+  /* Stage progression explosion effect - for blocks being cleared during stage advancement */
+  .disc.stage-explosion {
+    animation: bombRipple calc(0.5s * var(--animation-speed, 1)) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    filter: brightness(1.3) saturate(1.4);
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), 0 0 30px rgba(220, 38, 38, 0.2);
+    z-index: 10;
+  }
+  
+  /* Instant animations when speed is 0 (Blazing) */
+  .disc.stage-explosion[style*="--animation-speed: 0"] { animation: none; transform: scale(0.8); opacity: 0; filter: brightness(0.8) saturate(0.9); }
+
+  /* Bomb shockwave ripple effect - for blocks affected by the explosion */
   .disc.bomb-ripple {
     animation: bombRipple calc(0.5s * var(--animation-speed, 1)) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     filter: brightness(1.3) saturate(1.4);
@@ -1120,40 +1174,34 @@
   }
   
   /* Instant animations when speed is 0 (Blazing) */
-  .disc.bomb-ripple[style*="--animation-speed: 0"] { animation: none; transform: scale(0.8) translateY(0); opacity: 0; filter: brightness(0.8) saturate(0.9); }
+  .disc.bomb-ripple[style*="--animation-speed: 0"] { animation: none; transform: scale(0.8); opacity: 0; filter: brightness(0.8) saturate(0.9); }
   @keyframes bombRipple {
     0% { 
-      transform: scale(1) translateY(0); 
+      transform: scale(1); 
       opacity: 1; 
       filter: brightness(1) saturate(1);
       box-shadow: 0 0 0px rgba(220, 38, 38, 0);
     }
-    15% { 
-      transform: scale(1.3) translateY(-8px); 
+    20% { 
+      transform: scale(1.2); 
       opacity: 1; 
-      filter: brightness(1.6) saturate(1.8);
-      box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.3);
-    }
-    35% { 
-      transform: scale(1.15) translateY(-4px); 
-      opacity: 0.95; 
       filter: brightness(1.4) saturate(1.6);
-      box-shadow: 0 0 15px rgba(220, 38, 38, 0.5), 0 0 30px rgba(220, 38, 38, 0.25);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.5), 0 0 40px rgba(220, 38, 38, 0.3);
     }
-    55% { 
-      transform: scale(0.95) translateY(2px); 
+    40% { 
+      transform: scale(1.1); 
       opacity: 0.8; 
-      filter: brightness(1.2) saturate(1.4);
-      box-shadow: 0 0 10px rgba(220, 38, 38, 0.4), 0 0 20px rgba(220, 38, 38, 0.2);
+      filter: brightness(1.3) saturate(1.4);
+      box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), 0 0 30px rgba(220, 38, 38, 0.25);
     }
-    75% { 
-      transform: scale(0.85) translateY(4px); 
-      opacity: 0.5; 
+    70% { 
+      transform: scale(0.9); 
+      opacity: 0.4; 
       filter: brightness(1.1) saturate(1.2);
-      box-shadow: 0 0 8px rgba(220, 38, 38, 0.3), 0 0 15px rgba(220, 38, 38, 0.15);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.2), 0 0 20px rgba(220, 38, 38, 0.15);
     }
     100% { 
-      transform: scale(0.8) translateY(0); 
+      transform: scale(0.8); 
       opacity: 0; 
       filter: brightness(0.8) saturate(0.9);
       box-shadow: 0 0 0px rgba(220, 38, 38, 0);
@@ -1372,7 +1420,7 @@
   .block-item[data-value="512"] { background: #ea580c; color: #fff; }
   .block-item[data-value="1024"] { background: #dc2626; color: #fff; }
   .block-item[data-value="2048"] { background: #9d174d; color: #fff; }
-  .block-item[data-value="4096"] { background: #000; color: #fff; }
+  .block-item[data-value="4096"] { background: #7c2d6d; color: #fff; }
   .block-item[data-value="8192"] { background: #64748b; color: #fff; }
   .block-item[data-value="16384"] { background: #fff; color: #000; }
   
@@ -2733,7 +2781,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div data-value="4096" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #000; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
+                      <div data-value="4096" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #7c2d6d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
                     </div>
                   </div>
                   
@@ -3338,6 +3386,200 @@ class SoundManager {
   // Get current merge sound type preference
   getMergeSoundType() {
     return this.usePopMergeSounds;
+  }
+
+  // Generate a percussive bomb explosion sound effect for bomb merges
+  playBombSound(pitchMultiplier = 1.0, volumeMultiplier = 1.0) {
+    if (!this.initialized || this.isMuted) return;
+    
+    try {
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.connect(this.masterGain);
+      
+      // Phase 1: Sharp initial blast (0-0.15s)
+      const blastOsc = this.audioContext.createOscillator();
+      const blastGain = this.audioContext.createGain();
+      blastOsc.type = 'sawtooth';
+      blastOsc.frequency.setValueAtTime(150 * pitchMultiplier, this.audioContext.currentTime);
+      blastOsc.frequency.exponentialRampToValueAtTime(80 * pitchMultiplier, this.audioContext.currentTime + 0.15);
+      blastOsc.connect(blastGain);
+      blastGain.connect(gainNode);
+      
+      // Phase 2: Deep percussive impact (0-0.45s)
+      const impactOsc = this.audioContext.createOscillator();
+      const impactGain = this.audioContext.createGain();
+      impactOsc.type = 'sine';
+      impactOsc.frequency.setValueAtTime(40 * pitchMultiplier, this.audioContext.currentTime);
+      impactOsc.frequency.exponentialRampToValueAtTime(25 * pitchMultiplier, this.audioContext.currentTime + 0.45);
+      impactOsc.connect(impactGain);
+      impactGain.connect(gainNode);
+      
+      // Phase 3: Explosive noise burst (0-0.3s)
+      const noiseSource = this.audioContext.createBufferSource();
+      const noiseGain = this.audioContext.createGain();
+      const noiseBuffer = this.audioContext.createBuffer(1, 512, this.audioContext.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      
+      // Create sharp, percussive explosion noise
+      for (let i = 0; i < noiseData.length; i++) {
+        const envelope = Math.exp(-i * 0.04); // Faster decay for more percussive sound
+        noiseData[i] = (Math.random() * 2 - 1) * envelope * 1.8;
+      }
+      
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(gainNode);
+      
+      // Phase 4: Low rumble sustain (0-0.6s)
+      const rumbleOsc = this.audioContext.createOscillator();
+      const rumbleGain = this.audioContext.createGain();
+      rumbleOsc.type = 'sine';
+      rumbleOsc.frequency.setValueAtTime(35 * pitchMultiplier, this.audioContext.currentTime);
+      rumbleOsc.frequency.exponentialRampToValueAtTime(20 * pitchMultiplier, this.audioContext.currentTime + 0.6);
+      rumbleOsc.connect(rumbleGain);
+      rumbleGain.connect(gainNode);
+      
+      // Create filters for bomb character
+      const lowPassFilter = this.audioContext.createBiquadFilter();
+      lowPassFilter.type = 'lowpass';
+      lowPassFilter.frequency.setValueAtTime(600 * pitchMultiplier, this.audioContext.currentTime);
+      lowPassFilter.frequency.exponentialRampToValueAtTime(200 * pitchMultiplier, this.audioContext.currentTime + 0.8);
+      lowPassFilter.Q.setValueAtTime(0.3, this.audioContext.currentTime);
+      
+      const highPassFilter = this.audioContext.createBiquadFilter();
+      highPassFilter.type = 'highpass';
+      highPassFilter.frequency.setValueAtTime(30 * pitchMultiplier, this.audioContext.currentTime);
+      highPassFilter.Q.setValueAtTime(0.4, this.audioContext.currentTime);
+      
+      // Apply filters to noise
+      noiseSource.connect(lowPassFilter);
+      lowPassFilter.connect(highPassFilter);
+      highPassFilter.connect(noiseGain);
+      
+      // Master volume envelope: sharp attack, quick decay
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(1.0 * volumeMultiplier, this.audioContext.currentTime + 0.001); // Instant attack
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6); // Quick decay
+      
+      // Phase-specific gain control for percussive timing
+      // Blast phase (0-0.15s) - sharp and bright
+      blastGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      blastGain.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001);
+      blastGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
+      
+      // Impact phase (0-0.45s) - strong initial hit
+      impactGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      impactGain.gain.linearRampToValueAtTime(1.0, this.audioContext.currentTime + 0.001);
+      impactGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.45);
+      
+      // Noise phase (0-0.3s) - explosive burst
+      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      noiseGain.gain.linearRampToValueAtTime(0.7, this.audioContext.currentTime + 0.001);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
+      
+      // Rumble phase (0-0.6s) - sustained low end
+      rumbleGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      rumbleGain.gain.linearRampToValueAtTime(0.6, this.audioContext.currentTime + 0.05);
+      rumbleGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6);
+      
+      // Start all sources
+      blastOsc.start(this.audioContext.currentTime);
+      impactOsc.start(this.audioContext.currentTime);
+      noiseSource.start(this.audioContext.currentTime);
+      rumbleOsc.start(this.audioContext.currentTime);
+      
+      // Stop sources at appropriate times
+      blastOsc.stop(this.audioContext.currentTime + 0.15);
+      impactOsc.stop(this.audioContext.currentTime + 0.45);
+      noiseSource.stop(this.audioContext.currentTime + 0.3);
+      rumbleOsc.stop(this.audioContext.currentTime + 0.6);
+      
+      // Clean up nodes after playback
+      const cleanup = () => {
+        blastOsc.disconnect();
+        impactOsc.disconnect();
+        noiseSource.disconnect();
+        rumbleOsc.disconnect();
+        lowPassFilter.disconnect();
+        highPassFilter.disconnect();
+        blastGain.disconnect();
+        impactGain.disconnect();
+        noiseGain.disconnect();
+        rumbleGain.disconnect();
+        gainNode.disconnect();
+      };
+      
+      // Set timeout to ensure cleanup happens
+      setTimeout(cleanup, 700);
+      
+
+      
+    } catch (error) {
+      console.error('❌ Failed to play bomb sound:', error);
+    }
+  }
+
+  // Generate a beautiful chime/ring sound effect for stage progression
+  playStageProgressionSound(pitchMultiplier = 1.0) {
+
+    if (!this.initialized || this.isMuted) return;
+    
+    try {
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.connect(this.masterGain);
+      
+      // Create a single, pure oscillator for clean tone
+      const osc = this.audioContext.createOscillator();
+      osc.type = 'sine'; // Pure sine wave for clean, pleasant sound
+      
+      // Calculate frequency based on pitch multiplier (ascending major scale)
+      // Base frequency is C4 (261.63 Hz), ascending through major scale
+      const baseFreq = 261.63; // C4
+      const frequency = baseFreq * pitchMultiplier;
+      
+      osc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+      
+      // Connect the oscillator directly to the gain node
+      osc.connect(gainNode);
+      
+      // Create a gentle high-pass filter to remove harsh low frequencies
+      const highPassFilter = this.audioContext.createBiquadFilter();
+      highPassFilter.type = 'highpass';
+      highPassFilter.frequency.setValueAtTime(200, this.audioContext.currentTime);
+      highPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime);
+      
+      // Apply filter to the output
+      gainNode.connect(highPassFilter);
+      highPassFilter.connect(this.masterGain);
+      
+      // Volume envelope: very gentle attack, quick decay for pleasant sound
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.4 * pitchMultiplier, this.audioContext.currentTime + 0.05); // Gentle attack, scaled by pitch
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6); // Quick, pleasant decay
+      
+      // Harmonic-specific gain control removed - using single oscillator approach
+      
+      // Start and stop the oscillator
+      osc.start(this.audioContext.currentTime);
+      osc.stop(this.audioContext.currentTime + 0.6);
+      
+      // Clean up nodes after playback
+      const cleanup = () => {
+        osc.disconnect();
+        highPassFilter.disconnect();
+        gainNode.disconnect();
+      };
+      
+      // Set timeout to ensure cleanup happens
+      setTimeout(cleanup, 700);
+      
+
+      
+    } catch (error) {
+      console.error('❌ Failed to play stage progression sound:', error);
+    }
   }
 }
 
@@ -5102,7 +5344,7 @@ function colorFor(w){
     '#ea580c', // orange-600 - value 512 (vibrant orange)
     '#dc2626', // red-600 - value 1024 (bright red)
     '#9d174d', // rose-700 - value 2048 (darker magenta)
-    '#000',    // black - value 4096
+    '#7c2d6d',    // darker purple-magenta - value 4096
     '#64748b', // gray - value 8192
     '#fff'     // white - value 16384
   ];
@@ -5943,22 +6185,72 @@ async function animateStageProgression(index, mergedIndex, weight){
   await waitForAnimation(mergedEl);
   mergedEl.classList.remove('merge-in');
 
-  // Keep only the merged block, clear everything else
-  const mergedBlock = poles[index][mergedIndex];
-  poles[index] = [mergedBlock]; // Keep only the merged block
+  // Now treat the target block like a bomb - make it explode and clear the entire stack
+  const allDiscs = Array.from(poleDiv.querySelectorAll('.disc'));
   
-  // Animate clearing of other blocks (but not the merged one)
-  const blocksToClear = Array.from(poleDiv.querySelectorAll('.disc')).filter((_, i) => i !== mergedIndex);
-  blocksToClear.forEach(d => d.classList.add('clear-out'));
-  await Promise.all(blocksToClear.map(d => waitForAnimation(d)));
-
-  // Re-render to show the cleared stack with only the merged block
-  // Only render if we still have exactly 4 poles
-  if (gameDiv.children.length === 4) {
-    render();
+  // Check if animations are disabled (speed = 0)
+  const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
+  const isInstantAnimation = animationSpeed === 0;
+  
+  if (isInstantAnimation) {
+    // Instant animation - immediately hide all blocks
+    allDiscs.forEach(d => {
+      d.style.transform = 'scale(0.8)';
+      d.style.opacity = '0';
+      d.style.filter = 'brightness(0.8) saturate(0.9)';
+    });
   } else {
-    console.warn('Pole count mismatch in stage progression, skipping render');
+    // Start the explosion from the merged block (target location) and propagate outward in both directions
+    const targetIndex = mergedIndex; // The target block location
+    
+    // First, apply the bomb explosion effect to the target block itself
+    const targetDisc = allDiscs[targetIndex];
+    if (targetDisc) {
+      targetDisc.classList.add('bomb-explosion');
+              // Play stage progression chime sound instead of bomb sound (base pitch)
+        soundManager.playStageProgressionSound(1.0);
+    }
+    
+    // Then apply the shockwave effect to other blocks with decreasing intensity
+    for (let i = 0; i < allDiscs.length; i++) {
+      if (i === targetIndex) continue; // Skip the target block, it already has explosion effect
+      
+      const disc = allDiscs[i];
+      // Calculate distance from target location for wave propagation
+      const distanceFromTarget = Math.abs(i - targetIndex);
+      // Add a small delay to create the wave effect, starting from target location
+      const delay = distanceFromTarget * 40; // 40ms delay per block distance for the ripple effect (faster)
+      
+      setTimeout(() => {
+        disc.classList.add('bomb-ripple');
+        // Play stage progression chime sound for each block as it gets destroyed with ascending pitch
+        const pitchMultiplier = 1.0 + (distanceFromTarget * 0.25); // Ascend by 25% per block (major scale)
+        soundManager.playStageProgressionSound(pitchMultiplier);
+      }, delay);
+    }
+    
+    // Wait for the entire explosion animation to complete
+    const totalAnimationTime = Math.max(...Array.from({length: allDiscs.length}, (_, i) => 
+      Math.abs(i - targetIndex) * 40 + 350
+    )); // Max delay + 350ms animation duration (faster)
+    await new Promise(resolve => setTimeout(resolve, totalAnimationTime));
+    
+    // Clean up the explosion and ripple classes
+    allDiscs.forEach(d => {
+      d.classList.remove('bomb-explosion');
+      d.classList.remove('bomb-ripple');
+    });
   }
+
+  // Clear the entire pole
+  poles[index] = [];
+  
+  // Now create the new target block
+  const newBlock = { w: weight, bomb: false };
+  poles[index].push(newBlock);
+  
+  // Re-render to show the cleared stack with the new target block
+  render();
 }
 
 async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
@@ -6017,34 +6309,52 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   if (isInstantAnimation) {
     // Instant animation - immediately hide all blocks
     allDiscs.forEach(d => {
-      d.style.transform = 'scale(0.8) translateY(0)';
+      d.style.transform = 'scale(0.8)';
       d.style.opacity = '0';
       d.style.filter = 'brightness(0.8) saturate(0.9)';
     });
   } else {
-    // Start the ripple from the merged block (bomb location) and propagate outward in both directions
+    // Start the explosion from the merged block (bomb location) and propagate outward in both directions
     const bombIndex = mergedIndex; // The bomb merge location
     
+    // First, apply the bomb explosion effect to the bomb block itself
+    const bombDisc = allDiscs[bombIndex];
+    if (bombDisc) {
+      bombDisc.classList.add('bomb-explosion');
+      // Play bomb sound effect for the initial bomb explosion (full pitch and volume)
+      soundManager.playBombSound(1.0, 1.0);
+    }
+    
+    // Then apply the shockwave effect to other blocks with decreasing intensity
     for (let i = 0; i < allDiscs.length; i++) {
+      if (i === bombIndex) continue; // Skip the bomb block, it already has explosion effect
+      
       const disc = allDiscs[i];
       // Calculate distance from bomb location for wave propagation
       const distanceFromBomb = Math.abs(i - bombIndex);
       // Add a small delay to create the wave effect, starting from bomb location
-      const delay = distanceFromBomb * 60; // 60ms delay per block distance for the ripple effect
+      const delay = distanceFromBomb * 40; // 40ms delay per block distance for the ripple effect (faster)
       
       setTimeout(() => {
         disc.classList.add('bomb-ripple');
+        // Play bomb sound effect for each block as it gets destroyed with decreasing pitch and volume
+        const pitchMultiplier = Math.max(0.3, 1.0 - (distanceFromBomb * 0.15)); // Decrease pitch by 15% per block
+        const volumeMultiplier = Math.max(0.2, 1.0 - (distanceFromBomb * 0.25)); // Decrease volume by 25% per block
+        soundManager.playBombSound(pitchMultiplier, volumeMultiplier);
       }, delay);
     }
     
-    // Wait for the entire ripple animation to complete
+    // Wait for the entire explosion animation to complete
     const totalAnimationTime = Math.max(...Array.from({length: allDiscs.length}, (_, i) => 
-      Math.abs(i - bombIndex) * 60 + 500
-    )); // Max delay + 500ms animation duration
+      Math.abs(i - bombIndex) * 40 + 350
+    )); // Max delay + 350ms animation duration (faster)
     await new Promise(resolve => setTimeout(resolve, totalAnimationTime));
     
-    // Clean up the ripple classes
-    allDiscs.forEach(d => d.classList.remove('bomb-ripple'));
+    // Clean up the explosion and ripple classes
+    allDiscs.forEach(d => {
+      d.classList.remove('bomb-explosion');
+      d.classList.remove('bomb-ripple');
+    });
   }
 
   // Clear pole and re-render
@@ -6559,6 +6869,8 @@ window.addEventListener('keydown', (e) => {
     }
   }
 });
+
+
 </script>
 </body>
 </html>
