@@ -14,7 +14,17 @@
     --text:#f8fafc; 
     --font-family: 'Quantico', monospace;
   }
-  body { margin:0; font-family: var(--font-family); background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; }
+  body { 
+    margin:0; 
+    font-family: var(--font-family); 
+    background:var(--bg); 
+    color:var(--text); 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    height: 100vh; /* Lock page height to exactly viewport height */
+    overflow: hidden; /* Prevent any scrolling */
+  }
   .topbar { width:100%; max-width:1200px; display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 16px 8px; box-sizing:border-box; }
   h1 { margin:0; font-size:36px; font-weight:700; text-align:center; font-family: var(--font-family); }
   
@@ -23,7 +33,36 @@
     display: flex; 
     flex-direction: row; 
     align-items: center; 
-    gap: 24px; 
+    width: 100%;
+    position: relative;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+  
+  /* Left section - positioned to the left of center */
+  .title-section .left-section {
+    position: absolute;
+    right: calc(50% + 160px);
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Center section - absolutely centered title */
+  .title-section .center-section {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Right section - positioned to the right of center */
+  .title-section .right-section {
+    position: absolute;
+    left: calc(50% + 160px);
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
   
   /* Title button styling */
@@ -64,6 +103,41 @@
     animation: breatheGlow 2s ease-in-out infinite;
   }
   
+  /* Sound button states */
+  .title-btn#soundBtn {
+    transition: all 0.2s ease;
+  }
+  
+  .title-btn#soundBtn:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Merge sound button states */
+  .title-btn#mergeSoundBtn {
+    transition: all 0.2s ease;
+  }
+  
+  .title-btn#mergeSoundBtn:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Pop sound button special styling */
+  .title-btn#mergeSoundBtn[title*="pop"] {
+    background: linear-gradient(135deg, var(--panel) 0%, #374151 100%);
+  }
+  
+  /* Disabled musical sound button styling */
+  .title-btn#mergeSoundBtn[title*="musical"] {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    background: linear-gradient(135deg, var(--panel) 0%, #4a5568 100%);
+  }
+  
+  .title-btn#mergeSoundBtn[title*="musical"]:hover {
+    opacity: 0.7;
+    filter: grayscale(0.6);
+  }
+  
   @keyframes breatheGlow {
     0%, 100% { 
       box-shadow: 0 0 8px rgba(14, 165, 233, 0.5), 0 0 12px rgba(14, 165, 233, 0.3), 0 3px 0 rgba(0,0,0,0.25);
@@ -87,12 +161,42 @@
     }
   }
   
+  /* Mobile responsive spacing for title sections */
+  @media (max-width: 768px) {
+    .title-section .left-section {
+      right: calc(50% + 100px);
+    }
+    
+    .title-section .right-section {
+      left: calc(50% + 100px);
+      gap: 8px; /* Reduced gap between buttons on mobile */
+    }
+  }
+  
+  /* Extra small mobile devices - adjust title section spacing */
+  @media (max-width: 480px) {
+    .title-section {
+      gap: 12px;
+    }
+    
+    .title-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .title-section .right-section {
+      gap: 6px; /* Even smaller gap between buttons on very small mobile */
+    }
+  }
+  
 
   
   /* Controls section styling */
   .controls { display:flex; align-items:center; gap:18px; }
 
-  .game-info { display: flex; justify-content: center; gap: 48px; margin-top: 32px; }
+  .game-info { display: flex; justify-content: center; gap: 48px; margin-top: 40px; /* Increased spacing between title and game info */ }
   .score-display { display:flex; flex-direction:column; align-items:center; gap:12px; }
   .score-label { font-size:18px; opacity:0.9; font-family: var(--font-family); }
   .next { display:flex; flex-direction:column; align-items:center; gap:12px; }
@@ -871,201 +975,13 @@
     margin-top: 18px; 
   }
   
-  /* Next stage display styling */
-  .next-stage-container {
-    position: absolute;
-    right: calc(100% + 20px);
-    top: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .next-stage-display { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 12px; 
-  }
-  .next-stage-label { 
-    font-size: 18px; 
-    opacity: 0.9; 
-    font-family: var(--font-family);
-  }
-  .next-stage-indicator { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-  }
-  .next-stage-block { 
-    width: 108px; 
-    height: 45px; 
-    border-radius: 9px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-weight: 600; 
-    font-size: 24px; 
-    background: #6b7280; /* Default neutral gray */
-    color: white; 
-    box-shadow: 0 3px 0 rgba(0,0,0,0.25); 
-    font-family: var(--font-family);
-  }
+
   
-  /* Target block colors for different values - using the same color scheme as blocks */
-  .next-stage-block[data-value="1"] { background: #cfef08; color: #000; }
-  .next-stage-block[data-value="2"] { background: #10B981; color: #fff; }
-  .next-stage-block[data-value="4"] { background: #2563EB; color: #fff; }
-  .next-stage-block[data-value="8"] { background: #7C3AED; color: #fff; }
-  .next-stage-block[data-value="16"] { background: #581C87; color: #fff; }
-  .next-stage-block[data-value="32"] { background: #D946EF; color: #fff; }
-  .next-stage-block[data-value="64"] { background: #EC4899; color: #fff; }
-  .next-stage-block[data-value="128"] { background: #e86758; color: #fff; }
-  .next-stage-block[data-value="256"] { background: #F59E0B; color: #fff; }
-  .next-stage-block[data-value="512"] { background: #ea580c; color: #fff; }
-  .next-stage-block[data-value="1024"] { background: #dc2626; color: #fff; }
-  .next-stage-block[data-value="2048"] { background: #9d174d; color: #fff; }
-  .next-stage-block[data-value="4096"] { background: #000; color: #fff; }
-  .next-stage-block[data-value="8192"] { background: #64748b; color: #fff; }
-  .next-stage-block[data-value="16384"] { background: #fff; color: #000; }
-  /* For values above 16384, use white background with black text (same as game blocks) */
-  .next-stage-block[data-value^="32768"],
-  .next-stage-block[data-value^="65536"],
-  .next-stage-block[data-value^="131072"],
-  .next-stage-block[data-value^="262144"],
-  .next-stage-block[data-value^="524288"],
-  .next-stage-block[data-value^="1048576"],
-  .next-stage-block[data-value^="2097152"],
-  .next-stage-block[data-value^="4194304"],
-  .next-stage-block[data-value^="8388608"],
-  .next-stage-block[data-value^="16777216"],
-  .next-stage-block[data-value^="33554432"],
-  .next-stage-block[data-value^="67108864"],
-  .next-stage-block[data-value^="134217728"],
-  .next-stage-block[data-value^="268435456"],
-  .next-stage-block[data-value^="536870912"],
-  .next-stage-block[data-value^="1073741824"],
-  .next-stage-block[data-value^="2147483648"],
-  .next-stage-block[data-value^="4294967296"],
-  .next-stage-block[data-value^="8589934592"],
-  .next-stage-block[data-value^="17179869184"],
-  .next-stage-block[data-value^="34359738368"],
-  .next-stage-block[data-value^="68719476736"],
-  .next-stage-block[data-value^="137438953472"],
-  .next-stage-block[data-value^="274877906944"],
-  .next-stage-block[data-value^="549755813888"],
-  .next-stage-block[data-value^="1099511627776"],
-  .next-stage-block[data-value^="2199023255552"],
-  .next-stage-block[data-value^="4398046511104"],
-  .next-stage-block[data-value^="8796093022208"],
-  .next-stage-block[data-value^="17592186044416"],
-  .next-stage-block[data-value^="35184372088832"],
-  .next-stage-block[data-value^="70368744177664"],
-  .next-stage-block[data-value^="140737488355328"],
-  .next-stage-block[data-value^="281474976710656"],
-  .next-stage-block[data-value^="562949953421312"],
-  .next-stage-block[data-value^="1125899906842624"],
-  .next-stage-block[data-value^="2251799813685248"],
-  .next-stage-block[data-value^="4503599627370496"],
-  .next-stage-block[data-value^="9007199254740992"],
-  .next-stage-block[data-value^="18014398509481984"],
-  .next-stage-block[data-value^="36028797018963968"],
-  .next-stage-block[data-value^="72057594037927936"],
-  .next-stage-block[data-value^="144115188075855872"],
-  .next-stage-block[data-value^="288230376151711744"],
-  .next-stage-block[data-value^="576460752303423488"],
-  .next-stage-block[data-value^="1152921504606846976"],
-  .next-stage-block[data-value^="2305843009213693952"],
-  .next-stage-block[data-value^="4611686018427387904"],
-  .next-stage-block[data-value^="9223372036854775808"] {
-    background: #fff;
-    color: #000;
-  }
+
+
   
   /* Next block display styling in debug panel */
-  .next-block-display {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    min-width: 40px;
-    text-align: center;
-    background: #6b7280; /* Default gray for "Queue" */
-    color: white;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.1);
-  }
-  
-  /* Apply block colors based on data attributes */
-  .next-block-display[data-value="1"] { background: #cfef08; color: #000; }
-  .next-block-display[data-value="2"] { background: #10B981; color: #fff; }
-  .next-block-display[data-value="4"] { background: #2563EB; color: #fff; }
-  .next-block-display[data-value="8"] { background: #7C3AED; color: #fff; }
-  .next-block-display[data-value="16"] { background: #581C87; color: #fff; }
-  .next-block-display[data-value="32"] { background: #D946EF; color: #fff; }
-  .next-block-display[data-value="64"] { background: #EC4899; color: #fff; }
-  .next-block-display[data-value="128"] { background: #e86758; color: #fff; }
-  .next-block-display[data-value="256"] { background: #F59E0B; color: #fff; }
-  .next-block-display[data-value="512"] { background: #ea580c; color: #fff; }
-  .next-block-display[data-value="1024"] { background: #dc2626; color: #fff; }
-  .next-block-display[data-value="2048"] { background: #9d174d; color: #fff; }
-  .next-block-display[data-value="4096"] { background: #000; color: #fff; }
-  .next-block-display[data-value="8192"] { background: #64748b; color: #fff; }
-  .next-block-display[data-value="16384"] { background: #fff; color: #000; }
-  /* For values above 16384, use white background with black text (same as game blocks) */
-  .next-block-display[data-value^="32768"],
-  .next-block-display[data-value^="65536"],
-  .next-block-display[data-value^="131072"],
-  .next-block-display[data-value^="262144"],
-  .next-block-display[data-value^="524288"],
-  .next-block-display[data-value^="1048576"],
-  .next-block-display[data-value^="2097152"],
-  .next-block-display[data-value^="4194304"],
-  .next-block-display[data-value^="8388608"],
-  .next-block-display[data-value^="16777216"],
-  .next-block-display[data-value^="33554432"],
-  .next-block-display[data-value^="67108864"],
-  .next-block-display[data-value^="134217728"],
-  .next-block-display[data-value^="268435456"],
-  .next-block-display[data-value^="536870912"],
-  .next-block-display[data-value^="1073741824"],
-  .next-block-display[data-value^="2147483648"],
-  .next-block-display[data-value^="4294967296"],
-  .next-block-display[data-value^="8589934592"],
-  .next-block-display[data-value^="17179869184"],
-  .next-block-display[data-value^="34359738368"],
-  .next-block-display[data-value^="68719476736"],
-  .next-block-display[data-value^="137438953472"],
-  .next-block-display[data-value^="274877906944"],
-  .next-block-display[data-value^="549755813888"],
-  .next-block-display[data-value^="1099511627776"],
-  .next-block-display[data-value^="2199023255552"],
-  .next-block-display[data-value^="4398046511104"],
-  .next-block-display[data-value^="8796093022208"],
-  .next-block-display[data-value^="17592186044416"],
-  .next-block-display[data-value^="35184372088832"],
-  .next-block-display[data-value^="70368744177664"],
-  .next-block-display[data-value^="140737488355328"],
-  .next-block-display[data-value^="281474976710656"],
-  .next-block-display[data-value^="562949953421312"],
-  .next-block-display[data-value^="1125899906842624"],
-  .next-block-display[data-value^="2251799813685248"],
-  .next-block-display[data-value^="4503599627370496"],
-  .next-block-display[data-value^="9007199254740992"],
-  .next-block-display[data-value^="18014398509481984"],
-  .next-block-display[data-value^="36028797018963968"],
-  .next-block-display[data-value^="72057594037927936"],
-  .next-block-display[data-value^="144115188075855872"],
-  .next-block-display[data-value^="288230376151711744"],
-  .next-block-display[data-value^="576460752303423488"],
-  .next-block-display[data-value^="1152921504606846976"],
-  .next-block-display[data-value^="2305843009213693952"],
-  .next-block-display[data-value^="4611686018427387904"],
-  .next-block-display[data-value^="9223372036854775808"] {
-    background: #fff;
-    color: #000;
-  }
+
   .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
   .pole:hover { border: 3px solid #0ea5e9; }
   .pole.full { opacity:0.6; cursor: not-allowed; }
@@ -1700,7 +1616,7 @@
     flex-direction: row;
     justify-content: center;
     gap: 32px;
-    margin-top: 20px;
+    margin-top: 20px; /* Increased from 20px to give more spacing on mobile */
     flex-wrap: wrap;
   }
   
@@ -1784,10 +1700,7 @@
     order: 1;
   }
   
-  /* Position next stage and bomb conversion for mobile */
-  .next-stage-container {
-    display: none; /* Hide next stage display on mobile */
-  }
+
   
   /* Create a mobile button row for bomb and trash buttons */
   .mobile-button-row {
@@ -2270,10 +2183,7 @@
     font-size: 14px;
   }
   
-  /* Hide next stage display on extra small mobile too */
-  .next-stage-container {
-    display: none;
-  }
+
 }
 
 /* Landscape mobile orientation */
@@ -2284,13 +2194,7 @@
     gap: 12px;
   }
   
-  .next-stage-container {
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 0;
-    order: unset;
-    margin: 0;
-  }
+
   
   /* Position trash button for landscape mobile */
   .trash-button-container {
@@ -2525,9 +2429,17 @@
 
   <div class="topbar">
     <div class="title-section">
-      <button id="addBtn" class="title-btn" title="New Game">➕</button>
-      <h1>Stack Merge</h1>
-      <button id="helpBtn" class="title-btn" title="How to play">❓</button>
+      <div class="left-section">
+        <button id="addBtn" class="title-btn" title="New Game">➕</button>
+      </div>
+      <div class="center-section">
+        <h1>Stack Merge</h1>
+      </div>
+      <div class="right-section">
+        <button id="helpBtn" class="title-btn" title="How to play">❔</button>
+        <button id="soundBtn" class="title-btn" title="Toggle sound">🔊</button>
+        <button id="mergeSoundBtn" class="title-btn" title="Switch to musical merge sounds">🎵</button>
+      </div>
     </div>
   </div>
 
@@ -2569,16 +2481,6 @@
   </div>
 
   <div class="game-container">
-    <!-- Next stage display positioned to the left of stacks -->
-    <div class="next-stage-container">
-      <div class="next-stage-display">
-        <div class="next-stage-label">Next Stage</div>
-        <div class="next-stage-indicator">
-          <div class="next-stage-block" id="targetBlock" data-value="1024">1024</div>
-        </div>
-      </div>
-    </div>
-    
     <div class="game" id="game" role="application" aria-label="Stacks"></div>
     
     <!-- Bomb conversion button positioned to the right of stacks -->
@@ -2764,9 +2666,9 @@
             <div class="merge-example" style="justify-content: center; gap: 40px; padding: 20px;">
               <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
-                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
-                    <div class="next-stage-indicator">
-                      <div class="next-stage-block" data-value="1024" style="width: 120px; height: 50px; font-size: 24px;">1024</div>
+                  <div style="margin: 0; justify-self: end;">
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                      <div data-value="1024" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #dc2626; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">1024</div>
                     </div>
                   </div>
                   
@@ -2782,9 +2684,9 @@
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
-                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
-                    <div class="next-stage-indicator">
-                      <div class="next-stage-block" data-value="2048" style="width: 120px; height: 50px; font-size: 24px;">2048</div>
+                  <div style="margin: 0; justify-self: end;">
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                      <div data-value="2048" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #9d174d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">2048</div>
                     </div>
                   </div>
                   
@@ -2800,9 +2702,9 @@
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
-                  <div class="next-stage-display" style="margin: 0; justify-self: end;">
-                    <div class="next-stage-indicator">
-                      <div class="next-stage-block" data-value="4096" style="width: 120px; height: 50px; font-size: 24px;">4096</div>
+                  <div style="margin: 0; justify-self: end;">
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                      <div data-value="4096" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #000; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
                     </div>
                   </div>
                   
@@ -2849,6 +2751,22 @@
     </div>
     
     <div class="section">
+      <div class="section-title">Sound Settings</div>
+      <div class="controls">
+        <div class="control-row">
+          <label for="debugVolumeSlider">Volume:</label>
+          <input type="range" id="debugVolumeSlider" min="0" max="100" value="30" step="5">
+          <div class="value-display" id="debugVolumeLabel">30%</div>
+        </div>
+        <div class="control-row">
+          <label for="debugMuteToggle">Mute:</label>
+          <input type="checkbox" id="debugMuteToggle">
+          <div class="value-display" id="debugMuteStatus">No</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
       <div class="section-title">Custom Block Dropper</div>
       <div class="controls">
         <div class="control-row">
@@ -2875,7 +2793,7 @@
           <div class="block-item" data-value="16384">16.4k</div>
         </div>
         <div class="selected-block-info">
-          Next block: <span id="nextBlockValue" class="next-block-display">Queue</span>
+          <button id="cascadeTestBtn" class="button primary">Cascade Test</button>
         </div>
       </div>
     </div>
@@ -2912,6 +2830,492 @@
   </div>
 
 <script>
+// Sound Manager for Stack Merge Game
+class SoundManager {
+  constructor() {
+    this.audioContext = null;
+    this.masterGain = null;
+    this.isMuted = false;
+    this.usePopMergeSounds = true; // true = pop sounds (default), false = musical sounds
+    this.volume = 0.3; // Default volume (30%)
+    this.initialized = false;
+    
+    // Initialize audio context on first user interaction
+    this.initAudioContext = this.initAudioContext.bind(this);
+    this.addAudioInitListeners();
+  }
+  
+  addAudioInitListeners() {
+    // Add listeners for user interaction to initialize audio context
+    const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
+    initEvents.forEach(event => {
+      document.addEventListener(event, this.initAudioContext, { once: true, passive: true });
+    });
+  }
+  
+  initAudioContext() {
+    if (this.initialized) return;
+    
+    try {
+      // Create audio context
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Create master gain node for volume control
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.connect(this.audioContext.destination);
+      this.masterGain.gain.value = this.volume;
+      
+      this.initialized = true;
+      console.log('🎵 Sound system initialized successfully');
+      
+      // Remove init listeners since we're now initialized
+      this.removeAudioInitListeners();
+    } catch (error) {
+      console.error('❌ Failed to initialize audio context:', error);
+    }
+  }
+  
+  removeAudioInitListeners() {
+    const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
+    initEvents.forEach(event => {
+      document.removeEventListener(event, this.initAudioContext);
+    });
+  }
+  
+  // Generate a satisfying, rich drop sound effect like placing a block
+  playDropSound(blockValue = 1) {
+    if (!this.initialized || this.isMuted) return;
+    
+    try {
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.connect(this.masterGain);
+      
+      // Create an authentic IBM Model M mechanical keyboard sound
+      const mainOsc = this.audioContext.createOscillator();
+      const noiseSource = this.audioContext.createBufferSource();
+      
+      // Main oscillator - deep, resonant base (Model M signature)
+      mainOsc.type = 'sine';
+      const baseFreq = 75 + (Math.random() * 20 - 10); // 65-85Hz range for that deep thock
+      mainOsc.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime);
+      
+      // Add subtle frequency drift for mechanical realism
+      mainOsc.frequency.exponentialRampToValueAtTime(baseFreq * 1.05, this.audioContext.currentTime + 0.08);
+      
+      // Create the characteristic Model M "thock" noise
+      const noiseBuffer = this.audioContext.createBuffer(1, 1024, this.audioContext.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      
+      // Fill buffer with rich, mechanical noise
+      for (let i = 0; i < noiseData.length; i++) {
+        // Create a mechanical, resonant envelope
+        const envelope = Math.exp(-i * 0.008); // Slow decay for resonance
+        noiseData[i] = (Math.random() * 2 - 1) * envelope * 0.8; // Rich mechanical noise
+      }
+      
+      noiseSource.buffer = noiseBuffer;
+      
+      // Create filters for authentic Model M sound
+      const lowPassFilter = this.audioContext.createBiquadFilter();
+      lowPassFilter.type = 'lowpass';
+      lowPassFilter.frequency.setValueAtTime(800, this.audioContext.currentTime); // Lower cutoff for warmth
+      lowPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Natural resonance
+      
+      const highPassFilter = this.audioContext.createBiquadFilter();
+      highPassFilter.type = 'highpass';
+      highPassFilter.frequency.setValueAtTime(60, this.audioContext.currentTime); // Very low cutoff for deep bass
+      highPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Natural resonance
+      
+      // Create gain nodes
+      const toneGain = this.audioContext.createGain();
+      const noiseGain = this.audioContext.createGain();
+      
+      // Connect the audio chain
+      mainOsc.connect(toneGain);
+      toneGain.connect(gainNode);
+      
+      noiseSource.connect(lowPassFilter);
+      lowPassFilter.connect(highPassFilter);
+      highPassFilter.connect(noiseGain);
+      noiseGain.connect(gainNode);
+      
+      // Volume envelope: Model M signature attack and decay
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(1.5, this.audioContext.currentTime + 0.001); // Quick attack
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12); // Long, resonant decay
+      
+      // Separate gain control for tone vs noise
+      toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      toneGain.gain.linearRampToValueAtTime(0.6, this.audioContext.currentTime + 0.001); // Strong tone for body
+      toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
+      
+      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      noiseGain.gain.linearRampToValueAtTime(0.9, this.audioContext.currentTime + 0.001); // Strong noise for mechanical feel
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
+      
+      // Start sources
+      mainOsc.start(this.audioContext.currentTime);
+      noiseSource.start(this.audioContext.currentTime);
+      
+      // Stop after natural Model M duration
+      mainOsc.stop(this.audioContext.currentTime + 0.12);
+      noiseSource.stop(this.audioContext.currentTime + 0.12);
+      
+      // Clean up nodes after playback
+      const cleanup = () => {
+        mainOsc.disconnect();
+        noiseSource.disconnect();
+        lowPassFilter.disconnect();
+        highPassFilter.disconnect();
+        toneGain.disconnect();
+        noiseGain.disconnect();
+        gainNode.disconnect();
+      };
+      
+      // Set timeout to ensure cleanup happens
+      setTimeout(cleanup, 130);
+      
+      // Log successful sound playback (only in development)
+      if (console && console.log) {
+        console.log(`🔊 Rich, satisfying drop sound played successfully for block value ${blockValue}`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Failed to play drop sound:', error);
+    }
+  }
+  
+  // Generate a peaceful, raindrop-like merge sound effect
+  playMergeSound(blockValue = 1) {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Choose between musical and pop-like sounds based on user preference
+    if (this.usePopMergeSounds) {
+      console.log('💨 Playing pop merge sound');
+      this.playPopMergeSound(blockValue);
+    } else {
+      console.log('🎵 Playing musical merge sound');
+      this.playMusicalMergeSound(blockValue);
+    }
+  }
+  
+  // Generate a beautiful, physical bell sound like Christmas music
+  playMusicalMergeSound(blockValue = 1) {
+    if (!this.initialized || this.isMuted) return;
+    
+    try {
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.connect(this.masterGain);
+      
+      // Calculate frequency based on block value using a beautiful major scale
+      // Map block values to create a Christmas bell-like progression
+      const getFrequencyForBlock = (value) => {
+        // Chromatic scale: moves up in half-steps (semitones) for smooth progression
+        // Uses A4 (440Hz) as reference and moves up in 12-tone equal temperament
+        const bellScale = {
+          1: 440.00,   // A4 (reference pitch - bright start)
+          2: 466.16,   // A#4/Bb4 (half-step up)
+          4: 493.88,   // B4 (half-step up)
+          8: 523.25,   // C5 (half-step up)
+          16: 554.37,  // C#5/Db5 (half-step up)
+          32: 587.33,  // D5 (half-step up)
+          64: 622.25,  // D#5/Eb5 (half-step up)
+          128: 659.25, // E5 (half-step up)
+          256: 698.46, // F5 (half-step up)
+          512: 739.99, // F#5/Gb5 (half-step up)
+          1024: 783.99, // G5 (half-step up)
+          2048: 830.61, // G#5/Ab5 (half-step up)
+          4096: 880.00, // A5 (octave up - half-step progression)
+          8192: 932.33, // A#5/Bb5 (half-step up)
+          16384: 987.77, // B5 (half-step up)
+          32768: 1046.50, // C6 (half-step up)
+          65536: 1108.73, // C#6/Db6 (half-step up)
+          131072: 1174.66, // D6 (half-step up)
+          262144: 1244.51, // D#6/Eb6 (half-step up)
+          524288: 1318.51, // E6 (half-step up)
+          1048576: 1396.91, // F6 (half-step up)
+          2097152: 1479.98, // F#6/Gb6 (half-step up)
+          4194304: 1567.98, // G6 (half-step up)
+          8388608: 1661.22, // G#6/Ab6 (half-step up)
+          16777216: 1760.00, // A6 (octave up - half-step progression)
+          33554432: 1864.66, // A#6/Bb6 (half-step up)
+          67108864: 1975.53, // B6 (half-step up)
+          134217728: 2093.00, // C7 (half-step up)
+          268435456: 2217.46, // C#7/Db7 (half-step up)
+          536870912: 2349.32, // D7 (half-step up)
+          1073741824: 2489.02, // D#7/Eb7 (half-step up)
+          2147483648: 2637.02, // E7 (half-step up)
+          4294967296: 2793.83, // F7 (half-step up)
+          8589934592: 2959.96, // F#7/Gb7 (half-step up)
+          17179869184: 3135.96, // G7 (half-step up)
+          34359738368: 3322.44, // G#7/Ab7 (half-step up)
+          68719476736: 3520.00, // A7 (octave up - half-step progression)
+          137438953472: 3729.31, // A#7/Bb7 (half-step up)
+          274877906944: 3951.07, // B7 (half-step up)
+          549755813888: 4186.00, // C8 (half-step up)
+          1099511627776: 4434.92, // C#8/Db8 (half-step up)
+          2199023255552: 4698.64, // D8 (half-step up)
+          4398046511104: 4978.03, // D#8/Eb8 (half-step up)
+          8796093022208: 5274.04, // E8 (half-step up)
+          17592186044416: 5587.66, // F8 (half-step up)
+          35184372088832: 5919.91, // F#8/Gb8 (half-step up)
+          70368744177664: 6271.93, // G8 (half-step up)
+          140737488355328: 6644.88, // G#8/Ab8 (half-step up)
+          281474976710656: 7040.00, // A8 (octave up - half-step progression)
+          562949953421312: 7458.62, // A#8/Bb8 (half-step up)
+          1125899906842624: 7902.13, // B8 (half-step up)
+          2251799813685248: 8372.00, // C9 (half-step up)
+          4503599627370496: 8869.84, // C#9/Db9 (half-step up)
+          9007199254740992: 9397.27, // D9 (half-step up)
+          18014398509481984: 9956.06, // D#9/Eb9 (half-step up)
+          36028797018963968: 10548.08, // E9 (half-step up)
+          72057594037927936: 11175.32, // F9 (half-step up)
+          144115188075855872: 11839.82, // F#9/Gb9 (half-step up)
+          288230376151711744: 12543.85, // G9 (half-step up)
+          576460752303423488: 13289.75, // G#9/Ab9 (half-step up)
+          1152921504606846976: 14080.00, // A9 (octave up - half-step progression)
+          2305843009213693952: 14917.24, // A#9/Bb9 (half-step up)
+          4611686018427387904: 15804.27, // B9 (half-step up)
+          9223372036854775808: 16744.00  // C10 (half-step up - final progression)
+        };
+        
+        // Return the mapped frequency or fallback to a calculated frequency for very large values
+        if (bellScale[value]) {
+          return bellScale[value];
+        } else {
+          // For extremely large values beyond our scale, use chromatic octave calculation
+          const octave = Math.floor(Math.log2(value) / 12); // 12 notes per chromatic scale
+          const baseNote = value % 12;
+          const baseFreq = bellScale[Math.pow(2, baseNote)] || 440.00;
+          return baseFreq * Math.pow(2, octave);
+        }
+      };
+      
+      const frequency = getFrequencyForBlock(blockValue);
+      
+      // Create a crystal clear, pure bell sound
+      const mainOsc = this.audioContext.createOscillator();
+      const harmonicOsc1 = this.audioContext.createOscillator();
+      
+      // Main bell tone - pure sine wave for crystal clarity
+      mainOsc.type = 'sine'; // Pure sine wave for clear, bell-like sound
+      mainOsc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+      
+      // Single harmonic - octave above for clear resonance
+      harmonicOsc1.type = 'sine';
+      harmonicOsc1.frequency.setValueAtTime(frequency * 2, this.audioContext.currentTime);
+      
+      // Create separate gain nodes for different layers
+      const mainGain = this.audioContext.createGain();
+      const harmonicGain1 = this.audioContext.createGain();
+      
+      // Connect the audio chain
+      mainOsc.connect(mainGain);
+      mainGain.connect(gainNode);
+      
+      harmonicOsc1.connect(harmonicGain1);
+      harmonicGain1.connect(gainNode);
+      
+      // Volume envelope: crystal clear bell with natural decay
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.001); // Instant, clear attack (quieter)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0); // Natural bell decay
+      
+      // Separate gain control for clear bell balance
+      mainGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      mainGain.gain.linearRampToValueAtTime(0.9, this.audioContext.currentTime + 0.001);
+      mainGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
+      
+      harmonicGain1.gain.setValueAtTime(0, this.audioContext.currentTime);
+      harmonicGain1.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.001);
+      harmonicGain1.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
+      
+      // Start both oscillators
+      mainOsc.start(this.audioContext.currentTime);
+      harmonicOsc1.start(this.audioContext.currentTime);
+      
+      // Stop after clear bell resonance duration
+      mainOsc.stop(this.audioContext.currentTime + 1.0);
+      harmonicOsc1.stop(this.audioContext.currentTime + 1.0);
+      
+      // Clean up nodes after playback
+      const cleanup = () => {
+        mainOsc.disconnect();
+        harmonicOsc1.disconnect();
+        mainGain.disconnect();
+        harmonicGain1.disconnect();
+        gainNode.disconnect();
+      };
+      
+      // Set timeout to ensure cleanup happens
+      setTimeout(cleanup, 1050);
+      
+      // Log successful sound playback (only in development)
+      if (console && console.log) {
+        console.log(`🔔 Beautiful bell merge sound played successfully for block value ${blockValue} at ${Math.round(frequency)} Hz`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Failed to play merge sound:', error);
+    }
+  }
+  
+  // Generate a satisfying pop merge sound effect with frequency variation based on block value
+  playPopMergeSound(blockValue = 1) {
+    if (!this.initialized || this.isMuted) return;
+    
+    try {
+      // Create gain node for volume control
+      const gainNode = this.audioContext.createGain();
+      gainNode.connect(this.masterGain);
+      
+      // Calculate frequency based on block value - higher blocks = higher pitch
+      const getPopFrequency = (value) => {
+        // Map block values to create a satisfying pitch progression
+        // Start with lower frequencies for small blocks, higher for big blocks
+        const baseFreq = 200; // Base frequency for value 1
+        const freqMultiplier = Math.log2(value) * 0.3 + 1; // Logarithmic scaling
+        return Math.min(baseFreq * freqMultiplier, 1200); // Cap at 1200Hz to avoid harshness
+      };
+      
+      const frequency = getPopFrequency(blockValue);
+      
+      // Create a pop sound using a combination of oscillators and noise
+      const mainOsc = this.audioContext.createOscillator();
+      const noiseSource = this.audioContext.createBufferSource();
+      
+      // Main oscillator for the pop tone (more subtle)
+      mainOsc.type = 'sine';
+      mainOsc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+      
+      // Create a more percussive noise burst for the "pop" character
+      const noiseBuffer = this.audioContext.createBuffer(1, 256, this.audioContext.sampleRate); // Shorter for more percussive
+      const noiseData = noiseBuffer.getChannelData(0);
+      
+      // Fill buffer with more aggressive, percussive noise
+      for (let i = 0; i < noiseData.length; i++) {
+        // Create a sharp, percussive noise envelope
+        const envelope = Math.exp(-i * 0.08); // Much faster decay for sharpness
+        noiseData[i] = (Math.random() * 2 - 1) * envelope * 0.8; // Increased volume for more impact
+      }
+      
+      noiseSource.buffer = noiseBuffer;
+      
+      // Create filters for more percussive pop character
+      const lowPassFilter = this.audioContext.createBiquadFilter();
+      lowPassFilter.type = 'lowpass';
+      lowPassFilter.frequency.setValueAtTime(frequency * 3, this.audioContext.currentTime); // Higher cutoff for more high-end
+      lowPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Lower Q for wider passband
+      
+      const highPassFilter = this.audioContext.createBiquadFilter();
+      highPassFilter.type = 'highpass';
+      highPassFilter.frequency.setValueAtTime(frequency * 0.3, this.audioContext.currentTime); // Lower cutoff for more bass
+      highPassFilter.Q.setValueAtTime(0.3, this.audioContext.currentTime); // Lower Q for wider passband
+      
+      // Create separate gain nodes for tone vs noise
+      const toneGain = this.audioContext.createGain();
+      const noiseGain = this.audioContext.createGain();
+      
+      // Connect the audio chain with separate gain control
+      mainOsc.connect(toneGain);
+      toneGain.connect(gainNode);
+      
+      noiseSource.connect(lowPassFilter);
+      lowPassFilter.connect(highPassFilter);
+      highPassFilter.connect(noiseGain);
+      noiseGain.connect(gainNode);
+      
+      // Volume envelope: very quick attack, fast decay for pop
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(1.2, this.audioContext.currentTime + 0.001); // Extremely quick attack (MAXIMUM VOLUME)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06); // Faster decay for more percussive
+      
+      // Separate gain control for tone vs noise
+      toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      toneGain.gain.linearRampToValueAtTime(0.15, this.audioContext.currentTime + 0.001); // Much lower tone volume
+      toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
+      
+      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+      noiseGain.gain.linearRampToValueAtTime(0.8, this.audioContext.currentTime + 0.001); // Higher noise volume for impact
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
+      
+      // Start both sources
+      mainOsc.start(this.audioContext.currentTime);
+      noiseSource.start(this.audioContext.currentTime);
+      
+      // Stop after shorter duration for more percussive pop
+      mainOsc.stop(this.audioContext.currentTime + 0.06);
+      noiseSource.stop(this.audioContext.currentTime + 0.06);
+      
+      // Clean up nodes after playback
+      const cleanup = () => {
+        mainOsc.disconnect();
+        noiseSource.disconnect();
+        lowPassFilter.disconnect();
+        highPassFilter.disconnect();
+        toneGain.disconnect();
+        noiseGain.disconnect();
+        gainNode.disconnect();
+      };
+      
+      // Set timeout to ensure cleanup happens
+      setTimeout(cleanup, 80);
+      
+      // Log successful sound playback (only in development)
+      if (console && console.log) {
+        console.log(`💨 Pop merge sound played successfully for block value ${blockValue} at ${Math.round(frequency)} Hz`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Failed to play pop merge sound:', error);
+    }
+  }
+  
+  // Set master volume (0.0 to 1.0)
+  setVolume(volume) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.volume;
+    }
+  }
+  
+  // Toggle mute state
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.isMuted ? 0 : this.volume;
+    }
+    return this.isMuted;
+  }
+  
+  // Get current mute state
+  getMuteState() {
+    return this.isMuted;
+  }
+  
+  // Get current volume
+  getVolume() {
+    return this.volume;
+  }
+  
+  // Toggle between musical and pop merge sounds
+  toggleMergeSoundType() {
+    this.usePopMergeSounds = !this.usePopMergeSounds;
+    console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'pop' : 'musical'} merge sounds`);
+    return this.usePopMergeSounds;
+  }
+  
+  // Get current merge sound type preference
+  getMergeSoundType() {
+    return this.usePopMergeSounds;
+  }
+}
+
+// Initialize sound manager
+const soundManager = new SoundManager();
+
 // weights and probabilities - will be dynamically updated based on stage
 let weights = [1, 2]; // Start with 1 and 2, unlock others as player progresses
 let probabilities = [0.5, 0.5]; // Equal chance for 1 and 2 initially
@@ -2964,6 +3368,7 @@ function saveGameState() {
       trashButtonPresses: trashButtonPresses,
       bombSelected: bombSelected,
       previousBombCost: previousBombCost,
+      usePopMergeSounds: soundManager.getMergeSoundType(),
       timestamp: Date.now()
     };
     
@@ -3156,6 +3561,20 @@ function restoreGameState(gameState) {
     // Restore bomb selection state from saved state
     bombSelected = gameState.bombSelected || false;
     previousBombCost = gameState.previousBombCost || bombConversionCost;
+    
+    // Restore merge sound type preference from saved state
+    if (gameState.usePopMergeSounds !== undefined) {
+      // Set the merge sound type preference in the sound manager
+      soundManager.usePopMergeSounds = gameState.usePopMergeSounds;
+    }
+    
+    // Always update the merge sound button to reflect current state (including default)
+    const mergeSoundBtn = document.getElementById('mergeSoundBtn');
+    if (mergeSoundBtn) {
+      const usePopSounds = soundManager.getMergeSoundType();
+      mergeSoundBtn.textContent = '🎵'; // Always show music note
+      mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+    }
     
     console.log('🔄 Restored button costs - Bomb:', oldBombCost, '→', bombConversionCost, 'Trash:', oldTrashCost, '→', trashButtonCost);
     
@@ -3764,7 +4183,15 @@ function showGoldEarned(amount) {
   // Create the gold earned display element
   const goldEl = document.createElement('div');
   goldEl.className = 'gold-earned';
-  goldEl.textContent = `+${amount}`;
+  
+  // Debug: Check if formatNumber is available and working
+  console.log('showGoldEarned called with amount:', amount);
+  console.log('formatNumber function available:', typeof formatNumber);
+  if (typeof formatNumber === 'function') {
+    console.log('Formatted amount:', formatNumber(amount));
+  }
+  
+  goldEl.textContent = `+${formatNumber(amount)}`;
   
   // Position it closer to the top right corner of the gold display
   const goldDisplay = document.querySelector('.gold-value');
@@ -4200,6 +4627,28 @@ function closeHelp(){ helpModal.classList.add('hidden'); }
 helpBtn.addEventListener('click', openHelp);
 helpClose.addEventListener('click', closeHelp);
 helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+
+// Sound button event listener
+soundBtn.addEventListener('click', () => {
+  const isMuted = soundManager.toggleMute();
+  soundBtn.textContent = isMuted ? '🔇' : '🔊';
+  soundBtn.title = isMuted ? 'Unmute sound' : 'Mute sound';
+});
+
+// Merge sound button event listener
+const mergeSoundBtn = document.getElementById('mergeSoundBtn');
+mergeSoundBtn.addEventListener('click', () => {
+  const usePopSounds = soundManager.toggleMergeSoundType();
+  mergeSoundBtn.textContent = '🎵'; // Always show music note
+  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+});
+
+// Set initial merge sound button state
+if (mergeSoundBtn) {
+  const usePopSounds = soundManager.getMergeSoundType();
+  mergeSoundBtn.textContent = '🎵'; // Always show music note
+  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+}
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) closeHelp(); });
 
 // Bomb conversion button event listener
@@ -4427,13 +4876,6 @@ function closeDebugPane(){
   // Reset custom block mode when debug pane is closed
   customBlockMode = false;
   
-  // Reset next block display to show "Queue" when debug pane is closed
-  const nextBlockElement = document.getElementById('nextBlockValue');
-  if (nextBlockElement) {
-    nextBlockElement.textContent = 'Queue';
-    nextBlockElement.removeAttribute('data-value');
-  }
-  
   console.log('Debug pane closed, custom block mode disabled');
 }
 debugClose.addEventListener('click', closeDebugPane);
@@ -4473,6 +4915,17 @@ function syncDebugControls() {
     debugSpeedSlider.value = currentSpeed;
   }
   updateDebugSpeedLabel();
+  
+  // Sync sound controls
+  if (debugVolumeSlider) {
+    debugVolumeSlider.value = Math.round(soundManager.getVolume() * 100);
+  }
+  updateDebugVolumeLabel();
+  
+  if (debugMuteToggle) {
+    debugMuteToggle.checked = soundManager.getMuteState();
+  }
+  updateDebugMuteStatus();
 }
 
 // Debug pane controls - Block grid interface
@@ -4488,32 +4941,31 @@ document.querySelectorAll('.block-item').forEach(blockItem => {
     if (blockItem.dataset.value === 'none') {
       customBlockSize = null;
       customBlockMode = false;
-      const nextBlockElement = document.getElementById('nextBlockValue');
-      nextBlockElement.textContent = 'Queue';
-      nextBlockElement.removeAttribute('data-value');
       console.log('No block selected - using queue');
     } else {
       // Update the custom block size
       const value = parseInt(blockItem.dataset.value);
       customBlockSize = value;
       
-      // Update the display with number formatting for large values
-      const displayValue = value >= 100000 ? formatNumber(value) : value;
-      const nextBlockElement = document.getElementById('nextBlockValue');
-      nextBlockElement.textContent = displayValue;
-      nextBlockElement.setAttribute('data-value', value);
-      
       // Enable custom block mode
       customBlockMode = true;
       
       console.log(`Selected block: ${value}`);
     }
+    
+    // Re-render to update pole enabling/disabling based on the new custom block
+    render();
   });
 });
 
 bombToggle.addEventListener('change', (e) => {
   customBlockBomb = e.target.checked;
   bombStatus.textContent = customBlockBomb ? 'Yes' : 'No';
+  
+  // Re-render to update pole enabling/disabling if custom block mode is active
+  if (customBlockMode && customBlockSize) {
+    render();
+  }
 });
 
 // Gold grant button
@@ -4560,6 +5012,26 @@ debugSpeedSlider.addEventListener('input', (e) => {
   updateAnimationSpeed();
 });
 
+// Sound control event listeners
+debugVolumeSlider.addEventListener('input', (e) => {
+  const volume = parseInt(e.target.value) / 100;
+  soundManager.setVolume(volume);
+  updateDebugVolumeLabel();
+});
+
+debugMuteToggle.addEventListener('change', (e) => {
+  const isMuted = soundManager.toggleMute();
+  updateDebugMuteStatus();
+      // Update the main sound button to match
+    const soundBtn = document.getElementById('soundBtn');
+    if (soundBtn) {
+      soundBtn.textContent = isMuted ? '🔇' : '🔊';
+      soundBtn.title = isMuted ? 'Unmute sound' : 'Mute sound';
+    }
+    
+    
+});
+
 function updateDebugAutoPlayDisplay() {
   debugAiToggle.textContent = aiEnabled ? 'Auto Play: On' : 'Auto Play: Off';
   debugAiToggle.classList.toggle('active', aiEnabled);
@@ -4568,6 +5040,24 @@ function updateDebugAutoPlayDisplay() {
 function updateDebugSpeedLabel() {
   const speedLabels = ['Very Slow', 'Slow', 'Medium', 'Fast', 'Blazing'];
   debugSpeedLabel.textContent = speedLabels[currentSpeed];
+}
+
+function updateDebugVolumeLabel() {
+  const volume = Math.round(soundManager.getVolume() * 100);
+  debugVolumeLabel.textContent = volume + '%';
+}
+
+function updateDebugMuteStatus() {
+  const isMuted = soundManager.getMuteState();
+  debugMuteStatus.textContent = isMuted ? 'Yes' : 'No';
+  
+  // Also update merge sound button state in debug panel
+  const mergeSoundBtn = document.getElementById('mergeSoundBtn');
+  if (mergeSoundBtn) {
+    const usePopSounds = soundManager.getMergeSoundType();
+    mergeSoundBtn.textContent = '🎵'; // Always show music note
+    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+  }
 }
 
 function colorFor(w){
@@ -4624,7 +5114,16 @@ function render(){
   poles.forEach((pole, idx) => {
     const poleDiv = document.createElement('div');
     const isAtCapacity = pole.length >= currentStackCapacity;
-    const playable = canPlaceOnPole(nextQueue[0], pole);
+    
+    // Determine which piece to check against for pole enabling/disabling
+    let pieceToCheck;
+    if (customBlockMode && customBlockSize && debugPane && debugPane.classList.contains('show')) {
+      pieceToCheck = { w: customBlockSize, bomb: customBlockBomb };
+    } else {
+      pieceToCheck = nextQueue[0];
+    }
+    
+    const playable = canPlaceOnPole(pieceToCheck, pole);
     const isDisabled = isAtCapacity && !playable;
     
     poleDiv.className = 'pole' + (isDisabled ? ' full' : '');
@@ -4757,14 +5256,7 @@ function render(){
   // Update trash button state
   updateTrashButtonIfGoldChanged();
   
-  // update next stage display in bottom actions
-  const targetBlockEl = document.getElementById('targetBlock');
-  if (targetBlockEl) {
-    // Show the target block size (what you get after merging)
-    const targetValue = currentTargetBlockSize * 2;
-    targetBlockEl.textContent = targetValue;
-    targetBlockEl.setAttribute('data-value', targetValue);
-  }
+
   
   updateDebugPane();
   
@@ -4817,14 +5309,6 @@ function placeOnPole(idx){
   }
   const pole = poles[idx];
   
-  // Additional safety check: ensure this stack can actually accept the next piece
-  const isAtCapacity = pole.length >= currentStackCapacity;
-  const playable = canPlaceOnPole(nextQueue[0], pole);
-  if (isAtCapacity && !playable) {
-    console.log('Stack is full and cannot merge, ignoring click');
-    return;
-  }
-  
   // Check if custom block mode is active AND debug pane is open
   let nextPiece;
   let wasCustomBlock = false;
@@ -4836,7 +5320,11 @@ function placeOnPole(idx){
     nextPiece = nextQueue[0];
   }
   
-  if (pole.length >= currentStackCapacity && (!topOf(pole) || topOf(pole).w !== nextPiece.w)) return;
+  // Safety check: ensure this stack can actually accept the piece
+  if (!canPlaceOnPole(nextPiece, pole)) {
+    console.log('Cannot place piece on this pole, ignoring click');
+    return;
+  }
   placing = true;
   lastPlacementTime = Date.now();
 
@@ -4890,6 +5378,9 @@ function placeOnPole(idx){
   // The CSS media queries will automatically apply the correct animation
   
   poleDiv.appendChild(animDisc);
+
+  // Play drop sound effect
+  soundManager.playDropSound(nextPiece.w);
 
   // Check if animations are disabled (speed = 0)
   const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
@@ -5135,6 +5626,9 @@ async function animateMergeCascade(index){
     const isBombMerge = a.bomb || b.bomb;
     poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge });
     
+    // Play merge sound effect for the newly created block
+    soundManager.playMergeSound(newW);
+    
     // Earn gold for this merge (increases by 1 for each merge in the cascade, multiplied by current stage)
     mergeCount++;
     const baseGoldEarned = mergeCount;
@@ -5143,7 +5637,7 @@ async function animateMergeCascade(index){
     const goldEarned = baseGoldEarned * stageMultiplier;
     gold += goldEarned;
     updateGoldDisplay();
-    console.log(`Merge ${mergeCount}: Earned ${goldEarned} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${gold})`);
+    console.log(`Merge ${mergeCount}: Earned ${formatNumber(goldEarned)} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)})`);
     
     // Show gold earned animation
     showGoldEarned(goldEarned);
@@ -5327,13 +5821,6 @@ function resetGame(isFreshGame = true){
   // Reset custom block mode
   customBlockMode = false;
   
-  // Reset next block display to show "Queue"
-  const nextBlockElement = document.getElementById('nextBlockValue');
-  if (nextBlockElement) {
-    nextBlockElement.textContent = 'Queue';
-    nextBlockElement.removeAttribute('data-value');
-  }
-  
   // Reset speed to default (Medium)
   currentSpeed = 2;
   updateAnimationSpeed();
@@ -5467,7 +5954,7 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   
   // Add total gold to player's balance
   gold += totalGoldEarned;
-  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${totalGoldEarned} gold (sum of 1 to ${blocksCleared} × ${stageMultiplier}x multiplier) (Total: ${gold})`);
+  console.log(`Bomb clear: Cleared ${blocksCleared} blocks, earned ${formatNumber(totalGoldEarned)} gold (sum of 1 to ${blocksCleared} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)})`);
   
   // Show individual gold animations for each block cleared (like cascade merges)
   for (let i = 0; i < blocksCleared; i++) {
@@ -5782,6 +6269,14 @@ console.log('Attempting to load saved game state...');
 const gameLoaded = loadGameState();
 console.log('Load result:', gameLoaded ? 'SUCCESS' : 'FAILED - starting fresh game');
 
+// Ensure merge sound button is properly initialized with current state
+const initMergeSoundBtn = document.getElementById('mergeSoundBtn');
+if (initMergeSoundBtn) {
+  const usePopSounds = soundManager.getMergeSoundType();
+  initMergeSoundBtn.textContent = '🎵'; // Always show music note
+  initMergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+}
+
 
 
 // initial render
@@ -5811,18 +6306,9 @@ document.addEventListener('DOMContentLoaded', () => {
     noBlockOption.classList.add('selected');
     customBlockSize = null;
     customBlockMode = false;
-    const nextBlockElement = document.getElementById('nextBlockValue');
-    nextBlockElement.textContent = 'Queue';
-    nextBlockElement.removeAttribute('data-value');
   }
   
-  // Initialize the target block display with proper styling
-  const targetBlockEl = document.getElementById('targetBlock');
-  if (targetBlockEl) {
-    const targetValue = currentTargetBlockSize * 2;
-    targetBlockEl.textContent = targetValue;
-    targetBlockEl.setAttribute('data-value', targetValue);
-  }
+
   
   // Initial render to set up the game display
   if (typeof render === 'function') {
@@ -5994,6 +6480,30 @@ function logProbabilityState() {
 // Test probabilities button
 const testProbBtn = document.getElementById('testProbBtn');
 testProbBtn.addEventListener('click', testProbabilityDistribution);
+
+// Cascade test button
+const cascadeTestBtn = document.getElementById('cascadeTestBtn');
+cascadeTestBtn.addEventListener('click', () => {
+  // Clear the first column (pole 0)
+  poles[0] = [];
+  
+  // Create a perfect cascade stack from 512 to 1
+  // This will create the largest possible cascade when blocks are dropped
+  const cascadeValues = [512, 256, 128, 64, 32, 16, 8, 4, 2, 1];
+  
+  cascadeValues.forEach(value => {
+    poles[0].push({ w: value, bomb: false });
+  });
+  
+  // Re-render the game to show the new stack
+  render();
+  
+  // Save game state after cascade test setup
+  console.log('🔄 Triggering save after cascade test setup...');
+  saveGameState();
+  
+  console.log('Cascade test stack created: 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 → 1');
+});
 
 // Probability test modal close button
 const probTestClose = document.getElementById('probTestClose');
