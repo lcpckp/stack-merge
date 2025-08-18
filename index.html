@@ -1905,6 +1905,31 @@
       background: var(--panel) !important; /* Keep original background */
       box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
     }
+    
+    /* Disable hover effects for mobile powerup buttons on mobile */
+    .mobile-powerup-shop .powerup-btn:hover {
+      /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
+      transform: none !important;
+      border: 2px solid #DC2626 !important; /* Keep original border */
+      background: var(--panel) !important; /* Keep original background */
+      box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25) !important; /* Keep original shadow */
+    }
+    
+    .mobile-powerup-shop .powerup-btn.affordable:hover {
+      /* Disable hover effects for affordable state on mobile */
+      transform: none !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
+      background: var(--panel) !important; /* Keep original background */
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
+    }
+    
+    .mobile-powerup-shop .powerup-btn.undo-mode:hover {
+      /* Disable hover effects for undo mode on mobile */
+      transform: none !important;
+      border: 2px solid #10B981 !important; /* Keep undo border */
+      background: #065F46 !important; /* Keep undo background */
+      box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25) !important; /* Keep undo shadow */
+    }
   }
   
   /* Responsive adjustments for very small mobile screens */
