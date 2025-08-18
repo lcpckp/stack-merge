@@ -2894,6 +2894,20 @@
     </div>
     
     <div class="section">
+      <div class="section-title">Probability Curve</div>
+      <div class="controls">
+        <div class="control-row">
+          <label for="debugDecaySlider">Decay Factor:</label>
+          <input type="range" id="debugDecaySlider" min="0.1" max="0.9" value="0.6" step="0.05">
+          <div class="value-display" id="debugDecayLabel">0.60</div>
+        </div>
+        <div class="control-row">
+          <button id="debugUpdateProbBtn" class="button">Update Probabilities</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
       <div class="section-title">Sound Settings</div>
       <div class="controls">
         <div class="control-row">
@@ -2958,18 +2972,24 @@
       </div>
     </div>
     
+    <div class="section">
+      <div class="section-title">Current Probabilities</div>
+      <div class="controls">
+        <div id="debugProbabilities" style="font-size: 12px; font-family: monospace; max-height: 200px; overflow-y: auto; background: var(--bg); padding: 8px; border-radius: 4px; border: 1px solid #475569;">
+          <!-- Probabilities will be populated here -->
+        </div>
+        <div class="control-row" style="margin-top: 12px;">
+          <button id="testProbBtn" class="button">Test Probabilities</button>
+        </div>
+      </div>
+    </div>
+    
     <div class="section bottom-buttons">
       <div class="controls">
         <div class="button-row">
           <button id="debugAiToggle" class="button primary">Auto Play: Off</button>
           <button id="grantScoreBtn" class="button primary">Grant 1000 Score</button>
 <button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
-<button id="testCoinSoundsBtn" class="button">Test Coin Sounds</button>
-<button id="testStageUpBtn" class="button">Test Stage Up</button>
-<button id="checkCoinStatusBtn" class="button">Check Coin Status</button>
-        </div>
-        <div class="button-row" style="margin-top: 8px;">
-          <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
       </div>
     </div>
@@ -3972,7 +3992,8 @@ function saveGameState() {
       bombConversionPresses: bombConversionPresses,
       trashButtonPresses: trashButtonPresses,
       bombSelected: bombSelected,
-      previousBombCost: previousBombCost
+      previousBombCost: previousBombCost,
+      currentActiveDecayFactor: currentActiveDecayFactor
     });
     console.log('🔊 Sound settings being saved:', {
       usePopMergeSounds: soundManager.getMergeSoundType(),
@@ -4001,6 +4022,7 @@ function saveGameState() {
       usePopMergeSounds: soundManager.getMergeSoundType(),
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
+      currentActiveDecayFactor: currentActiveDecayFactor,
       timestamp: Date.now()
     };
     
@@ -4182,6 +4204,9 @@ function restoreGameState(gameState) {
     probabilities = gameState.probabilities || [0.5, 0.5];
     nextQueue = gameState.nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()];
     
+    // Restore the current active decay factor
+    currentActiveDecayFactor = gameState.currentActiveDecayFactor || PROBABILITY_DECAY_FACTOR;
+    
     // Restore button costs from saved state
     const oldBombCost = bombConversionCost;
     const oldTrashCost = trashButtonCost;
@@ -4237,6 +4262,7 @@ function restoreGameState(gameState) {
     console.log('- Weights:', weights);
     console.log('- Next queue length:', nextQueue.length);
     console.log('- Bomb conversion cost:', bombConversionCost);
+    console.log('- Current active decay factor:', currentActiveDecayFactor);
     console.log('- Trash button cost:', trashButtonCost);
     console.log('- Bomb selected:', bombSelected);
     console.log('- Previous bomb cost:', previousBombCost);
@@ -4597,6 +4623,30 @@ const MAX_HEIGHT = 10;
 const BOMB_CHANCE = 0.01; // 1% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
+const PROBABILITY_DECAY_FACTOR = 0.7; // Each block is 70% as likely as the previous one
+// 
+// PROBABILITY SYSTEM EXPLANATION:
+// 
+// The game uses a hybrid probability system:
+// 
+// FOUNDATION BLOCKS (equal probability):
+// - Block 1: 100% base probability
+// - Block 2: 100% base probability  
+// - Block 4: 100% base probability
+//
+// DECAY BLOCKS (exponential decay):
+// - Block 8: 60% base probability (0.6^1)
+// - Block 16: 36% base probability (0.6^2)
+// - Block 32: 21.6% base probability (0.6^3)
+// - Block 64: 12.96% base probability (0.6^4)
+// - And so on...
+//
+// These base probabilities are then normalized to sum to 100%.
+// This creates a stable early game foundation while maintaining
+// exponential rarity for higher-tier blocks.
+
+// Initialize the current active decay factor
+let currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR;
 
 function getRandomWeight(){
   // Validate probabilities before selecting
@@ -4651,29 +4701,10 @@ let previousBombCost = 25; // Store the previous bomb cost before conversion
 let trashButtonCost = 25;
 let trashButtonPresses = 0; // Number of times button has been pressed
 
-// Set up initial probability distribution for the starting block sizes (1 and 2)
-updateProbabilityDistribution();
-
-// Initialize next queue after probability distribution is set up
+// Initialize next queue (probabilities will be set up after functions are defined)
 let nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
 
-// Emergency reset keyboard shortcut (Ctrl+R)
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'r') {
-    e.preventDefault();
-    console.log('Emergency reset triggered via Ctrl+R');
-    placing = false; // Force reset placing state
-    
-    // Re-enable hover effects and pointer events on all poles
-    const allPoles = Array.from(gameDiv.children);
-    allPoles.forEach(poleDiv => {
-      poleDiv.style.pointerEvents = '';
-      poleDiv.classList.remove('no-hover');
-    });
-    
-    resetGame(true);
-  }
-});
+// Emergency reset keyboard shortcut (Ctrl+R) - will be set up after gameDiv is defined
 
 
 
@@ -4731,65 +4762,112 @@ function checkForNewBlockSize(mergedSize) {
 }
 
 function updateProbabilityDistribution() {
-  // Create a balanced probability distribution that scales properly with new blocks
-  // Lower tier blocks should be more common, higher tiers progressively rarer
-  
-  const numBlocks = weights.length;
-  
-  if (numBlocks === 0) {
-    console.warn('No blocks available for probability distribution');
-    return;
+  try {
+    console.log('🔄 updateProbabilityDistribution called with decay factor:', currentActiveDecayFactor);
+    // Call the custom version with the current active decay factor
+    updateProbabilityDistributionCustom(currentActiveDecayFactor);
+    console.log('✅ updateProbabilityDistribution completed successfully');
+  } catch (error) {
+    console.error('❌ Error in updateProbabilityDistribution:', error);
+    console.error('Error stack:', error.stack);
+    throw error; // Re-throw to be caught by the caller
   }
-  
-  // Base probabilities with proper scaling
-  const baseProbabilities = [];
-  
-  for (let i = 0; i < numBlocks; i++) {
-    const blockSize = weights[i];
+}
+
+function updateProbabilityDistributionCustom(decayFactor) {
+  try {
+    console.log('🔄 updateProbabilityDistributionCustom called with decay factor:', decayFactor);
     
-    if (i < 3) {
-      // First three block sizes (1, 2, 4) get equal, higher probabilities
-      baseProbabilities.push(0.25);
-    } else if (i < 6) {
-      // Next three block sizes (8, 16, 32) get medium probabilities
-      baseProbabilities.push(0.15);
-    } else if (i < 9) {
-      // Next three block sizes (64, 128, 256) get lower probabilities
-      baseProbabilities.push(0.08);
-    } else {
-      // Highest tier blocks get very low probabilities
-      baseProbabilities.push(0.04);
+    // Create a hybrid probability system with foundation blocks and exponential decay
+    // Foundation blocks (1, 2, 4) get equal probabilities for stable early game
+    // Higher blocks (8+) follow an exponential decay curve for progression
+    
+    const numBlocks = weights.length;
+    console.log('📊 Number of blocks available:', numBlocks);
+    console.log('📊 Current weights:', weights);
+    
+    if (numBlocks === 0) {
+      console.warn('No blocks available for probability distribution');
+      return;
     }
+    
+    // Sort weights to ensure they're in ascending order for proper curve calculation
+    const sortedWeights = [...weights].sort((a, b) => a - b);
+    const sortedIndices = sortedWeights.map(w => weights.indexOf(w));
+    
+    // Calculate base probabilities using exponential decay
+    const baseProbabilities = [];
+    
+    for (let i = 0; i < numBlocks; i++) {
+      const blockSize = sortedWeights[i];
+      
+      if (i < 3) {
+        // First three blocks (1, 2, 4) get equal, high probabilities
+        // This creates a stable foundation for the early game
+        baseProbabilities.push(1.0);
+      } else {
+        // Starting from block 8 (index 3), apply exponential decay
+        // Each subsequent block is progressively rarer
+        const decayPosition = i - 2; // Start decay from position 1 (after the foundation blocks)
+        const baseProbability = Math.pow(decayFactor, decayPosition);
+        baseProbabilities.push(baseProbability);
+      }
+    }
+    
+    // Normalize probabilities to sum to 1.0
+    const totalProbability = baseProbabilities.reduce((sum, p) => sum + p, 0);
+    
+    if (totalProbability === 0) {
+      console.error('Total probability is 0, using uniform distribution');
+      probabilities = new Array(numBlocks).fill(1.0 / numBlocks);
+    } else {
+      // Map the normalized probabilities back to the original weights order
+      const normalizedProbs = baseProbabilities.map(p => p / totalProbability);
+      probabilities = new Array(numBlocks);
+      
+      // Place probabilities back in original order
+      sortedIndices.forEach((originalIndex, sortedIndex) => {
+        probabilities[originalIndex] = normalizedProbs[sortedIndex];
+      });
+    }
+    
+    // Verify probabilities sum to 1.0 (with small floating point tolerance)
+    const actualSum = probabilities.reduce((sum, p) => sum + p, 0);
+    if (Math.abs(actualSum - 1.0) > 0.0001) {
+      console.warn(`Probability sum is ${actualSum.toFixed(6)}, expected 1.0. Normalizing...`);
+      // Force normalization
+      const correctedSum = probabilities.reduce((sum, p) => sum + p, 0);
+      probabilities = probabilities.map(p => p / correctedSum);
+    }
+    
+    // Final validation
+    validateProbabilityDistribution();
+    
+    // Log the current state for debugging
+    logProbabilityState();
+    
+    // Update the debug display
+    updateDebugProbabilitiesDisplay();
+    
+    console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
+    console.log('Probability sum:', probabilities.reduce((sum, p) => sum + p, 0).toFixed(6));
+    console.log('Current weights array:', weights);
+    console.log('Decay factor used:', decayFactor);
+    
+    // Log the foundation vs decay blocks for clarity
+    if (weights.length >= 3) {
+      console.log('Foundation blocks (equal prob):', weights.slice(0, 3).join(', '));
+      if (weights.length > 3) {
+        console.log('Decay blocks (exponential):', weights.slice(3).join(', '));
+      }
+    }
+    
+    console.log('✅ updateProbabilityDistributionCustom completed successfully');
+  } catch (error) {
+    console.error('❌ Error in updateProbabilityDistributionCustom:', error);
+    console.error('Error stack:', error.stack);
+    throw error; // Re-throw to be caught by the caller
   }
-  
-  // Normalize probabilities to sum to 1.0
-  const totalProbability = baseProbabilities.reduce((sum, p) => sum + p, 0);
-  
-  if (totalProbability === 0) {
-    console.error('Total probability is 0, using uniform distribution');
-    probabilities = new Array(numBlocks).fill(1.0 / numBlocks);
-  } else {
-    probabilities = baseProbabilities.map(p => p / totalProbability);
-  }
-  
-  // Verify probabilities sum to 1.0 (with small floating point tolerance)
-  const actualSum = probabilities.reduce((sum, p) => sum + p, 0);
-  if (Math.abs(actualSum - 1.0) > 0.0001) {
-    console.warn(`Probability sum is ${actualSum.toFixed(6)}, expected 1.0. Normalizing...`);
-    // Force normalization
-    const correctedSum = probabilities.reduce((sum, p) => sum + p, 0);
-    probabilities = probabilities.map(p => p / correctedSum);
-  }
-  
-  // Final validation
-  validateProbabilityDistribution();
-  
-  // Log the current state for debugging
-  logProbabilityState();
-  
-  console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
-  console.log('Probability sum:', probabilities.reduce((sum, p) => sum + p, 0).toFixed(6));
-  console.log('Current weights array:', weights);
 }
 
 function validateProbabilityDistribution() {
@@ -5258,6 +5336,26 @@ debugAiToggle = document.getElementById('debugAiToggle');
 debugSpeedSlider = document.getElementById('debugSpeedSlider');
 debugSpeedLabel = document.getElementById('debugSpeedLabel');
 
+// Emergency reset keyboard shortcut (Ctrl+R)
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'r') {
+    e.preventDefault();
+    console.log('Emergency reset triggered via Ctrl+R');
+    placing = false; // Force reset placing state
+    
+    // Re-enable hover effects and pointer events on all poles
+    if (gameDiv && gameDiv.children) {
+      const allPoles = Array.from(gameDiv.children);
+      allPoles.forEach(poleDiv => {
+        poleDiv.style.pointerEvents = '';
+        poleDiv.classList.remove('no-hover');
+      });
+    }
+    
+    resetGame(true);
+  }
+});
+
 
 
 // Help modal wiring
@@ -5715,6 +5813,9 @@ function updateDebugPane() {
   if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
   if (debugBombStatus) debugBombStatus.textContent = blocksDropped >= BOMB_DELAY_BLOCKS ? 'Enabled' : 'Disabled';
   if (debugStage) debugStage.textContent = currentStage;
+  
+  // Update probabilities display
+  updateDebugProbabilitiesDisplay();
 }
 
 
@@ -5781,50 +5882,140 @@ function syncDebugControls() {
     debugMuteToggle.checked = soundManager.getMuteState();
   }
   updateDebugMuteStatus();
+  
+  // Sync probability curve controls
+  if (debugDecaySlider) {
+    // Always show the current active decay factor
+    debugDecaySlider.value = currentActiveDecayFactor;
+    updateDebugDecayLabel(currentActiveDecayFactor);
+  } else {
+    updateDebugDecayLabel(currentActiveDecayFactor);
+  }
+  
+  // Update probabilities display
+  updateDebugProbabilitiesDisplay();
+  
+  // Set up event listeners for debug controls (only if they exist)
+  if (debugVolumeSlider) {
+    // Remove existing listeners to avoid duplicates
+    debugVolumeSlider.removeEventListener('input', handleVolumeChange);
+    debugVolumeSlider.addEventListener('input', handleVolumeChange);
+  }
+  
+  if (debugMuteToggle) {
+    // Remove existing listeners to avoid duplicates
+    debugMuteToggle.removeEventListener('change', handleMuteToggle);
+    debugMuteToggle.addEventListener('change', handleMuteToggle);
+  }
+  
+  if (debugDecaySlider) {
+    // Remove existing listeners to avoid duplicates
+    debugDecaySlider.removeEventListener('input', handleDecayChange);
+    debugDecaySlider.addEventListener('input', handleDecayChange);
+  }
+  
+  if (debugUpdateProbBtn) {
+    // Remove existing listeners to avoid duplicates
+    debugUpdateProbBtn.removeEventListener('click', handleUpdateProbabilities);
+    debugUpdateProbBtn.addEventListener('click', handleUpdateProbabilities);
+  }
+  
+  // Set up auto-play control event listeners
+  if (debugAiToggle) {
+    // Remove existing listeners to avoid duplicates
+    debugAiToggle.removeEventListener('click', handleAiToggle);
+    debugAiToggle.addEventListener('click', handleAiToggle);
+  }
+  
+  if (debugSpeedSlider) {
+    // Remove existing listeners to avoid duplicates
+    debugSpeedSlider.removeEventListener('input', handleSpeedSlider);
+    debugSpeedSlider.addEventListener('input', handleSpeedSlider);
+  }
+  
+  // Set up debug button event listeners
+  if (grantGoldBtn) {
+    // Remove existing listeners to avoid duplicates
+    grantGoldBtn.removeEventListener('click', handleGrantGold);
+    grantGoldBtn.addEventListener('click', handleGrantGold);
+  }
+  
+  if (grantScoreBtn) {
+    // Remove existing listeners to avoid duplicates
+    grantScoreBtn.removeEventListener('click', handleGrantScore);
+    grantScoreBtn.addEventListener('click', handleGrantScore);
+  }
+  
+  const checkCoinStatusBtn = document.getElementById('checkCoinStatusBtn');
+  if (checkCoinStatusBtn) {
+    // Remove existing listeners to avoid duplicates
+    checkCoinStatusBtn.removeEventListener('click', handleCheckCoinStatus);
+    checkCoinStatusBtn.addEventListener('click', handleCheckCoinStatus);
+  }
+  
+  // Set up block grid interface event listeners
+  document.querySelectorAll('.block-item').forEach(blockItem => {
+    // Remove existing listeners to avoid duplicates
+    blockItem.removeEventListener('click', () => handleBlockItemClick(blockItem));
+    blockItem.addEventListener('click', () => handleBlockItemClick(blockItem));
+  });
+  
+  // Set up bomb toggle event listener
+  if (bombToggle) {
+    // Remove existing listeners to avoid duplicates
+    bombToggle.removeEventListener('change', handleBombToggle);
+    bombToggle.addEventListener('change', handleBombToggle);
+  }
 }
 
-// Debug pane controls - Block grid interface
-document.querySelectorAll('.block-item').forEach(blockItem => {
-  blockItem.addEventListener('click', () => {
-    // Remove previous selection
-    document.querySelectorAll('.block-item').forEach(item => item.classList.remove('selected'));
-    
-    // Select this block
-    blockItem.classList.add('selected');
-    
-    // Check if "No Block" is selected
-    if (blockItem.dataset.value === 'none') {
-      customBlockSize = null;
-      customBlockMode = false;
-      console.log('No block selected - using queue');
-    } else {
-      // Update the custom block size
-      const value = parseInt(blockItem.dataset.value);
-      customBlockSize = value;
-      
-      // Enable custom block mode
-      customBlockMode = true;
-      
-      console.log(`Selected block: ${value}`);
-    }
-    
-    // Re-render to update pole enabling/disabling based on the new custom block
-    render();
-  });
-});
+// Debug pane controls will be set up in syncDebugControls()
 
-bombToggle.addEventListener('change', (e) => {
-  customBlockBomb = e.target.checked;
-  bombStatus.textContent = customBlockBomb ? 'Yes' : 'No';
-  
-  // Re-render to update pole enabling/disabling if custom block mode is active
-  if (customBlockMode && customBlockSize) {
-    render();
+// Debug button event listeners will be set up in syncDebugControls()
+
+// Debug auto-play controls - will be set up in syncDebugControls()
+
+// Event listener handler functions for debug controls
+function handleVolumeChange(e) {
+  const volume = parseInt(e.target.value) / 100;
+  soundManager.setVolume(volume);
+  updateDebugVolumeLabel();
+}
+
+function handleMuteToggle(e) {
+  const isMuted = soundManager.toggleMute();
+  updateDebugMuteStatus();
+  // Update the main sound button to match
+  const soundBtn = document.getElementById('soundBtn');
+  if (soundBtn) {
+    soundBtn.textContent = isMuted ? '🔇' : '🔊';
+    soundBtn.title = isMuted ? 'Unmute sound' : 'Mute sound';
   }
-});
+}
 
-// Gold grant button
-grantGoldBtn.addEventListener('click', () => {
+function handleDecayChange(e) {
+  const decayFactor = parseFloat(e.target.value);
+  updateDebugDecayLabel(decayFactor);
+}
+
+function handleUpdateProbabilities() {
+  const decayFactor = parseFloat(debugDecaySlider.value);
+  updateProbabilityDistributionWithDecay(decayFactor);
+}
+
+function handleAiToggle() {
+  toggleAI(!aiEnabled);
+  updateDebugAutoPlayDisplay();
+}
+
+function handleSpeedSlider(e) {
+  currentSpeed = parseInt(e.target.value);
+  updateSpeedLabel();
+  updateDebugSpeedLabel();
+  updateAISpeed();
+  updateAnimationSpeed();
+}
+
+function handleGrantGold() {
   gold += 1000;
   // Update gold display
   updateGoldDisplay();
@@ -5841,32 +6032,9 @@ grantGoldBtn.addEventListener('click', () => {
   saveGameState();
   
   console.log(`Granted 1000 gold. New balance: ${gold}`);
-});
+}
 
-// Test coin sounds button
-document.getElementById('testCoinSoundsBtn').addEventListener('click', () => {
-  soundManager.testAllCoinSounds();
-});
-
-// Test stage up sound button
-document.getElementById('testStageUpBtn').addEventListener('click', () => {
-  soundManager.testStageUpSound();
-});
-
-// Check coin sound status button
-document.getElementById('checkCoinStatusBtn').addEventListener('click', () => {
-  const status = soundManager.getCoinSoundStatus();
-  console.log('🪙 Coin Sound Status:', status);
-  
-  if (status.loaded && status.count === status.expected) {
-    console.log('✅ All coin sounds loaded successfully!');
-  } else {
-    console.warn('⚠️ Coin sound loading issues detected');
-  }
-});
-
-// Score grant button
-grantScoreBtn.addEventListener('click', () => {
+function handleGrantScore() {
   score += 1000;
   // Update score display
   updateScoreDisplay();
@@ -5876,41 +6044,55 @@ grantScoreBtn.addEventListener('click', () => {
   saveGameState();
   
   console.log(`Granted 1000 score. New score: ${score}`);
-});
+}
 
-// Debug auto-play controls
-debugAiToggle.addEventListener('click', () => {
-  toggleAI(!aiEnabled);
-  updateDebugAutoPlayDisplay();
-});
+function handleCheckCoinStatus() {
+  const status = soundManager.getCoinSoundStatus();
+  console.log('🪙 Coin Sound Status:', status);
+  
+  if (status.loaded && status.count === status.expected) {
+    console.log('✅ All coin sounds loaded successfully!');
+  } else {
+    console.warn('⚠️ Coin sound loading issues detected');
+  }
+}
 
-debugSpeedSlider.addEventListener('input', (e) => {
-  currentSpeed = parseInt(e.target.value);
-  updateSpeedLabel();
-  updateDebugSpeedLabel();
-  updateAISpeed();
-  updateAnimationSpeed();
-});
-
-// Sound control event listeners
-debugVolumeSlider.addEventListener('input', (e) => {
-  const volume = parseInt(e.target.value) / 100;
-  soundManager.setVolume(volume);
-  updateDebugVolumeLabel();
-});
-
-debugMuteToggle.addEventListener('change', (e) => {
-  const isMuted = soundManager.toggleMute();
-  updateDebugMuteStatus();
-      // Update the main sound button to match
-    const soundBtn = document.getElementById('soundBtn');
-    if (soundBtn) {
-      soundBtn.textContent = isMuted ? '🔇' : '🔊';
-      soundBtn.title = isMuted ? 'Unmute sound' : 'Mute sound';
-    }
+function handleBlockItemClick(blockItem) {
+  // Remove previous selection
+  document.querySelectorAll('.block-item').forEach(item => item.classList.remove('selected'));
+  
+  // Select this block
+  blockItem.classList.add('selected');
+  
+  // Check if "No Block" is selected
+  if (blockItem.dataset.value === 'none') {
+    customBlockSize = null;
+    customBlockMode = false;
+    console.log('No block selected - using queue');
+  } else {
+    // Update the custom block size
+    const value = parseInt(blockItem.dataset.value);
+    customBlockSize = value;
     
+    // Enable custom block mode
+    customBlockMode = true;
     
-});
+    console.log(`Selected block: ${value}`);
+  }
+  
+  // Re-render to update pole enabling/disabling based on the new custom block
+  render();
+}
+
+function handleBombToggle(e) {
+  customBlockBomb = e.target.checked;
+  bombStatus.textContent = customBlockBomb ? 'Yes' : 'No';
+  
+  // Re-render to update pole enabling/disabling if custom block mode is active
+  if (customBlockMode && customBlockSize) {
+    render();
+  }
+}
 
 function updateDebugAutoPlayDisplay() {
   debugAiToggle.textContent = aiEnabled ? 'Auto Play: On' : 'Auto Play: Off';
@@ -5937,6 +6119,65 @@ function updateDebugMuteStatus() {
     const usePopSounds = soundManager.getMergeSoundType();
     mergeSoundBtn.textContent = '🎵'; // Always show music note
     mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+  }
+}
+
+function updateDebugDecayLabel(decayFactor) {
+  debugDecayLabel.textContent = decayFactor.toFixed(2);
+}
+
+function updateDebugProbabilitiesDisplay() {
+  const probDiv = document.getElementById('debugProbabilities');
+  if (!probDiv) return;
+  
+  if (!probabilities || probabilities.length === 0) {
+    probDiv.innerHTML = '<em>No probabilities available</em>';
+    return;
+  }
+  
+  let html = '<div style="margin-bottom: 8px;"><strong>Block | Probability | Cumulative</strong></div>';
+  
+  let cumulative = 0;
+  for (let i = 0; i < weights.length; i++) {
+    cumulative += probabilities[i];
+    const percentage = (probabilities[i] * 100).toFixed(2);
+    const cumulativePercentage = (cumulative * 100).toFixed(2);
+    
+    // Different styling for foundation vs decay blocks
+    const isFoundation = i < 3;
+    const blockColor = isFoundation ? '#10B981' : '#0ea5e9'; // Green for foundation, blue for decay
+    const bgColor = i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'transparent';
+    const borderStyle = isFoundation ? '2px solid #10B981' : 'none';
+    
+    html += `<div style="margin: 2px 0; padding: 2px 4px; background: ${bgColor}; border-radius: 2px; border: ${borderStyle};">
+      <span style="color: ${blockColor}; font-weight: 600;">${weights[i]}</span> | 
+      <span style="color: #10B981;">${percentage}%</span> | 
+      <span style="color: #F59E0B;">${cumulativePercentage}%</span>
+      ${isFoundation ? ' <span style="color: #10B981; font-size: 10px;">(Foundation)</span>' : ''}
+    </div>`;
+  }
+  
+  probDiv.innerHTML = html;
+}
+
+function updateProbabilityDistributionWithDecay(decayFactor) {
+  // Update the current active decay factor
+  currentActiveDecayFactor = decayFactor;
+  
+  console.log(`Updating probability distribution with decay factor: ${decayFactor}`);
+  
+  // Recalculate probabilities with the new decay factor
+  updateProbabilityDistributionCustom(decayFactor);
+  
+  // Log the change
+  console.log(`Probability distribution updated with decay factor: ${decayFactor}`);
+  
+  // Update the debug display
+  updateDebugDecayLabel(decayFactor);
+  
+  // Update the slider to reflect the current active setting
+  if (debugDecaySlider) {
+    debugDecaySlider.value = decayFactor;
   }
 }
 
@@ -6580,6 +6821,8 @@ async function animateMergeCascade(index){
       // Check if this merge unlocks a new stack (stage progression)
   if (newW === currentTargetBlockSize * 2){
     console.log(`Stage progression triggered! Merged to ${newW}, target was ${currentTargetBlockSize}`);
+    // Check if this merge unlocks a new block size for future drops BEFORE stage progression
+    checkForNewBlockSize(newW);
     // Stage progression: keep the merged block, clear the rest of the stack
     await animateStageProgression(index, pairIndex - 1, newW);
     // Check if we should add a new stack
@@ -6724,6 +6967,12 @@ function resetGame(isFreshGame = true){
   
   // Reset weights and probabilities to initial state
   weights = [1, 2];
+  
+  // Reset decay factor to default for fresh games
+  if (isFreshGame) {
+    currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR;
+  }
+  
   // Let updateProbabilityDistribution calculate the correct initial probabilities
   updateProbabilityDistribution();
   
@@ -7220,14 +7469,8 @@ function aiStep(){
   placeOnPole(pick);
 }
 
-// Try to load saved game state
-console.log('=== GAME INITIALIZATION ===');
-console.log('Attempting to load saved game state...');
-const gameLoaded = loadGameState();
-console.log('Load result:', gameLoaded ? 'SUCCESS' : 'FAILED - starting fresh game');
-
 // Ensure merge sound button is properly initialized with current state
-const initMergeSoundBtn = document.getElementById('mergeSoundBtn');
+const initMergeSoundBtn = document.getElementById('mergeBtn');
 if (initMergeSoundBtn) {
   const usePopSounds = soundManager.getMergeSoundType();
   initMergeSoundBtn.textContent = '🎵'; // Always show music note
@@ -7236,8 +7479,7 @@ if (initMergeSoundBtn) {
 
 
 
-// initial render
-render();
+// Initial render will happen after game state loading
 
 // Initialize animation speed and stack height
 updateAnimationSpeed();
@@ -7267,13 +7509,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
 
   
-  // Initial render to set up the game display
-  if (typeof render === 'function') {
-    render();
-  }
-  if (typeof renderNext === 'function') {
-    renderNext();
-  }
+  // Initial render is handled after game state loading
 });
 
 if (bombToggle && bombStatus) {
@@ -7489,6 +7725,37 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Initialize the game after all functions are defined
+console.log('🎮 Starting game initialization...');
+
+try {
+  // Set up initial probability distribution for the starting block sizes (1 and 2)
+  console.log('📊 Setting up initial probability distribution...');
+  updateProbabilityDistribution();
+  console.log('✅ Probability distribution initialized');
+
+  // Initialize next queue after probability distribution is set up
+  console.log('🔄 Initializing next queue...');
+  nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+  console.log('✅ Next queue initialized:', nextQueue);
+
+  console.log('🎮 Game initialized with probability system');
+  
+  // Now try to load saved game state AFTER everything is initialized
+  console.log('=== ATTEMPTING TO LOAD SAVED GAME STATE ===');
+  const gameLoaded = loadGameState();
+  console.log('Load result:', gameLoaded ? 'SUCCESS' : 'FAILED - starting fresh game');
+  
+  // Force a render after loading (or if loading failed)
+  console.log('🔄 Rendering game display...');
+  render();
+  renderNext();
+  console.log('✅ Game display rendered');
+  
+} catch (error) {
+  console.error('❌ Error during game initialization:', error);
+  console.error('Error stack:', error.stack);
+}
 
 </script>
 </body>
