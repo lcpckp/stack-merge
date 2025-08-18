@@ -3223,9 +3223,12 @@ class SoundManager {
       other: 3      // Other sounds (stage up, etc.)
     };
     
-    // Initialize audio context on first user interaction
-    this.initAudioContext = this.initAudioContext.bind(this);
-    this.addAudioInitListeners();
+      // Initialize audio context on first user interaction
+  this.initAudioContext = this.initAudioContext.bind(this);
+  this.addAudioInitListeners();
+  
+  // Also try to resume audio context immediately if possible
+  this.tryResumeAudioContextOnLoad();
   }
   
   addAudioInitListeners() {
@@ -3301,6 +3304,9 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('drop');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
     
     try {
       // Create gain node for volume control
@@ -3425,6 +3431,9 @@ class SoundManager {
   // Generate a beautiful, physical bell sound like Christmas music
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
     
     try {
       // Create gain node for volume control
@@ -3591,6 +3600,9 @@ class SoundManager {
   playPopMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
+    
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
@@ -3738,6 +3750,32 @@ class SoundManager {
     console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'pop' : 'musical'} merge sounds`);
     this.saveSoundSettings();
     return this.usePopMergeSounds;
+  }
+  
+  // Ensure audio context is active (called by sound functions)
+  ensureAudioContextActive() {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      console.log('🔄 Audio context suspended, resuming...');
+      return this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context:', error);
+      });
+    }
+    return Promise.resolve();
+  }
+  
+  // Try to resume audio context on page load (for immediate sound playback)
+  tryResumeAudioContextOnLoad() {
+    // Wait a bit for the page to fully load, then try to resume audio context
+    setTimeout(() => {
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        console.log('🔄 Attempting to resume audio context on page load...');
+        this.audioContext.resume().then(() => {
+          console.log('✅ Audio context resumed on page load');
+        }).catch(error => {
+          console.log('ℹ️ Audio context resume on load failed (will resume on user interaction)');
+        });
+      }
+    }, 1000); // Wait 1 second after page load
   }
   
   // Get current merge sound type preference
@@ -3897,6 +3935,9 @@ class SoundManager {
     const actualVolume = this.getActualVolume('bomb');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
+    
     try {
       // Create audio element for the bomb sound if not already created
       if (!this.bombAudio) {
@@ -3927,6 +3968,9 @@ class SoundManager {
     // Check individual sound type volume - use 'other' category as requested
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
     
     try {
       // Create audio element for the purchase sound if not already created
@@ -4204,6 +4248,9 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    this.ensureAudioContextActive();
     
     try {
       // Create audio element for the stage up sound if not already created
