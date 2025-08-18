@@ -4107,34 +4107,55 @@ class SoundManager {
       const coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
       coinAudio.volume = actualVolume; // Apply individual sound type volume
       
-      // Add error handling and retry logic
+      // Track if we've already played or failed to prevent duplicates
+      let hasPlayed = false;
+      let hasFailed = false;
+      
+      // Add error handling
       coinAudio.addEventListener('error', (e) => {
         console.error(`❌ Audio error for coin${randomIndex}:`, e);
-      });
-      
-      // Ensure audio is loaded before playing
-      coinAudio.addEventListener('canplaythrough', () => {
-        // Play the sound once it's ready
-        coinAudio.play().then(() => {
-          console.log(`🪙 Coin sound ${randomIndex} played successfully`);
-        }).catch(error => {
-          console.error(`❌ Failed to play coin audio ${randomIndex}:`, error);
-          // Try alternative approach if direct play fails
-          this.playCoinSoundFallback(randomIndex);
-        });
-      });
-      
-      // Set a timeout in case the audio doesn't load
-      setTimeout(() => {
-        if (coinAudio.readyState < 2) { // HAVE_CURRENT_DATA
-          console.warn(`⚠️ Coin audio ${randomIndex} taking too long to load, trying fallback`);
+        if (!hasPlayed && !hasFailed) {
+          hasFailed = true;
           this.playCoinSoundFallback(randomIndex);
         }
-      }, 100);
+      });
       
-      // Try to play immediately as well
-      coinAudio.play().catch(error => {
+      // Try to play immediately first (most common success case)
+      coinAudio.play().then(() => {
+        if (!hasPlayed) {
+          hasPlayed = true;
+          console.log(`🪙 Coin sound ${randomIndex} played successfully (immediate)`);
+        }
+      }).catch(error => {
         console.log(`ℹ️ Immediate play failed for coin${randomIndex}, waiting for load...`);
+        
+        // Only set up the load listener if immediate play failed
+        if (!hasPlayed && !hasFailed) {
+          // Ensure audio is loaded before trying again
+          coinAudio.addEventListener('canplaythrough', () => {
+            if (!hasPlayed && !hasFailed) {
+              coinAudio.play().then(() => {
+                hasPlayed = true;
+                console.log(`🪙 Coin sound ${randomIndex} played successfully (after load)`);
+              }).catch(error => {
+                console.error(`❌ Failed to play coin audio ${randomIndex} after load:`, error);
+                if (!hasPlayed && !hasFailed) {
+                  hasFailed = true;
+                  this.playCoinSoundFallback(randomIndex);
+                }
+              });
+            }
+          });
+          
+          // Set a timeout in case the audio doesn't load
+          setTimeout(() => {
+            if (!hasPlayed && !hasFailed && coinAudio.readyState < 2) {
+              console.warn(`⚠️ Coin audio ${randomIndex} taking too long to load, trying fallback`);
+              hasFailed = true;
+              this.playCoinSoundFallback(randomIndex);
+            }
+          }, 150); // Increased timeout slightly for better reliability
+        }
       });
       
     } catch (error) {
@@ -4164,10 +4185,14 @@ class SoundManager {
         // Apply individual sound type volume
         coinAudio.volume = actualVolume;
         coinAudio.currentTime = 0;
-        coinAudio.play().catch(error => {
+        
+        // Play the fallback sound
+        coinAudio.play().then(() => {
+          console.log(`🪙 Coin sound ${soundIndex} played via fallback`);
+        }).catch(error => {
           console.error(`❌ Fallback also failed for coin sound ${soundIndex}:`, error);
+          // Don't retry again to prevent infinite loops
         });
-        console.log(`🪙 Coin sound ${soundIndex} played via fallback`);
       } else {
         console.warn(`⚠️ No preloaded audio found for coin sound ${soundIndex}`);
       }
@@ -4186,6 +4211,26 @@ class SoundManager {
         this.playCoinSound();
       }, i * 200); // Play each sound 200ms apart
     }
+  }
+  
+  // Prevent multiple simultaneous coin sound calls
+  isPlayingCoinSound = false;
+  
+  // Safe coin sound method that prevents duplicates
+  playCoinSoundSafe() {
+    if (this.isPlayingCoinSound) {
+      console.log('🔄 Coin sound already playing, skipping duplicate call');
+      return;
+    }
+    
+    this.isPlayingCoinSound = true;
+    
+    // Reset flag after a short delay to allow for natural sound duration
+    setTimeout(() => {
+      this.isPlayingCoinSound = false;
+    }, 300); // Most coin sounds are shorter than 300ms
+    
+    this.playCoinSound();
   }
   
   // Test method to verify stage up sound is working (for debugging)
