@@ -3187,6 +3187,10 @@
         <div class="control-row" style="margin-top: 12px;">
           <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
+        
+        <div class="control-row" style="margin-top: 8px;">
+          <button id="testAudioContextBtn" class="button">Test Audio Context</button>
+        </div>
       </div>
     </div>
     
@@ -3231,6 +3235,21 @@ class SoundManager {
     const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
     initEvents.forEach(event => {
       document.addEventListener(event, this.initAudioContext, { once: true, passive: true });
+    });
+    
+    // Also add a listener that proactively checks audio context state on any interaction
+    const checkAudioContext = () => {
+      if (this.initialized && this.audioContext && this.audioContext.state === 'suspended') {
+        console.log('🔄 Audio context suspended during interaction, attempting to resume...');
+        this.audioContext.resume().catch(error => {
+          console.warn('⚠️ Failed to resume audio context during interaction:', error);
+        });
+      }
+    };
+    
+    // Add to the same events but without 'once' to check on every interaction
+    initEvents.forEach(event => {
+      document.addEventListener(event, checkAudioContext, { passive: true });
     });
   }
   
@@ -3282,6 +3301,13 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('drop');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for drop sound:', error);
+      });
+    }
     
     try {
       // Create gain node for volume control
@@ -3406,6 +3432,13 @@ class SoundManager {
   // Generate a beautiful, physical bell sound like Christmas music
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for musical merge sound:', error);
+      });
+    }
     
     try {
       // Create gain node for volume control
@@ -3572,6 +3605,13 @@ class SoundManager {
   playPopMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for pop merge sound:', error);
+      });
+    }
+    
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
@@ -3709,6 +3749,47 @@ class SoundManager {
   // Get current volume
   getVolume() {
     return this.volume;
+  }
+  
+  // Proactively check and resume audio context if suspended
+  ensureAudioContextActive() {
+    // Quick synchronous check first
+    if (!this.audioContext || this.audioContext.state !== 'suspended') {
+      return Promise.resolve(true); // Already active or not initialized
+    }
+    
+    // Only log and resume if actually suspended
+    console.log('🔄 Audio context suspended, attempting to resume...');
+    return this.audioContext.resume().then(() => {
+      console.log('✅ Audio context resumed successfully');
+      return true;
+    }).catch(error => {
+      console.warn('⚠️ Failed to resume audio context:', error);
+      return false;
+    });
+  }
+  
+  // Synchronous check for audio context state (for performance-critical operations)
+  isAudioContextActive() {
+    return this.audioContext && this.audioContext.state === 'running';
+  }
+  
+  // Batch check and resume audio context (for multiple sounds at once)
+  batchEnsureAudioContextActive() {
+    // Quick synchronous check first
+    if (!this.audioContext || this.audioContext.state !== 'suspended') {
+      return Promise.resolve(true); // Already active or not initialized
+    }
+    
+    // Only resume once for the batch
+    console.log('🔄 Audio context suspended during batch operation, resuming...');
+    return this.audioContext.resume().then(() => {
+      console.log('✅ Audio context resumed for batch operation');
+      return true;
+    }).catch(error => {
+      console.warn('⚠️ Failed to resume audio context for batch operation:', error);
+      return false;
+    });
   }
   
   // Toggle between musical and pop merge sounds
@@ -3876,6 +3957,13 @@ class SoundManager {
     const actualVolume = this.getActualVolume('bomb');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for bomb sound:', error);
+      });
+    }
+    
     try {
       // Create audio element for the bomb sound if not already created
       if (!this.bombAudio) {
@@ -3906,6 +3994,13 @@ class SoundManager {
     // Check individual sound type volume - use 'other' category as requested
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for purchase sound:', error);
+      });
+    }
     
     try {
       // Create audio element for the purchase sound if not already created
@@ -4101,6 +4196,27 @@ class SoundManager {
     this.playStageProgressionSound();
   }
   
+  // Test method to verify audio context state (for debugging)
+  testAudioContextState() {
+    if (!this.audioContext) {
+      console.log('❌ Audio context not initialized');
+      return;
+    }
+    
+    console.log('🔍 Audio context state:', this.audioContext.state);
+    console.log('🔍 Audio context sample rate:', this.audioContext.sampleRate);
+    console.log('🔍 Audio context current time:', this.audioContext.currentTime);
+    
+    if (this.audioContext.state === 'suspended') {
+      console.log('⚠️ Audio context is suspended - attempting to resume...');
+      this.audioContext.resume().then(() => {
+        console.log('✅ Audio context resumed successfully');
+      }).catch(error => {
+        console.error('❌ Failed to resume audio context:', error);
+      });
+    }
+  }
+  
   // Verify coin sound loading status (for debugging)
   getCoinSoundStatus() {
     if (!this.coinAudios) return { loaded: false, count: 0, status: 'Not initialized' };
@@ -4136,6 +4252,13 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context for stage progression sound:', error);
+      });
+    }
     
     try {
       // Create audio element for the stage up sound if not already created
@@ -4735,7 +4858,32 @@ function setupAutoSave() {
     if (document.hidden) {
       console.log('🔄 Page hidden - saving game state...');
       saveGameState();
+    } else {
+      console.log('🔄 Page visible - checking audio context state...');
+      // Proactively resume audio context when page becomes visible
+      if (soundManager.audioContext && soundManager.audioContext.state === 'suspended') {
+        soundManager.audioContext.resume().catch(error => {
+          console.warn('⚠️ Failed to resume audio context on page visibility change:', error);
+        });
+      }
     }
+  });
+  
+  // Add page focus/blur handlers for better audio context management
+  window.addEventListener('focus', () => {
+    console.log('🔄 Window focused - checking audio context state...');
+    // Resume audio context when window gains focus
+    if (soundManager.audioContext && soundManager.audioContext.state === 'suspended') {
+      soundManager.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context on window focus:', error);
+      });
+    }
+  });
+  
+  window.addEventListener('blur', () => {
+    console.log('🔄 Window blurred - audio context may be suspended...');
+    // Note: We don't suspend here as browsers handle this automatically
+    // But we can log it for debugging
   });
 }
 
@@ -6706,8 +6854,20 @@ function placeOnPole(idx){
   
   poleDiv.appendChild(animDisc);
 
-  // Play drop sound effect
-  soundManager.playDropSound(nextPiece.w);
+  // Quick check if audio context is already active (most common case)
+  if (soundManager.isAudioContextActive()) {
+    // Audio context is active, play sound immediately
+    soundManager.playDropSound(nextPiece.w);
+  } else {
+    // Audio context might be suspended, ensure it's active then play
+    soundManager.ensureAudioContextActive().then(() => {
+      soundManager.playDropSound(nextPiece.w);
+    }).catch(error => {
+      console.warn('⚠️ Failed to ensure audio context active for drop sound:', error);
+      // Try to play anyway as fallback
+      soundManager.playDropSound(nextPiece.w);
+    });
+  }
 
   // Check if animations are disabled (speed = 0)
   const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
@@ -7880,6 +8040,12 @@ function logProbabilityState() {
 const testProbBtn = document.getElementById('testProbBtn');
 testProbBtn.addEventListener('click', testProbabilityDistribution);
 
+// Test audio context button
+const testAudioContextBtn = document.getElementById('testAudioContextBtn');
+testAudioContextBtn.addEventListener('click', () => {
+  soundManager.testAudioContextState();
+});
+
 // Cascade test button
 const cascadeTestBtn = document.getElementById('cascadeTestBtn');
 cascadeTestBtn.addEventListener('click', () => {
@@ -7957,6 +8123,16 @@ try {
   render();
   renderNext();
   console.log('✅ Game display rendered');
+  
+  // Proactively check audio context state after game initialization
+  console.log('🔊 Checking audio context state...');
+  if (soundManager.initialized) {
+    soundManager.ensureAudioContextActive().then(() => {
+      console.log('✅ Audio context is active and ready');
+    }).catch(error => {
+      console.warn('⚠️ Audio context check failed:', error);
+    });
+  }
   
 } catch (error) {
   console.error('❌ Error during game initialization:', error);
