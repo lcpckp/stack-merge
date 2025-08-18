@@ -3188,6 +3188,10 @@
           <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
         
+        <div class="control-row" style="margin-top: 8px;">
+          <button id="testAudioContextBtn" class="button">Test Audio Context</button>
+        </div>
+        
 
       </div>
     </div>
@@ -3754,12 +3758,28 @@ class SoundManager {
   
   // Ensure audio context is active (called by sound functions)
   ensureAudioContextActive() {
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      console.log('🔄 Audio context suspended, resuming...');
-      return this.audioContext.resume().catch(error => {
+    if (!this.audioContext) {
+      console.log('ℹ️ Audio context not initialized yet');
+      return Promise.resolve();
+    }
+    
+    if (this.audioContext.state === 'running') {
+      console.log('✅ Audio context already running');
+      return Promise.resolve();
+    }
+    
+    if (this.audioContext.state === 'suspended') {
+      console.log('🔄 Audio context suspended, attempting to resume...');
+      return this.audioContext.resume().then(() => {
+        console.log('✅ Audio context resumed successfully');
+        return true;
+      }).catch(error => {
         console.warn('⚠️ Failed to resume audio context:', error);
+        return false;
       });
     }
+    
+    console.log(`ℹ️ Audio context in unexpected state: ${this.audioContext.state}`);
     return Promise.resolve();
   }
   
@@ -3769,13 +3789,35 @@ class SoundManager {
     setTimeout(() => {
       if (this.audioContext && this.audioContext.state === 'suspended') {
         console.log('🔄 Attempting to resume audio context on page load...');
-        this.audioContext.resume().then(() => {
-          console.log('✅ Audio context resumed on page load');
-        }).catch(error => {
-          console.log('ℹ️ Audio context resume on load failed (will resume on user interaction)');
-        });
+        this.forceResumeAudioContext();
       }
     }, 1000); // Wait 1 second after page load
+  }
+  
+  // Force resume audio context with retry logic
+  forceResumeAudioContext() {
+    if (!this.audioContext) return;
+    
+    const attemptResume = (attempt = 1, maxAttempts = 3) => {
+      console.log(`🔄 Attempt ${attempt} to resume audio context...`);
+      
+      this.audioContext.resume().then(() => {
+        console.log('✅ Audio context resumed successfully');
+      }).catch(error => {
+        console.warn(`⚠️ Attempt ${attempt} failed:`, error);
+        
+        if (attempt < maxAttempts) {
+          // Retry after a short delay
+          setTimeout(() => {
+            attemptResume(attempt + 1, maxAttempts);
+          }, 200 * attempt); // Increasing delay between attempts
+        } else {
+          console.log('ℹ️ Max attempts reached, will resume on user interaction');
+        }
+      });
+    };
+    
+    attemptResume();
   }
   
   // Get current merge sound type preference
@@ -4062,12 +4104,8 @@ class SoundManager {
     const actualVolume = this.getActualVolume('coin');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure audio context is running (some browsers suspend it)
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume().catch(error => {
-        console.warn('⚠️ Failed to resume audio context:', error);
-      });
-    }
+    // Ensure Web Audio API context is running (this will wake up drop/merge sounds too)
+    this.ensureAudioContextActive();
     
     try {
       // Pick a random coin sound (1-7 for 7 sounds)
@@ -4143,6 +4181,9 @@ class SoundManager {
     const actualVolume = this.getActualVolume('coin');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
+    // Ensure Web Audio API context is running (this will wake up drop/merge sounds too)
+    this.ensureAudioContextActive();
+    
     // Validate sound index is within range (1-7)
     if (soundIndex < 1 || soundIndex > 7) {
       console.warn(`⚠️ Invalid coin sound index: ${soundIndex}, using random fallback`);
@@ -4180,6 +4221,26 @@ class SoundManager {
       setTimeout(() => {
         this.playCoinSound();
       }, i * 200); // Play each sound 200ms apart
+    }
+  }
+  
+  // Test method to verify audio context state (for debugging)
+  testAudioContextState() {
+    if (!this.audioContext) {
+      console.log('❌ Audio context not initialized');
+      return;
+    }
+    
+    console.log('🔍 Audio context state:', this.audioContext.state);
+    console.log('🔍 Audio context sample rate:', this.audioContext.sampleRate);
+    console.log('🔍 Audio context current time:', this.audioContext.currentTime);
+    
+    if (this.audioContext.state === 'suspended') {
+      console.log('⚠️ Audio context is suspended - attempting to resume...');
+      this.forceResumeAudioContext();
+    } else if (this.audioContext.state === 'running') {
+      console.log('✅ Audio context is running - testing a sound...');
+      this.playDropSound(1);
     }
   }
   
@@ -8019,6 +8080,12 @@ function logProbabilityState() {
 // Test probabilities button
 const testProbBtn = document.getElementById('testProbBtn');
 testProbBtn.addEventListener('click', testProbabilityDistribution);
+
+// Test audio context button
+const testAudioContextBtn = document.getElementById('testAudioContextBtn');
+testAudioContextBtn.addEventListener('click', () => {
+  soundManager.testAudioContextState();
+});
 
 
 
