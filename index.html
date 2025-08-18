@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Stack Merge</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -521,37 +522,37 @@
     }
     
     /* Make target blocks smaller in help modal */
-    .help-modal .next-stage-block[style*="width: 120px"] {
-      width: 60px !important;
-      height: 28px !important;
-      font-size: 14px !important;
+    .help-modal .next-stage-block {
+      width: 70px !important;
+      height: 32px !important;
+      font-size: 16px !important;
     }
     
     /* Make gold displays smaller in help modal */
-    .help-modal .gold-value[style*="padding: 10px 20px"] {
-      padding: 4px 8px !important;
-      font-size: 14px !important;
-      min-width: 40px !important;
+    .help-modal .gold-value {
+      padding: 6px 12px !important;
+      font-size: 16px !important;
+      min-width: 60px !important;
     }
     
     /* Make gold emojis smaller in help modal */
-    .help-modal .gold-emoji[style*="font-size: 28px"] {
-      font-size: 16px !important;
+    .help-modal .gold-emoji {
+      font-size: 18px !important;
       top: -6px !important;
       left: -6px !important;
     }
     
     /* Make gold text smaller in help modal */
-    .help-modal .gold-text[style*="font-size: 20px"] {
-      font-size: 14px !important;
+    .help-modal .gold-text {
+      font-size: 16px !important;
     }
     
     /* Make stage multiplier badges smaller in help modal */
-    .help-modal .stage-multiplier-badge[style*="font-size: 12px"] {
-      font-size: 8px !important;
-      padding: 1px 3px !important;
-      bottom: -8px !important;
-      min-width: 14px !important;
+    .help-modal .stage-multiplier-badge {
+      font-size: 10px !important;
+      padding: 2px 4px !important;
+      bottom: -10px !important;
+      min-width: 16px !important;
     }
     
     /* Reduce gaps in help modal stage progression */
@@ -1968,6 +1969,83 @@
     gap: 16px;
   }
   
+  /* Adjust powerup buttons section for mobile */
+  .help-modal .help-content [style*="gap: 80px"] {
+    gap: 40px !important;
+  }
+  
+  /* Make powerup buttons more compact on mobile */
+  .help-modal .powerup-btn {
+    min-width: 50px !important;
+    min-height: 50px !important;
+    padding: 0 6px !important;
+  }
+  
+  .help-modal .powerup-emoji {
+    font-size: 20px !important;
+  }
+  
+  .help-modal .cost-emoji,
+  .help-modal .cost-amount {
+    font-size: 14px !important;
+  }
+  
+  /* Adjust help section padding for mobile */
+  .help-modal .help-section {
+    padding: 16px !important;
+  }
+  
+  /* Adjust help section header spacing for mobile */
+  .help-modal .help-section-header {
+    margin-bottom: 12px !important;
+  }
+  
+  .help-modal .help-section-header h3 {
+    font-size: 18px !important;
+  }
+  
+  /* Make merge examples more compact on mobile */
+  .help-modal .merge-example {
+    gap: 30px !important;
+  }
+  
+  .help-modal .merge-example[style*="gap: 80px"] {
+    gap: 30px !important;
+  }
+  
+  .help-modal .merge-block {
+    width: 70px !important;
+    height: 28px !important;
+    font-size: 18px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block {
+    width: 76px !important;
+    height: 30px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block .bomb-emoji {
+    font-size: 30px !important;
+    top: -2px !important;
+    left: -15px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block .bomb-text {
+    font-size: 18px !important;
+  }
+  
+  .help-modal .merge-arrow {
+    font-size: 18px !important;
+  }
+  
+  .help-modal .merge-example [style*="gap: 12px"] {
+    gap: 10px !important;
+  }
+  
+  .help-modal .merge-example [style*="margin-left: 20px"] {
+    margin-left: 16px !important;
+  }
+  
   /* Adjust debug pane for mobile */
   .debug-pane {
     width: 95vw;
@@ -1983,6 +2061,81 @@
   
   h1 {
     font-size: 24px;
+  }
+  
+  /* Extra help modal adjustments for very small screens */
+  .help-modal {
+    width: 98vw;
+    padding: 16px;
+  }
+  
+  .help-modal .help-content [style*="gap: 80px"] {
+    gap: 24px !important;
+  }
+  
+  .help-modal .powerup-btn {
+    min-width: 45px !important;
+    min-height: 45px !important;
+    padding: 0 4px !important;
+  }
+  
+  .help-modal .powerup-emoji {
+    font-size: 18px !important;
+  }
+  
+  .help-modal .cost-emoji,
+  .help-modal .cost-amount {
+    font-size: 12px !important;
+  }
+  
+  .help-modal .help-section {
+    padding: 12px !important;
+  }
+  
+  .help-modal .help-section-header h3 {
+    font-size: 16px !important;
+  }
+  
+  /* Make merge examples more compact on mobile */
+  .help-modal .merge-example {
+    gap: 20px !important;
+  }
+  
+  .help-modal .merge-example[style*="gap: 80px"] {
+    gap: 20px !important;
+  }
+  
+  .help-modal .merge-block {
+    width: 60px !important;
+    height: 24px !important;
+    font-size: 16px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block {
+    width: 60px !important;
+    height: 24px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block .bomb-emoji {
+    font-size: 24px !important;
+    top: -2px !important;
+    left: -12px !important;
+  }
+  
+  .help-modal .merge-block.bomb-block .bomb-text {
+    font-size: 16px !important;
+  }
+  
+  .help-modal .merge-arrow {
+    font-size: 16px !important;
+  }
+  
+  .help-modal .merge-example [style*="gap: 12px"] {
+    gap: 8px !important;
+  }
+  
+  .help-modal .merge-example [style*="margin-left: 20px"] {
+    margin-left: 12px !important;
   }
   
   .game-info {
@@ -2687,21 +2840,29 @@
         <div class="help-section">
           <div class="help-section-header">
             <span class="help-icon">🎮</span>
-            <h3>Basic Controls</h3>
+            <h3>Basic Gameplay</h3>
           </div>
           <div class="help-content">
-            <p>Click one of the four stacks to drop the next block from the queue.</p>
+            <p>Drop the incoming blocks onto stacks to gain score.</p>
+            <p>Avoid filling up stacks by merging blocks to create more space.</p>
+            <p>Survive as long as possible for a high score!</p>
+            <p><strong>Basic Controls:</strong></p>
+            <p>Click/Tap one of the four stacks to drop the next block from the queue.</p>
+            <p>Click/Tap the bomb button to convert the next block to a bomb.</p>
+            <p>Click/Tap the trash can button to remove the next block from the queue.</p>
+            <p>Open the Sound Control menu to adjust the volume of the game.</p>
           </div>
         </div>
 
         <!-- Merging Section -->
+        <!-- Basic Merging Section -->
         <div class="help-section">
           <div class="help-section-header">
             <span class="help-icon">🔗</span>
             <h3>Merging Blocks</h3>
           </div>
           <div class="help-content">
-            <p>When two blocks with the same number touch, they merge into one bigger block.</p>
+            <p>When two blocks with the same value are stacked, they merge into one bigger block.</p>
             <div class="merge-example" style="display: flex; gap: 80px; justify-content: center;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="merge-before">
@@ -2733,8 +2894,18 @@
                 </div>
               </div>
             </div>
-            
-            <p><strong>Bombs:</strong> When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
+          </div>
+        </div>
+
+        <!-- Bombs Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">💣</span>
+            <h3>Bombs</h3>
+          </div>
+          <div class="help-content">
+            <p>When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
+            <p>Bombs will appear in the queue naturally, but you can also buy them with gold.</p>
             <div class="merge-example">
               <div class="merge-before">
                 <div class="merge-blocks">
@@ -2763,38 +2934,57 @@
                 <span style="font-size: 18px; font-weight: bold; color: #ef4444; margin-left: 24px;">Stack Destroyed</span>
               </div>
             </div>
+            
+
+            <div style="display: flex; justify-content: center; margin: 16px 0;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <button class="powerup-btn bomb-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
+                  <span class="powerup-emoji" style="font-size: 24px;">💣</span>
+                  <div class="powerup-cost">
+                    <span class="cost-emoji">💰</span>
+                    <span class="cost-amount">25</span>
+                  </div>
+                </button>
+                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts next block to bomb</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Gold & Power-ups Section -->
+        <!-- Trash Can Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🗑️</span>
+            <h3>Trash Can</h3>
+          </div>
+          <div class="help-content">
+            <p>The trash can power-up allows you to remove the next block from the queue.</p>
+            <div style="display: flex; justify-content: center; margin: 16px 0;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <button class="powerup-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
+                  <span class="powerup-emoji" style="font-size: 24px;">🗑️</span>
+                  <div class="powerup-cost">
+                    <span class="cost-emoji">💰</span>
+                    <span class="cost-amount">25</span>
+                  </div>
+                </button>
+                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes next block</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gold Section -->
         <div class="help-section">
           <div class="help-section-header">
             <span class="help-icon">💰</span>
-            <h3>Gold & Power-Ups</h3>
+            <h3>Gold</h3>
           </div>
-                      <div class="help-content">
-              <p><strong>Earn gold by merging blocks</strong></p>
-              <p>• Each additional block in a cascade of merges earns more gold.</p>
-              <p>• Use gold to buy power-ups.</p>
-              <p>• <strong>Warning! </strong>Power-ups double in cost each time they are used, so try to increase your gold multiplier as soon as possible.</p>
-              
-              <p style="text-align: center;"><strong>Power-ups:</strong></p>
-                            <div style="display: flex; gap: 80px; margin: 16px 0; justify-content: center;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="bomb-conversion-btn" style="width: 60px; height: 60px; pointer-events: none;">
-                    <span class="emoji">💣</span>
-                  </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts next block to bomb</span>
-                </div>
-                
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="trash-btn" style="width: 60px; height: 60px; pointer-events: none;">
-                    <span class="emoji">🗑️</span>
-                  </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes next block</span>
-                </div>
-              </div>
-            </div>
+          <div class="help-content">
+            <p><strong>Earn gold by merging blocks!</strong></p>
+            <p>Each additional merge in a cascade earns additional gold.</p>
+            <p>Use gold to buy power-ups, but use them strategically as power-ups double in cost each time they are used.</p>
+          </div>
         </div>
 
         <!-- Stage System Section -->
@@ -2804,24 +2994,25 @@
             <h3>Stage Progression</h3>
           </div>
           <div class="help-content">
-            <p><strong>Advance through stages to unlock new block sizes and increase gold earnings!</strong></p>
-            
+            <p>Merge two 512 blocks to create a 1024 block and gain a gold multiplier of 10x.</p>
+            <p>Merging two 1024 blocks will increase the multiplier to 100x.</p>
+            <p>Each additional block size up will increase your multiplier by 10x.</p>
             <div class="merge-example" style="justify-content: center; gap: 40px; padding: 20px;">
               <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div data-value="1024" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #dc2626; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">1024</div>
+                      <div class="next-stage-block" data-value="1024" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #dc2626; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">1024</div>
                     </div>
                   </div>
                   
                   <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
                   
                   <div class="gold-display" style="margin: 0; justify-self: start;">
-                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
-                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
-                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">1.5k</div>
-                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">10x</div>
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 8px 16px; border-radius: 9px; font-weight: 600; font-size: 18px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -10px; left: -10px; font-size: 24px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 18px; font-weight: 600; line-height: 1; color: #000;">1.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">10x</div>
                     </div>
                   </div>
                 </div>
@@ -2829,17 +3020,17 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div data-value="2048" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #9d174d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">2048</div>
+                      <div class="next-stage-block" data-value="2048" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #9d174d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">2048</div>
                     </div>
                   </div>
                   
                   <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
                   
                   <div class="gold-display" style="margin: 0; justify-self: start;">
-                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
-                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
-                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">15.5k</div>
-                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">100x</div>
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 8px 16px; border-radius: 9px; font-weight: 600; font-size: 18px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -10px; left: -10px; font-size: 24px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 18px; font-weight: 600; line-height: 1; color: #000;">15.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">100x</div>
                     </div>
                   </div>
                 </div>
@@ -2847,22 +3038,37 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div data-value="4096" style="width: 120px; height: 50px; font-size: 24px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #7c2d6d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
+                      <div class="next-stage-block" data-value="4096" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #7c2d6d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
                     </div>
                   </div>
                   
                   <div style="display: flex; align-items: center; font-size: 24px; color: #94a3b8; justify-self: center;">→</div>
                   
                   <div class="gold-display" style="margin: 0; justify-self: start;">
-                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 10px 20px; border-radius: 9px; font-weight: 600; font-size: 20px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
-                      <div class="gold-emoji" style="position: absolute; top: -12px; left: -12px; font-size: 28px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
-                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 20px; font-weight: 600; line-height: 1; color: #000;">555.5k</div>
-                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1000x</div>
+                    <div class="gold-value" style="position: relative; display: inline-block; background: #FCD34D; color: #000; padding: 8px 16px; border-radius: 9px; font-weight: 600; font-size: 18px; min-width: 70px; text-align: center; box-shadow: 0 3px 0 rgba(0,0,0,0.25);">
+                      <div class="gold-emoji" style="position: absolute; top: -10px; left: -10px; font-size: 24px; opacity: 1; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">💰</div>
+                      <div class="gold-text" style="position: relative; z-index: 2; font-size: 18px; font-weight: 600; line-height: 1; color: #000;">555.5k</div>
+                      <div class="stage-multiplier-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); min-width: 20px; text-align: center;">1000x</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Sound Controls Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">🔊</span>
+            <h3>Sound Controls</h3>
+          </div>
+          <div class="help-content">
+            <p>Customize your audio experience with the sound control menu.</p>
+            <p><strong>Volume Slider:</strong> Adjust the overall volume from 0% (muted) to 100% (full volume).</p>
+            <p><strong>Mute Toggle:</strong> Quickly mute or unmute all game sounds with a single click.</p>
+            <p><strong>Sound Effects:</strong> The game includes various sound effects for merging blocks, collecting gold, using power-ups, and more.</p>
+            <p>Access the sound controls by clicking the speaker icon in the top bar.</p>
           </div>
         </div>
 
