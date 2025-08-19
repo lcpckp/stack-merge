@@ -2836,15 +2836,9 @@
       <button id="soundControlClose" class="sound-control-close">Close</button>
       
       <div style="margin-top: 16px; text-align: center;">
-        <button id="testAllSoundsBtn" class="sound-control-mute" style="background: #0ea5e9; border-color: #0284c7; min-width: 120px;">
-          Test All Sounds
+        <button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px;">
+          Reset Audio Settings
         </button>
-        <button id="debugVolumeBtn" class="sound-control-mute" style="background: #dc2626; border-color: #b91c1c; min-width: 120px; margin-top: 8px;">
-  Debug Volumes
-</button>
-<button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px; margin-top: 8px;">
-  Reset Audio Settings
-</button>
       </div>
     </div>
   </div>
@@ -3298,6 +3292,23 @@ class SoundManager {
     
     // Preload audio files for better performance
     this.preloadAudioFiles();
+    
+    // Wait for sounds to be ready in the background
+    this.waitForSoundsReady().then(() => {
+      console.log('🎵 Sound system fully initialized and ready!');
+      console.log('🎵 Sound system status:', this.getSoundSystemStatus());
+    });
+    
+    // Log preloading progress every 2 seconds until complete
+    const progressInterval = setInterval(() => {
+      const progress = this.getPreloadProgress();
+      if (progress === 100) {
+        clearInterval(progressInterval);
+        console.log('🎵 All sounds fully loaded!');
+      } else {
+        console.log(`🎵 Preloading progress: ${progress}% (${this.getLoadedSoundCount()}/22 sounds ready)`);
+      }
+    }, 2000);
   }
   
   // Debug localStorage to check for corrupted settings
@@ -3347,31 +3358,108 @@ class SoundManager {
     }
   }
   
-  // Minimal audio preloading - just the essentials
+  // Comprehensive audio preloading for maximum performance
   preloadAudioFiles() {
     try {
-      // Only preload the most critical sounds
-      this.dropAudio = new Audio('sounds/click2.wav');
-      this.dropAudio.preload = 'auto';
+      console.log('🎵 Starting comprehensive audio preloading...');
       
-      console.log('🎵 Minimal audio preloading complete');
+      // Preload all sound files for instant playback
+      this.audioCache = {
+        // Drop sounds
+        drop: new Audio('sounds/click2.wav'),
+        
+        // Merge cascade sounds (cork0.wav through cork9.wav)
+        cork0: new Audio('sounds/cork0.wav'),
+        cork1: new Audio('sounds/cork1.wav'),
+        cork2: new Audio('sounds/cork2.wav'),
+        cork3: new Audio('sounds/cork3.wav'),
+        cork4: new Audio('sounds/cork4.wav'),
+        cork5: new Audio('sounds/cork5.wav'),
+        cork6: new Audio('sounds/cork6.wav'),
+        cork7: new Audio('sounds/cork7.wav'),
+        cork8: new Audio('sounds/cork8.wav'),
+        cork9: new Audio('sounds/cork9.wav'),
+        
+        // Coin sounds (coin1.wav through coin7.wav)
+        coin1: new Audio('sounds/coin1.wav'),
+        coin2: new Audio('sounds/coin2.wav'),
+        coin3: new Audio('sounds/coin3.wav'),
+        coin4: new Audio('sounds/coin4.wav'),
+        coin5: new Audio('sounds/coin5.wav'),
+        coin6: new Audio('sounds/coin6.wav'),
+        coin7: new Audio('sounds/coin7.wav'),
+        
+        // Other sounds
+        bomb: new Audio('sounds/bomb.mp3'),
+        stageUp: new Audio('sounds/stage_up.mp3'),
+        purchase: new Audio('sounds/purchase.wav'),
+        purchase2: new Audio('sounds/purchase2.wav')
+      };
+      
+      // Set preload attribute to 'auto' for all audio files
+      Object.values(this.audioCache).forEach(audio => {
+        audio.preload = 'auto';
+        // Set initial volume to 0 to prevent any accidental playback during preloading
+        audio.volume = 0;
+      });
+      
+      // Force load all audio files by setting their currentTime
+      // This ensures they're fully loaded and ready for instant playback
+      let loadedCount = 0;
+      const totalSounds = Object.keys(this.audioCache).length;
+      
+      Object.values(this.audioCache).forEach(audio => {
+        audio.currentTime = 0;
+        
+        // Monitor loading progress
+        audio.addEventListener('canplaythrough', () => {
+          loadedCount++;
+          if (loadedCount === totalSounds) {
+            console.log('🎵 All sounds fully loaded and ready for instant playback!');
+          } else {
+            console.log(`🎵 Sound loaded: ${loadedCount}/${totalSounds}`);
+          }
+        });
+        
+        audio.addEventListener('error', (e) => {
+          console.warn('⚠️ Sound failed to load:', e);
+        });
+      });
+      
+      console.log('🎵 Comprehensive audio preloading initiated - caching all sounds for instant playback');
       
     } catch (error) {
       console.error('❌ Failed to preload audio files:', error);
+      // Fallback to minimal preloading if comprehensive preloading fails
+      this.audioCache = {};
     }
   }
   
 
   
-  // Play the click2.wav sound effect for drops - ULTRA SIMPLE
+  // Play the click2.wav sound effect for drops - using preloaded audio
   playDropSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping drop sound');
+      return;
+    }
+    
     try {
-      // Just create and play - no complex logic
-      const dropAudio = new Audio('sounds/click2.wav');
-      dropAudio.volume = this.getActualVolume('drop');
-      dropAudio.play();
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache.drop && this.audioCache.drop.readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const dropAudio = this.audioCache.drop.cloneNode();
+        dropAudio.volume = this.getActualVolume('drop');
+        dropAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const dropAudio = new Audio('sounds/click2.wav');
+        dropAudio.volume = this.getActualVolume('drop');
+        dropAudio.play();
+      }
     } catch (error) {
       // Silent fail - no console spam
     }
@@ -3381,48 +3469,51 @@ class SoundManager {
   playMergeSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping merge sound');
+      return;
+    }
+    
     try {
       // Get the current merge count for cascade sounds
       const mergeCount = this.getCurrentMergeCount();
       
       // Determine which cork sound to play based on cascade position
-      let corkSoundFile;
+      let corkSoundKey;
       if (mergeCount <= 1) {
-        corkSoundFile = 'sounds/cork0.wav'; // First merge
+        corkSoundKey = 'cork0'; // First merge
       } else if (mergeCount <= 10) {
-        corkSoundFile = `sounds/cork${mergeCount - 1}.wav`; // cork1.wav through cork9.wav
+        corkSoundKey = `cork${mergeCount - 1}`; // cork1 through cork9
       } else {
-        corkSoundFile = 'sounds/cork9.wav'; // Any remaining merges use cork9
+        corkSoundKey = 'cork9'; // Any remaining merges use cork9
       }
       
-      console.log(`🔗 Playing cascade merge sound: ${corkSoundFile} (merge #${mergeCount})`);
+      console.log(`🔗 Playing cascade merge sound: ${corkSoundKey} (merge #${mergeCount})`);
       
-      // Create and play the appropriate cork sound
-      const mergeAudio = new Audio(corkSoundFile);
-      mergeAudio.volume = this.getActualVolume('merge');
-      
-      // Add error handling for audio loading
-      mergeAudio.addEventListener('error', (e) => {
-        console.warn(`⚠️ Failed to load cork sound: ${corkSoundFile}`, e);
-        // Fallback to cork1.wav if the specific cork sound fails
-        if (corkSoundFile !== 'sounds/cork1.wav') {
-          console.log('🔄 Falling back to cork1.wav');
-          const fallbackAudio = new Audio('sounds/cork1.wav');
-          fallbackAudio.volume = this.getActualVolume('merge');
-          fallbackAudio.play().catch(err => console.log('Fallback audio also failed:', err));
-        }
-      });
-      
-      mergeAudio.play().catch(error => {
-        console.warn(`⚠️ Failed to play cork sound: ${corkSoundFile}`, error);
-        // Fallback to cork1.wav if playback fails
-        if (corkSoundFile !== 'sounds/cork1.wav') {
-          console.log('🔄 Falling back to cork1.wav');
-          const fallbackAudio = new Audio('sounds/cork1.wav');
-          fallbackAudio.volume = this.getActualVolume('merge');
-          fallbackAudio.play().catch(err => console.log('Fallback audio also failed:', err));
-        }
-      });
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache[corkSoundKey] && this.audioCache[corkSoundKey].readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const mergeAudio = this.audioCache[corkSoundKey].cloneNode();
+        mergeAudio.volume = this.getActualVolume('merge');
+        mergeAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const fallbackSoundFile = `sounds/${corkSoundKey}.wav`;
+        console.log(`🔄 Falling back to creating new audio: ${fallbackSoundFile}`);
+        const mergeAudio = new Audio(fallbackSoundFile);
+        mergeAudio.volume = this.getActualVolume('merge');
+        mergeAudio.play().catch(error => {
+          console.warn(`⚠️ Failed to play cork sound: ${fallbackSoundFile}`, error);
+          // Final fallback to cork1.wav
+          if (corkSoundKey !== 'cork1') {
+            console.log('🔄 Final fallback to cork1.wav');
+            const finalFallbackAudio = new Audio('sounds/cork1.wav');
+            finalFallbackAudio.volume = this.getActualVolume('merge');
+            finalFallbackAudio.play().catch(err => console.log('Final fallback audio also failed:', err));
+          }
+        });
+      }
     } catch (error) {
       console.warn('⚠️ Error in playMergeSound:', error);
       // Silent fail - no console spam
@@ -3644,16 +3735,33 @@ class SoundManager {
   
 
   
-  // Play a random coin sound effect when gold is earned - ULTRA SIMPLE
+  // Play a random coin sound effect when gold is earned - using preloaded audio
   playCoinSound() {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping coin sound');
+      return;
+    }
     
     try {
       // Randomly select one of the 7 coin sounds
       const coinNumber = Math.floor(Math.random() * 7) + 1;
-      const coinAudio = new Audio(`sounds/coin${coinNumber}.wav`);
-      coinAudio.volume = this.getActualVolume('coin');
-      coinAudio.play();
+      const coinKey = `coin${coinNumber}`;
+      
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache[coinKey] && this.audioCache[coinKey].readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const coinAudio = this.audioCache[coinKey].cloneNode();
+        coinAudio.volume = this.getActualVolume('coin');
+        coinAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const coinAudio = new Audio(`sounds/coin${coinNumber}.wav`);
+        coinAudio.volume = this.getActualVolume('coin');
+        coinAudio.play();
+      }
     } catch (error) {
       // Silent fail - no console spam
     }
@@ -3673,33 +3781,61 @@ class SoundManager {
   
 
 
-  // Load and play the stage up sound effect from audio file - ULTRA SIMPLE
+  // Load and play the stage up sound effect from audio file - using preloaded audio
   playStageProgressionSound() {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping stage progression sound');
+      return;
+    }
+    
     try {
-      // Just create and play - no complex logic
-      const stageUpAudio = new Audio('sounds/stage_up.mp3');
-      stageUpAudio.volume = this.getActualVolume('other');
-      stageUpAudio.play();
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache.stageUp && this.audioCache.stageUp.readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const stageUpAudio = this.audioCache.stageUp.cloneNode();
+        stageUpAudio.volume = this.getActualVolume('other');
+        stageUpAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const stageUpAudio = new Audio('sounds/stage_up.mp3');
+        stageUpAudio.volume = this.getActualVolume('other');
+        stageUpAudio.play();
+      }
     } catch (error) {
       // Silent fail - no console spam
     }
   }
 
-  // Load and play the bomb explosion sound effect from audio file - ULTRA SIMPLE
+  // Load and play the bomb explosion sound effect from audio file - using preloaded audio
   playBombSound() {
     if (!this.initialized || this.isMuted) return;
     
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping bomb sound');
+      return;
+    }
+    
     try {
-      // Just create and play - no complex logic
-      const bombAudio = new Audio('sounds/bomb.mp3');
-      bombAudio.volume = this.getActualVolume('bomb');
-      bombAudio.play();
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache.bomb && this.audioCache.bomb.readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const bombAudio = this.audioCache.bomb.cloneNode();
+        bombAudio.volume = this.getActualVolume('bomb');
+        bombAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const bombAudio = new Audio('sounds/bomb.mp3');
+        bombAudio.volume = this.getActualVolume('bomb');
+        bombAudio.play();
+      }
     } catch (error) {
       // Silent fail - no console spam
     }
-    }
+  }
 
 
 
@@ -3707,14 +3843,28 @@ class SoundManager {
 
 
 
-  // Play purchase sound effect - ULTRA SIMPLE
+  // Play purchase sound effect - using preloaded audio
   playPurchaseSound() {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure sound system is ready
+    if (!this.areSoundsPreloaded()) {
+      console.log('🎵 Sounds not ready yet, skipping purchase sound');
+      return;
+    }
     try {
-      // Just create and play - no complex logic
-      const purchaseAudio = new Audio('sounds/purchase.wav');
-      purchaseAudio.volume = this.getActualVolume('other');
-      purchaseAudio.play();
+      // Use preloaded audio for instant playback
+      if (this.audioCache && this.audioCache.purchase && this.audioCache.purchase.readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        const purchaseAudio = this.audioCache.purchase.cloneNode();
+        purchaseAudio.volume = this.getActualVolume('other');
+        purchaseAudio.play();
+      } else {
+        // Fallback to creating new audio if preloading failed
+        const purchaseAudio = new Audio('sounds/purchase.wav');
+        purchaseAudio.volume = this.getActualVolume('other');
+        purchaseAudio.play();
+      }
     } catch (error) {
       // Silent fail - no console spam
     }
@@ -3735,6 +3885,135 @@ class SoundManager {
       loaded: true,
       count: 1,
       expected: 1
+    };
+  }
+  
+  // Check if all sounds are preloaded and ready for playback
+  areSoundsPreloaded() {
+    if (!this.audioCache) return false;
+    
+    const requiredSounds = [
+      'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
+      'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
+      'bomb', 'stageUp', 'purchase', 'purchase2'
+    ];
+    
+    return requiredSounds.every(soundKey => 
+      this.audioCache[soundKey] && 
+      this.audioCache[soundKey].readyState >= 2 // HAVE_CURRENT_DATA
+    );
+  }
+  
+  // Get preloading status for debugging
+  getPreloadStatus() {
+    if (!this.audioCache) return { status: 'not_initialized', loaded: 0, total: 0 };
+    
+    const requiredSounds = [
+      'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
+      'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
+      'bomb', 'stageUp', 'purchase', 'purchase2'
+    ];
+    
+    const loadedSounds = requiredSounds.filter(soundKey => 
+      this.audioCache[soundKey] && 
+      this.audioCache[soundKey].readyState >= 2
+    );
+    
+    return {
+      status: loadedSounds.length === requiredSounds.length ? 'fully_loaded' : 'partially_loaded',
+      loaded: loadedSounds.length,
+      total: requiredSounds.length,
+      readyState: requiredSounds.reduce((acc, soundKey) => {
+        if (this.audioCache[soundKey]) {
+          acc[soundKey] = this.audioCache[soundKey].readyState;
+        }
+        return acc;
+      }, {})
+    };
+  }
+  
+  // Force reload all sounds (useful for troubleshooting)
+  reloadAllSounds() {
+    console.log('🔄 Reloading all sounds...');
+    this.audioCache = {};
+    this.preloadAudioFiles();
+  }
+  
+  // Wait for all sounds to be ready (returns a promise)
+  waitForSoundsReady() {
+    return new Promise((resolve) => {
+      if (this.areSoundsPreloaded()) {
+        resolve();
+        return;
+      }
+      
+      // Check every 100ms until sounds are ready
+      const checkInterval = setInterval(() => {
+        if (this.areSoundsPreloaded()) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+      
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        console.warn('⚠️ Timeout waiting for sounds to load, proceeding anyway');
+        resolve();
+      }, 10000);
+    });
+  }
+  
+  // Get preloading progress as a percentage
+  getPreloadProgress() {
+    if (!this.audioCache) return 0;
+    
+    const requiredSounds = [
+      'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
+      'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
+      'bomb', 'stageUp', 'purchase', 'purchase2'
+    ];
+    
+    const loadedSounds = requiredSounds.filter(soundKey => 
+      this.audioCache[soundKey] && 
+      this.audioCache[soundKey].readyState >= 2
+    );
+    
+    return Math.round((loadedSounds.length / requiredSounds.length) * 100);
+  }
+  
+  // Check if a specific sound is ready for playback
+  isSoundReady(soundKey) {
+    return this.audioCache && 
+           this.audioCache[soundKey] && 
+           this.audioCache[soundKey].readyState >= 2;
+  }
+  
+  // Get the number of sounds currently loaded
+  getLoadedSoundCount() {
+    if (!this.audioCache) return 0;
+    
+    const requiredSounds = [
+      'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
+      'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
+      'bomb', 'stageUp', 'purchase', 'purchase2'
+    ];
+    
+    return requiredSounds.filter(soundKey => this.isSoundReady(soundKey)).length;
+  }
+  
+  // Get comprehensive sound system status
+  getSoundSystemStatus() {
+    return {
+      initialized: this.initialized,
+      muted: this.isMuted,
+      masterVolume: this.volume,
+      soundVolumes: this.soundVolumes,
+      preloadProgress: this.getPreloadProgress(),
+      loadedCount: this.getLoadedSoundCount(),
+      totalSounds: 22, // Total number of required sounds
+      ready: this.areSoundsPreloaded(),
+      cacheStatus: this.audioCache ? 'active' : 'inactive'
     };
   }
 }
@@ -5467,29 +5746,7 @@ function initializeSoundControlModal() {
     closeBtn.addEventListener('click', closeSoundControlModal);
   }
   
-  // Test all sounds button
-  const testAllSoundsBtn = document.getElementById('testAllSoundsBtn');
-  if (testAllSoundsBtn) {
-    testAllSoundsBtn.addEventListener('click', () => {
-      console.log('🧪 Testing all sounds with current volume settings...');
-      
-      // Test each sound type
-      const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
-      soundTypes.forEach((soundType, index) => {
-        setTimeout(() => {
-          testVolumeChange(soundType, soundManager.getSoundVolume(soundType));
-        }, index * 500); // Play each sound 500ms apart
-      });
-    });
-  }
-  
-  // Debug volumes button
-  const debugVolumeBtn = document.getElementById('debugVolumeBtn');
-  if (debugVolumeBtn) {
-    debugVolumeBtn.addEventListener('click', () => {
-      debugVolumeHandling();
-    });
-  }
+
   
   // Reset audio settings button
   const resetAudioBtn = document.getElementById('resetAudioBtn');
@@ -5654,34 +5911,7 @@ function testVolumeChange(soundType, volume) {
   }
 }
 
-// Debug function to test volume handling
-function debugVolumeHandling() {
-  console.log('🔍 Debugging volume handling...');
-  
-  // Test setting a volume to 0
-  console.log('🧪 Setting drop volume to 0...');
-  soundManager.setSoundVolume('drop', 0);
-  
-  // Test getting the volume back
-  const retrievedVolume = soundManager.getSoundVolume('drop');
-  console.log(`📊 Retrieved drop volume: ${retrievedVolume} (should be 0)`);
-  
-  // Test the actual volume calculation
-  const actualVolume = soundManager.getActualVolume('drop');
-  console.log(`🔊 Actual drop volume: ${actualVolume} (should be 0)`);
-  
-  // Test setting it back to 3
-  console.log('🧪 Setting drop volume back to 3...');
-  soundManager.setSoundVolume('drop', 3);
-  
-  const retrievedVolume2 = soundManager.getSoundVolume('drop');
-  console.log(`📊 Retrieved drop volume: ${retrievedVolume2} (should be 3)`);
-  
-  const actualVolume2 = soundManager.getActualVolume('drop');
-  console.log(`🔊 Actual drop volume: ${actualVolume2} (should be 0.6)`);
-  
-  console.log('🔍 Volume handling debug complete');
-}
+
 
 function toggleAI(enable){
   if(enable === aiEnabled) return;
