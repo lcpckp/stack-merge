@@ -3400,9 +3400,24 @@ class SoundManager {
   setupAudioMonitoring() {
     if (!this.audioContext) return;
     
-    // Monitor audio context state changes
+    // Monitor audio context state changes and auto-resume if suspended
     this.audioContext.addEventListener('statechange', () => {
-      console.log('🔊 Audio context state changed to:', this.audioContext.state);
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
+    });
+    
+    // Resume audio context when page becomes visible or gains focus
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
+    });
+    
+    window.addEventListener('focus', () => {
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
     });
   }
   
@@ -3411,6 +3426,13 @@ class SoundManager {
     initEvents.forEach(event => {
       document.removeEventListener(event, this.initAudioContext);
     });
+  }
+  
+  // Ensure audio context is running (called by new game functions)
+  ensureAudioContextRunning() {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
   }
   
   // Play the click2.wav sound effect for drops
@@ -3444,6 +3466,11 @@ class SoundManager {
     const actualVolume = this.getActualVolume('merge');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
+    // Ensure audio context is running before playing merge sounds
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+    
     // Choose between musical and pop-like sounds based on user preference
     if (this.usePopMergeSounds) {
       console.log('💨 Playing pop merge sound');
@@ -3457,6 +3484,11 @@ class SoundManager {
   // Generate a beautiful, physical bell sound like Christmas music
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure audio context is running
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
     
     try {
       // Create gain node for volume control
@@ -3622,6 +3654,11 @@ class SoundManager {
   // Generate a satisfying pop merge sound effect with frequency variation based on block value
   playPopMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
+    
+    // Ensure audio context is running
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
     
     try {
       // Create gain node for volume control
