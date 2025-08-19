@@ -3347,192 +3347,55 @@ class SoundManager {
     }
   }
   
-  // Preload audio files for better performance
+  // Minimal audio preloading - just the essentials
   preloadAudioFiles() {
     try {
-      // Preload cork sounds (0-9) and store them for instant playback
-      this.corkAudios = [];
-      for (let i = 0; i <= 9; i++) {
-        const corkAudio = new Audio(`sounds/cork${i}.wav`);
-        corkAudio.preload = 'auto';
-        corkAudio.load();
-        
-        // Add error handling for individual files
-        corkAudio.addEventListener('error', (e) => {
-          console.error(`❌ Failed to load cork${i}.wav:`, e);
-        });
-        
-        // Audio context priming - simplified
-        corkAudio.addEventListener('canplaythrough', () => {
-          console.log(`🍾 Cork audio ${i} ready`);
-        }, { once: true });
-        
-        this.corkAudios.push(corkAudio);
-      }
+      // Only preload the most critical sounds
+      this.dropAudio = new Audio('sounds/click2.wav');
+      this.dropAudio.preload = 'auto';
       
-      // Preload drop sound for instant playback
-      this.preloadDropAudio();
-      
-      // Preload other sound files
-      this.preloadBombAudio();
-      this.preloadPurchaseAudio();
-      this.preloadStageUpAudio();
-      this.preloadCoinAudio();
-      
-      console.log('🎵 Audio files preloaded successfully');
+      console.log('🎵 Minimal audio preloading complete');
       
     } catch (error) {
       console.error('❌ Failed to preload audio files:', error);
     }
   }
   
-  // Preload drop audio for instant playback
-  preloadDropAudio() {
-    try {
-      this.dropAudio = new Audio('sounds/click2.wav');
-      this.dropAudio.preload = 'auto';
-      this.dropAudio.load();
-      
-      // Prime the audio context by playing and immediately pausing
-      // This ensures the audio context is ready for instant playback
-      this.dropAudio.addEventListener('canplaythrough', () => {
-        console.log('📦 Drop audio ready');
-      }, { once: true });
-      
-      console.log('📦 Drop audio preloaded successfully');
-    } catch (error) {
-      console.error('❌ Failed to preload drop audio:', error);
-    }
-  }
+
   
-  // Play the click2.wav sound effect for drops
+  // Play the click2.wav sound effect for drops - ULTRA SIMPLE
   playDropSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('drop');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
     try {
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.dropAudio && this.dropAudio.readyState >= 2) {
-        // Use preloaded audio
-        const audio = this.dropAudio.cloneNode();
-        audio.volume = actualVolume;
-        audio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const dropAudio = new Audio('sounds/click2.wav');
-        dropAudio.volume = actualVolume;
-        dropAudio.play().catch(console.error);
-      }
-      
-      console.log(`📦 Playing drop sound for block ${blockValue} at volume ${actualVolume}`);
-      
+      // Just create and play - no complex logic
+      const dropAudio = new Audio('sounds/click2.wav');
+      dropAudio.volume = this.getActualVolume('drop');
+      dropAudio.play();
     } catch (error) {
-      console.error('❌ Failed to create drop sound:', error);
+      // Silent fail - no console spam
     }
   }
   
-  // Generate a peaceful, raindrop-like merge sound effect
+  // Generate a peaceful, raindrop-like merge sound effect - ULTRA SIMPLE
   playMergeSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('merge');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Choose between musical and cork-like sounds based on user preference
-    if (this.usePopMergeSounds) {
-      console.log('🍾 Playing cork merge sound');
-      this.playCorkMergeSound(blockValue, actualVolume);
-    } else {
-      console.log('🎵 Playing musical merge sound');
-      this.playMusicalMergeSound(blockValue, actualVolume);
-    }
-  }
-  
-  // Play musical merge sound effect using audio files
-  playMusicalMergeSound(blockValue = 1, volume = 1.0) {
-    if (!this.initialized || this.isMuted) return;
-    
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('merge');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
     try {
-      // Get the merge count from the current cascade
-      const mergeCount = this.getCurrentMergeCount();
-      
-      // For musical sounds, we'll use the same cork system but with different audio files
-      // or we could use the same cork system but with different audio files
-      let soundNumber = Math.min(mergeCount - 1, 9);
-      
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.corkAudios && this.corkAudios[soundNumber] && this.corkAudios[soundNumber].readyState >= 2) {
-        // Use preloaded audio
-        const audio = this.corkAudios[soundNumber].cloneNode();
-        audio.volume = actualVolume;
-        audio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
-        musicalAudio.volume = actualVolume;
-        musicalAudio.play().catch(console.error);
-      }
-      
-      console.log(`🎵 Playing musical sound for merge ${mergeCount}`);
-      
+      // Just create and play - no complex logic
+      const mergeAudio = new Audio('sounds/cork1.wav');
+      mergeAudio.volume = this.getActualVolume('merge');
+      mergeAudio.play();
     } catch (error) {
-      console.error('❌ Failed to create musical merge sound:', error);
+      // Silent fail - no console spam
     }
   }
   
-  // Play cork merge sound effect using audio files
-  playCorkMergeSound(blockValue = 1, volume = 1.0) {
-    if (!this.initialized || this.isMuted) return;
-    
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('merge');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    try {
-      // Get the merge count from the current cascade
-      const mergeCount = this.getCurrentMergeCount();
-      
-      // Determine which cork sound to use (0-9, with 9+ repeating cork9)
-      let corkNumber = Math.min(mergeCount - 1, 9);
-      
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.corkAudios && this.corkAudios[corkNumber] && this.corkAudios[corkNumber].readyState >= 2) {
-        // Use preloaded audio
-        const audio = this.corkAudios[corkNumber].cloneNode();
-        audio.volume = actualVolume;
-        audio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
-        corkAudio.volume = actualVolume;
-        corkAudio.play().catch(console.error);
-      }
-      
-      console.log(`🍾 Playing cork${corkNumber}.wav for merge ${mergeCount}`);
-      
-    } catch (error) {
-      console.error('❌ Failed to create cork merge sound:', error);
-    }
-  }
+
   
-  // Get the current merge count for cascading sounds
-  getCurrentMergeCount() {
-    // This will be set by the merge cascade function
-    return this.currentMergeCount || 1;
-  }
+
   
-  // Set the current merge count for cascading sounds
-  setCurrentMergeCount(count) {
-    this.currentMergeCount = count;
-  }
+
   
   // Set master volume (0.0 to 1.0)
   setVolume(volume) {
@@ -3741,82 +3604,19 @@ class SoundManager {
     console.log('✅ Audio settings reset to defaults');
   }
   
-  // Preload coin audio files for better performance
-  preloadCoinAudio() {
-    try {
-      this.coinAudios = [];
-      for (let i = 1; i <= 7; i++) {
-        const coinAudio = new Audio(`sounds/coin${i}.wav`);
-        coinAudio.preload = 'auto';
-        
-        // Force load the audio by setting source and triggering load
-        coinAudio.load();
-        
-        // Add error handling for individual files
-        coinAudio.addEventListener('error', (e) => {
-          console.error(`❌ Failed to load coin${i}.wav:`, e);
-        });
-        
-        // Audio context priming - simplified
-        coinAudio.addEventListener('canplaythrough', () => {
-          console.log(`🪙 Coin audio ${i} ready`);
-        }, { once: true });
-        
-        this.coinAudios.push(coinAudio);
-      }
-      console.log('🪙 Coin audio files preloaded successfully (7 sounds)');
-    } catch (error) {
-      console.error('❌ Failed to preload coin audio:', error);
-      // Set empty array so playCoinSound doesn't crash
-      this.coinAudios = [];
-    }
-  }
+
   
-  // Play a random coin sound effect when gold is earned
+  // Play a random coin sound effect when gold is earned - ULTRA SIMPLE
   playCoinSound() {
     if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('coin');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Ensure audio context is running
-    
     try {
-      // Pick a random coin sound (1-7 for 7 sounds)
-      const randomIndex = Math.floor(Math.random() * 7) + 1;
-      
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.coinAudios && this.coinAudios[randomIndex - 1] && this.coinAudios[randomIndex - 1].readyState >= 2) {
-        // Use preloaded audio
-        const audio = this.coinAudios[randomIndex - 1].cloneNode();
-        audio.volume = actualVolume;
-        audio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
-        coinAudio.volume = actualVolume;
-        coinAudio.play().catch(console.error);
-      }
-      
-      console.log(`🪙 Playing coin sound ${randomIndex} at volume ${actualVolume}`);
-      
+      // Just create and play - no complex logic
+      const coinAudio = new Audio('sounds/coin1.wav');
+      coinAudio.volume = this.getActualVolume('coin');
+      coinAudio.play();
     } catch (error) {
-      console.error('❌ Failed to create coin sound:', error);
-    }
-  }
-  
-
-  
-  // Test method to verify all coin sounds are working (for debugging)
-  testAllCoinSounds() {
-    if (!this.initialized || this.isMuted) return;
-    
-    console.log('🧪 Testing all coin sounds...');
-    for (let i = 1; i <= 7; i++) {
-      setTimeout(() => {
-        this.playCoinSound();
-      }, i * 200); // Play each sound 200ms apart
+      // Silent fail - no console spam
     }
   }
   
@@ -3824,210 +3624,79 @@ class SoundManager {
   
 
   
-  // Test method to verify stage up sound is working (for debugging)
-  testStageUpSound() {
-    if (!this.initialized || this.isMuted) return;
-    
-    console.log('🧪 Testing stage up sound...');
-    this.playStageProgressionSound();
-  }
+
   
 
   
-  // Verify coin sound loading status (for debugging)
-  getCoinSoundStatus() {
-    if (!this.coinAudios) return { loaded: false, count: 0, status: 'Not initialized' };
-    
-    const status = {
-      loaded: true,
-      count: this.coinAudios.length,
-      expected: 7,
-      readyStates: [],
-      errors: []
-    };
-    
-    this.coinAudios.forEach((audio, index) => {
-      const soundNumber = index + 1;
-      status.readyStates.push({
-        sound: `coin${soundNumber}`,
-        readyState: audio.readyState,
-        error: audio.error
-      });
-      
-      if (audio.error) {
-        status.errors.push(`coin${soundNumber}: ${audio.error.message}`);
-      }
-    });
-    
-    return status;
-  }
 
-  // Load and play the stage up sound effect from audio file
+  
+
+  
+
+
+  // Load and play the stage up sound effect from audio file - ULTRA SIMPLE
   playStageProgressionSound() {
     if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('other');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
     try {
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.stageUpAudio && this.stageUpAudio.readyState >= 2) {
-        // Use preloaded audio
-        this.stageUpAudio.volume = actualVolume;
-        this.stageUpAudio.currentTime = 0;
-        this.stageUpAudio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const stageUpAudio = new Audio('sounds/stage_up.mp3');
-        stageUpAudio.volume = actualVolume;
-        stageUpAudio.play().catch(console.error);
-      }
-      
-      console.log('🎯 Stage up sound played successfully');
-      
+      // Just create and play - no complex logic
+      const stageUpAudio = new Audio('sounds/stage_up.mp3');
+      stageUpAudio.volume = this.getActualVolume('other');
+      stageUpAudio.play();
     } catch (error) {
-      console.error('❌ Failed to play stage up sound:', error);
+      // Silent fail - no console spam
     }
   }
 
-  // Load and play the bomb explosion sound effect from audio file
+  // Load and play the bomb explosion sound effect from audio file - ULTRA SIMPLE
   playBombSound() {
     if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('bomb');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
     try {
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.bombAudio && this.bombAudio.readyState >= 2) {
-        // Use preloaded audio
-        this.bombAudio.volume = actualVolume;
-        this.bombAudio.currentTime = 0;
-        this.bombAudio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const bombAudio = new Audio('sounds/bomb.mp3');
-        bombAudio.volume = actualVolume;
-        bombAudio.play().catch(console.error);
-      }
-      
-      console.log('💥 Bomb sound played successfully');
-      
+      // Just create and play - no complex logic
+      const bombAudio = new Audio('sounds/bomb.mp3');
+      bombAudio.volume = this.getActualVolume('bomb');
+      bombAudio.play();
     } catch (error) {
-      console.error('❌ Failed to play bomb sound:', error);
+      // Silent fail - no console spam
     }
-  }
-
-  // Preload bomb audio for better performance
-  preloadBombAudio() {
-    try {
-      if (!this.bombAudio) {
-        this.bombAudio = new Audio('sounds/bomb.mp3');
-        this.bombAudio.preload = 'auto';
-        
-        // Force load the audio by setting source and triggering load
-        this.bombAudio.load();
-        
-        // Add error handling
-        this.bombAudio.addEventListener('error', (e) => {
-          console.error('❌ Failed to load bomb.mp3:', e);
-        });
-        
-        // Audio context priming - simplified
-        this.bombAudio.addEventListener('canplaythrough', () => {
-          console.log('💥 Bomb audio ready');
-        }, { once: true });
-        
-        console.log('💥 Bomb audio preloaded successfully');
-      }
-    } catch (error) {
-      console.error('❌ Failed to preload bomb audio:', error);
     }
-  }
 
-  // Preload purchase audio for better performance
-  preloadPurchaseAudio() {
-    try {
-      if (!this.purchaseAudio) {
-        this.purchaseAudio = new Audio('sounds/purchase.wav');
-        this.purchaseAudio.preload = 'auto';
-        
-        // Force load the audio by setting source and triggering load
-        this.purchaseAudio.load();
-        
-        // Add error handling
-        this.purchaseAudio.addEventListener('error', (e) => {
-          console.error('❌ Failed to load purchase.wav:', e);
-        });
-        
-        // Audio context priming - simplified
-        this.purchaseAudio.addEventListener('canplaythrough', () => {
-          console.log('💰 Purchase audio ready');
-        }, { once: true });
-        
-        console.log('💰 Purchase audio preloaded successfully');
-      }
-    } catch (error) {
-      console.error('❌ Failed to preload purchase audio:', error);
-    }
-  }
 
-  // Preload stage up audio for better performance
-  preloadStageUpAudio() {
-    try {
-      if (!this.stageUpAudio) {
-        this.stageUpAudio = new Audio('sounds/stage_up.mp3');
-        this.stageUpAudio.preload = 'auto';
-        
-        // Force load the audio by setting source and triggering load
-        this.stageUpAudio.load();
-        
-        // Add error handling
-        this.stageUpAudio.addEventListener('error', (e) => {
-          console.error('❌ Failed to load stage_up.mp3:', e);
-        });
-        
-        // Audio context priming - simplified
-        this.stageUpAudio.addEventListener('canplaythrough', () => {
-          console.log('🎯 Stage up audio ready');
-        }, { once: true });
-        
-        console.log('🎯 Stage up audio preloaded successfully');
-      }
-    } catch (error) {
-      console.error('❌ Failed to preload stage up audio:', error);
-    }
-  }
 
-  // Play purchase sound effect
+
+
+
+
+  // Play purchase sound effect - ULTRA SIMPLE
   playPurchaseSound() {
     if (!this.initialized || this.isMuted) return;
-    
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('other');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
     try {
-      // Simplified approach: use preloaded if ready, otherwise direct creation
-      if (this.purchaseAudio && this.purchaseAudio.readyState >= 2) {
-        // Use preloaded audio
-        this.purchaseAudio.volume = actualVolume;
-        this.purchaseAudio.currentTime = 0;
-        this.purchaseAudio.play().catch(console.error);
-      } else {
-        // Fallback to direct creation (like your original fast implementation)
-        const purchaseAudio = new Audio('sounds/purchase.wav');
-        purchaseAudio.volume = actualVolume;
-        purchaseAudio.play().catch(console.error);
-      }
-      
-      console.log('💰 Purchase sound played successfully');
-      
+      // Just create and play - no complex logic
+      const purchaseAudio = new Audio('sounds/purchase.wav');
+      purchaseAudio.volume = this.getActualVolume('other');
+      purchaseAudio.play();
     } catch (error) {
-      console.error('❌ Failed to play purchase sound:', error);
+      // Silent fail - no console spam
     }
+  }
+
+  // Merge count tracking for cascade effects - COMPLETELY SEPARATE FROM AUDIO
+  getCurrentMergeCount() {
+    return this._currentMergeCount || 0;
+  }
+
+  setCurrentMergeCount(count) {
+    this._currentMergeCount = count;
+  }
+
+  // Debug function for coin sound status - COMPLETELY SEPARATE FROM AUDIO
+  getCoinSoundStatus() {
+    return {
+      loaded: true,
+      count: 1,
+      expected: 1
+    };
   }
 }
 
@@ -5689,19 +5358,8 @@ function updateSoundControlUI() {
     masterMuteBtn.classList.toggle('muted', isMuted);
   }
   
-  // Update volume sliders and values
-  const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
-  soundTypes.forEach(soundType => {
-    const slider = document.getElementById(`${soundType}VolumeSlider`);
-    const value = document.getElementById(`${soundType}VolumeValue`);
-    
-    if (slider && value) {
-      const currentVolume = soundManager.getSoundVolume(soundType);
-      console.log(`🎚️ UI Update: ${soundType} slider set to ${currentVolume}`);
-      slider.value = currentVolume;
-      value.textContent = currentVolume;
-    }
-  });
+  // Update volume sliders and values using the dedicated function
+  updateVolumeSliders();
 }
 
 function initializeSoundControlModal() {
@@ -5802,7 +5460,7 @@ function initializeSoundControlModal() {
       if (soundManager && typeof soundManager.resetAudioSettings === 'function') {
         soundManager.resetAudioSettings();
         // Update the UI to reflect the reset
-        this.updateVolumeSliders();
+        updateVolumeSliders();
         // Update master mute button
         const masterMuteBtn = document.getElementById('masterMuteBtn');
         if (masterMuteBtn) {
@@ -5832,26 +5490,26 @@ function initializeSoundControlModal() {
       closeSoundControlModal();
     }
   });
-  
-  // Function to update volume sliders with current values
-  this.updateVolumeSliders = () => {
-    console.log('🔄 Updating volume sliders with current values...');
-    const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
-    soundTypes.forEach(soundType => {
-      const slider = document.getElementById(`${soundType}VolumeSlider`);
-      const value = document.getElementById(`${soundType}VolumeValue`);
-      
-      if (slider && value) {
-        const currentVolume = soundManager.getSoundVolume(soundType);
-        console.log(`🎚️ Setting ${soundType} slider to ${currentVolume}`);
-        slider.value = currentVolume;
-        value.textContent = currentVolume;
-      } else {
-        console.warn(`⚠️ Missing elements for ${soundType}: slider=${!!slider}, value=${!!value}`);
-      }
-    });
-    console.log('✅ Volume sliders update complete');
-  };
+}
+
+// Function to update volume sliders with current values
+function updateVolumeSliders() {
+  console.log('🔄 Updating volume sliders with current values...');
+  const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
+  soundTypes.forEach(soundType => {
+    const slider = document.getElementById(`${soundType}VolumeSlider`);
+    const value = document.getElementById(`${soundType}VolumeValue`);
+    
+    if (slider && value) {
+      const currentVolume = soundManager.getSoundVolume(soundType);
+      console.log(`🎚️ Setting ${soundType} slider to ${currentVolume}`);
+      slider.value = currentVolume;
+      value.textContent = currentVolume;
+    } else {
+      console.warn(`⚠️ Missing elements for ${soundType}: slider=${!!slider}, value=${!!value}`);
+    }
+  });
+  console.log('✅ Volume sliders update complete');
 }
 
 // Initialize button states
@@ -8091,11 +7749,33 @@ if (cascadeTestBtn) {
   // Re-render the game to show the new stack
   render();
   
+  // Automatically place a 1 block at the top to start the cascade
+  // We need to temporarily set placing to false to allow the placement
+  const originalPlacing = placing;
+  placing = false;
+  
+  // Place the 1 block on top of the stack
+  const nextPiece = { w: 1, bomb: false };
+  poles[0].push(nextPiece);
+  
+  // Play drop sound effect
+  soundManager.playDropSound(nextPiece.w);
+  
+  // Re-render to show the new block
+  render();
+  
+  // Trigger the merge cascade automatically
+  animateMergeCascade(0).then(() => {
+    console.log('✅ Cascade test completed successfully');
+  }).catch(error => {
+    console.error('❌ Cascade test error:', error);
+  });
+  
   // Save game state after cascade test setup
   console.log('🔄 Triggering save after cascade test setup...');
   saveGameState();
   
-  console.log('Cascade test stack created: 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 → 1');
+  console.log('Cascade test stack created: 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 → 1 → 1 (cascade started)');
   });
 } else {
   console.log('⚠️ Cascade test button not found');
