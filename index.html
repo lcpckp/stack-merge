@@ -2835,13 +2835,16 @@
       
       <button id="soundControlClose" class="sound-control-close">Close</button>
       
-      <div style="margin-top: 16px; text-align: center; display: none;">
+      <div style="margin-top: 16px; text-align: center;">
         <button id="testAllSoundsBtn" class="sound-control-mute" style="background: #0ea5e9; border-color: #0284c7; min-width: 120px;">
           Test All Sounds
         </button>
         <button id="debugVolumeBtn" class="sound-control-mute" style="background: #dc2626; border-color: #b91c1c; min-width: 120px; margin-top: 8px;">
-          Debug Volumes
-        </button>
+  Debug Volumes
+</button>
+<button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px; margin-top: 8px;">
+  Reset Audio Settings
+</button>
       </div>
     </div>
   </div>
@@ -3292,9 +3295,59 @@ class SoundManager {
       other: 3      // Other sounds (stage up, etc.)
     };
     
-      // Initialize audio context on first user interaction
-  this.initAudioContext = this.initAudioContext.bind(this);
-  this.addAudioInitListeners();
+    // Debug localStorage to check for corrupted settings
+    this.debugLocalStorage();
+    
+    // Initialize audio context on first user interaction
+    this.initAudioContext = this.initAudioContext.bind(this);
+    this.addAudioInitListeners();
+  }
+  
+  // Debug localStorage to check for corrupted settings
+  debugLocalStorage() {
+    try {
+      // Check if localStorage is available
+      if (typeof localStorage !== 'undefined') {
+        console.log('📱 localStorage is available');
+        
+        // Check for corrupted sound settings
+        const soundSettings = localStorage.getItem('stackMerge_soundSettings');
+        if (soundSettings) {
+          try {
+            const parsed = JSON.parse(soundSettings);
+            console.log('🔍 Found sound settings in localStorage:', parsed);
+            
+            // Check for suspicious values
+            if (parsed.isMuted === true) {
+              console.warn('⚠️ WARNING: Sound is muted in localStorage!');
+            }
+            if (parsed.volume === 0) {
+              console.warn('⚠️ WARNING: Master volume is 0 in localStorage!');
+            }
+            if (parsed.soundVolumes) {
+              Object.entries(parsed.soundVolumes).forEach(([type, vol]) => {
+                if (vol === 0) {
+                  console.warn(`⚠️ WARNING: ${type} volume is 0 in localStorage!`);
+                }
+              });
+            }
+          } catch (parseError) {
+            console.error('❌ CORRUPTED localStorage data found!', parseError);
+            console.log('Raw data:', soundSettings);
+            
+            // Clear corrupted data
+            localStorage.removeItem('stackMerge_soundSettings');
+            console.log('🧹 Cleared corrupted sound settings');
+          }
+        } else {
+          console.log('📱 No sound settings found in localStorage');
+        }
+      } else {
+        console.log('📱 localStorage is not available');
+      }
+    } catch (error) {
+      console.log('📱 Error checking localStorage:', error);
+    }
   }
   
   addAudioInitListeners() {
@@ -3310,7 +3363,7 @@ class SoundManager {
     
     try {
       // Create audio context
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.audioContext = new AudioContext();
       
       // Create master gain node for volume control
       this.masterGain = this.audioContext.createGain();
@@ -3334,9 +3387,23 @@ class SoundManager {
       
       // Remove init listeners since we're now initialized
       this.removeAudioInitListeners();
+      
+      // Audio context monitoring
+      this.setupAudioMonitoring();
+      
     } catch (error) {
       console.error('❌ Failed to initialize audio context:', error);
     }
+  }
+  
+  // Audio context monitoring
+  setupAudioMonitoring() {
+    if (!this.audioContext) return;
+    
+    // Monitor audio context state changes
+    this.audioContext.addEventListener('statechange', () => {
+      console.log('🔊 Audio context state changed to:', this.audioContext.state);
+    });
   }
   
   removeAudioInitListeners() {
@@ -3845,115 +3912,39 @@ class SoundManager {
       }
     } catch (error) {
       console.error('❌ Failed to load sound settings:', error);
+      // If loading fails, reset to defaults and clear corrupted data
+      this.resetAudioSettings();
     }
     return false;
   }
-
-  // Preload bomb audio for better performance
-  bombAudio = null;
   
-  // Preload coin audio files for better performance
-  coinAudios = null;
-  
-  // Preload stage up audio for better performance
-  stageUpAudio = null;
-  
-  // Preload purchase audio for better performance
-  purchaseAudio = null;
-  
-  // Load and play the bomb explosion sound effect from audio file
-  playBombSound() {
-    if (!this.initialized || this.isMuted) return;
+  // Reset audio settings to defaults (useful for fixing corrupted settings)
+  resetAudioSettings() {
+    console.log('🔄 Resetting audio settings to defaults');
     
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('bomb');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
+    // Reset to default values
+    this.isMuted = false;
+    this.volume = 0.3;
+    this.usePopMergeSounds = true;
+    this.soundVolumes = {
+      drop: 3,
+      merge: 3,
+      coin: 3,
+      bomb: 3,
+      other: 3
+    };
     
+    // Clear corrupted localStorage data
     try {
-      // Create audio element for the bomb sound if not already created
-      if (!this.bombAudio) {
-        this.bombAudio = new Audio('sounds/bomb.mp3');
-        this.bombAudio.preload = 'auto'; // Preload the audio
-      }
-      
-      // Apply individual sound type volume
-      this.bombAudio.volume = actualVolume;
-      
-      // Reset audio to beginning and play
-      this.bombAudio.currentTime = 0;
-      this.bombAudio.play().catch(error => {
-        console.error('❌ Failed to play bomb audio file:', error);
-      });
-      
-      console.log('💥 Bomb explosion sound played successfully');
-      
+      localStorage.removeItem('stackMerge_soundSettings');
+      console.log('🧹 Cleared corrupted localStorage data');
     } catch (error) {
-      console.error('❌ Failed to play bomb sound:', error);
+      console.log('📱 Could not clear localStorage:', error);
     }
-  }
-  
-  // Load and play the purchase sound effect from audio file
-  playPurchaseSound() {
-    if (!this.initialized || this.isMuted) return;
     
-    // Check individual sound type volume - use 'other' category as requested
-    const actualVolume = this.getActualVolume('other');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    try {
-      // Create audio element for the purchase sound if not already created
-      if (!this.purchaseAudio) {
-        this.purchaseAudio = new Audio('sounds/purchase.wav');
-        this.purchaseAudio.preload = 'auto'; // Preload the audio
-      }
-      
-      // Apply individual sound type volume
-      this.purchaseAudio.volume = actualVolume;
-      
-      // Reset audio to beginning and play
-      this.purchaseAudio.currentTime = 0;
-      this.purchaseAudio.play().catch(error => {
-        console.error('❌ Failed to play purchase audio file:', error);
-      });
-      
-      console.log('💰 Purchase sound played successfully');
-      
-    } catch (error) {
-      console.error('❌ Failed to play purchase sound:', error);
-    }
-  }
-  
-  // Preload bomb audio for better performance
-  preloadBombAudio() {
-    try {
-      this.bombAudio = new Audio('sounds/bomb.mp3');
-      this.bombAudio.preload = 'auto';
-      console.log('💥 Bomb audio preloaded successfully');
-    } catch (error) {
-      console.error('❌ Failed to preload bomb audio:', error);
-    }
-  }
-  
-  // Preload purchase audio for better performance
-  preloadPurchaseAudio() {
-    try {
-      this.purchaseAudio = new Audio('sounds/purchase.wav');
-      this.purchaseAudio.preload = 'auto';
-      console.log('💰 Purchase audio preloaded successfully');
-    } catch (error) {
-      console.error('❌ Failed to preload purchase audio:', error);
-    }
-  }
-  
-  // Preload stage up audio for better performance
-  preloadStageUpAudio() {
-    try {
-      this.stageUpAudio = new Audio('sounds/stage_up.mp3');
-      this.stageUpAudio.preload = 'auto';
-      console.log('🎯 Stage up audio preloaded successfully');
-    } catch (error) {
-      console.error('❌ Failed to preload stage up audio:', error);
-    }
+    // Save fresh default settings
+    this.saveSoundSettings();
+    console.log('✅ Audio settings reset to defaults');
   }
   
   // Preload coin audio files for better performance
@@ -3990,12 +3981,7 @@ class SoundManager {
     const actualVolume = this.getActualVolume('coin');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure audio context is running (some browsers suspend it)
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume().catch(error => {
-        console.warn('⚠️ Failed to resume audio context:', error);
-      });
-    }
+    // Ensure audio context is running
     
     try {
       // Pick a random coin sound (1-7 for 7 sounds)
@@ -4199,6 +4185,37 @@ class SoundManager {
       
     } catch (error) {
       console.error('❌ Failed to play stage up sound:', error);
+    }
+  }
+
+  // Load and play the bomb explosion sound effect from audio file
+  playBombSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('bomb');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    try {
+      // Create audio element for the bomb sound if not already created
+      if (!this.bombAudio) {
+        this.bombAudio = new Audio('sounds/bomb.mp3');
+        this.bombAudio.preload = 'auto'; // Preload the audio
+      }
+      
+      // Apply individual sound type volume
+      this.bombAudio.volume = actualVolume;
+      
+      // Reset audio to beginning and play
+      this.bombAudio.currentTime = 0;
+      this.bombAudio.play().catch(error => {
+        console.error('❌ Failed to play bomb audio file:', error);
+      });
+      
+      console.log('💥 Bomb sound played successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to play bomb sound:', error);
     }
   }
 }
@@ -4919,7 +4936,7 @@ const PROBABILITY_DECAY_FACTOR = 0.7; // Each block is 70% as likely as the prev
 // - Block 1: 100% base probability
 // - Block 2: 100% base probability  
 // - Block 4: 100% base probability
-//
+
 // DECAY BLOCKS (exponential decay):
 // - Block 8: 60% base probability (0.6^1)
 // - Block 16: 36% base probability (0.6^2)
@@ -5872,6 +5889,28 @@ function initializeSoundControlModal() {
   if (debugVolumeBtn) {
     debugVolumeBtn.addEventListener('click', () => {
       debugVolumeHandling();
+    });
+  }
+  
+  // Reset audio settings button
+  const resetAudioBtn = document.getElementById('resetAudioBtn');
+  if (resetAudioBtn) {
+    resetAudioBtn.addEventListener('click', () => {
+      console.log('🔄 Reset audio settings button clicked');
+      if (soundManager && typeof soundManager.resetAudioSettings === 'function') {
+        soundManager.resetAudioSettings();
+        // Update the UI to reflect the reset
+        this.updateVolumeSliders();
+        // Update master mute button
+        const masterMuteBtn = document.getElementById('masterMuteBtn');
+        if (masterMuteBtn) {
+          masterMuteBtn.textContent = 'Mute';
+          masterMuteBtn.classList.remove('muted');
+        }
+        console.log('✅ Audio settings reset and UI updated');
+      } else {
+        console.error('❌ Sound manager not available or reset method missing');
+      }
     });
   }
   
