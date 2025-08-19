@@ -3350,11 +3350,28 @@ class SoundManager {
   // Preload audio files for better performance
   preloadAudioFiles() {
     try {
-      // Preload cork sounds (0-9)
+      // Preload cork sounds (0-9) and store them for instant playback
+      this.corkAudios = [];
       for (let i = 0; i <= 9; i++) {
         const corkAudio = new Audio(`sounds/cork${i}.wav`);
+        corkAudio.preload = 'auto';
         corkAudio.load();
+        
+        // Add error handling for individual files
+        corkAudio.addEventListener('error', (e) => {
+          console.error(`❌ Failed to load cork${i}.wav:`, e);
+        });
+        
+        // Add canplaythrough listener for audio context priming
+        corkAudio.addEventListener('canplaythrough', () => {
+          console.log(`🍾 Cork audio ${i} ready for instant playback`);
+        }, { once: true });
+        
+        this.corkAudios.push(corkAudio);
       }
+      
+      // Preload drop sound for instant playback
+      this.preloadDropAudio();
       
       // Preload other sound files
       this.preloadBombAudio();
@@ -3369,6 +3386,26 @@ class SoundManager {
     }
   }
   
+  // Preload drop audio for instant playback
+  preloadDropAudio() {
+    try {
+      this.dropAudio = new Audio('sounds/click2.wav');
+      this.dropAudio.preload = 'auto';
+      this.dropAudio.load();
+      
+      // Prime the audio context by playing and immediately pausing
+      // This ensures the audio context is ready for instant playback
+      this.dropAudio.addEventListener('canplaythrough', () => {
+        // Audio is ready, we can now play it instantly
+        console.log('📦 Drop audio ready for instant playback');
+      }, { once: true });
+      
+      console.log('📦 Drop audio preloaded successfully');
+    } catch (error) {
+      console.error('❌ Failed to preload drop audio:', error);
+    }
+  }
+  
   // Play the click2.wav sound effect for drops
   playDropSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
@@ -3378,11 +3415,19 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Create a fresh audio element for this sound
-      const dropAudio = new Audio('sounds/click2.wav');
+      // Use preloaded audio if available, otherwise create fresh
+      let dropAudio;
+      if (this.dropAudio && this.dropAudio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        dropAudio = this.dropAudio.cloneNode();
+      } else {
+        // Fallback to creating fresh audio if preloaded isn't ready
+        dropAudio = new Audio('sounds/click2.wav');
+      }
+      
       dropAudio.volume = actualVolume; // Apply individual sound type volume
       
-      // Play the sound
+      // Play the sound immediately
       dropAudio.play().catch(error => {
         console.error('❌ Failed to play drop sound:', error);
       });
@@ -3414,6 +3459,10 @@ class SoundManager {
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('merge');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
     try {
       // Get the merge count from the current cascade
       const mergeCount = this.getCurrentMergeCount();
@@ -3422,11 +3471,19 @@ class SoundManager {
       // or we could use the same cork system but with different audio files
       let soundNumber = Math.min(mergeCount - 1, 9);
       
-      // Create audio element for the musical sound (using cork sounds for now)
-      const musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
-      musicalAudio.volume = volume;
+      // Use preloaded audio if available, otherwise create fresh
+      let musicalAudio;
+      if (this.corkAudios && this.corkAudios[soundNumber] && this.corkAudios[soundNumber].readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        musicalAudio = this.corkAudios[soundNumber].cloneNode();
+      } else {
+        // Fallback to creating fresh audio if preloaded isn't ready
+        musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
+      }
       
-      // Play the sound
+      musicalAudio.volume = actualVolume;
+      
+      // Play the sound immediately
       musicalAudio.play().catch(error => {
         console.error('❌ Failed to play musical merge sound:', error);
       });
@@ -3442,6 +3499,10 @@ class SoundManager {
   playCorkMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('merge');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
     try {
       // Get the merge count from the current cascade
       const mergeCount = this.getCurrentMergeCount();
@@ -3449,11 +3510,19 @@ class SoundManager {
       // Determine which cork sound to use (0-9, with 9+ repeating cork9)
       let corkNumber = Math.min(mergeCount - 1, 9);
       
-      // Create audio element for the cork sound
-      const corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
-      corkAudio.volume = volume;
+      // Use preloaded audio if available, otherwise create fresh
+      let corkAudio;
+      if (this.corkAudios && this.corkAudios[corkNumber] && this.corkAudios[corkNumber].readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        corkAudio = this.corkAudios[corkNumber].cloneNode();
+      } else {
+        // Fallback to creating fresh audio if preloaded isn't ready
+        corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
+      }
       
-      // Play the sound
+      corkAudio.volume = actualVolume;
+      
+      // Play the sound immediately
       corkAudio.play().catch(error => {
         console.error('❌ Failed to play cork merge sound:', error);
       });
@@ -3699,6 +3768,11 @@ class SoundManager {
           console.error(`❌ Failed to load coin${i}.wav:`, e);
         });
         
+        // Add canplaythrough listener for audio context priming
+        coinAudio.addEventListener('canplaythrough', () => {
+          console.log(`🪙 Coin audio ${i} ready for instant playback`);
+        }, { once: true });
+        
         this.coinAudios.push(coinAudio);
       }
       console.log('🪙 Coin audio files preloaded successfully (7 sounds)');
@@ -3723,8 +3797,16 @@ class SoundManager {
       // Pick a random coin sound (1-7 for 7 sounds)
       const randomIndex = Math.floor(Math.random() * 7) + 1;
       
-      // Create a fresh audio element for this specific sound to allow overlapping playback
-      const coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
+      // Use preloaded audio if available, otherwise create fresh
+      let coinAudio;
+      if (this.coinAudios && this.coinAudios[randomIndex - 1] && this.coinAudios[randomIndex - 1].readyState >= 2) {
+        // Clone the preloaded audio to allow multiple simultaneous plays
+        coinAudio = this.coinAudios[randomIndex - 1].cloneNode();
+      } else {
+        // Fallback to creating fresh audio if preloaded isn't ready
+        coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
+      }
+      
       coinAudio.volume = actualVolume; // Apply individual sound type volume
       
       // Track if we've already played or failed to prevent duplicates
@@ -3970,6 +4052,11 @@ class SoundManager {
           console.error('❌ Failed to load bomb.mp3:', e);
         });
         
+        // Add canplaythrough listener for audio context priming
+        this.bombAudio.addEventListener('canplaythrough', () => {
+          console.log('💥 Bomb audio ready for instant playback');
+        }, { once: true });
+        
         console.log('💥 Bomb audio preloaded successfully');
       }
     } catch (error) {
@@ -3992,6 +4079,11 @@ class SoundManager {
           console.error('❌ Failed to load purchase.wav:', e);
         });
         
+        // Add canplaythrough listener for audio context priming
+        this.purchaseAudio.addEventListener('canplaythrough', () => {
+          console.log('💰 Purchase audio ready for instant playback');
+        }, { once: true });
+        
         console.log('💰 Purchase audio preloaded successfully');
       }
     } catch (error) {
@@ -4013,6 +4105,11 @@ class SoundManager {
         this.stageUpAudio.addEventListener('error', (e) => {
           console.error('❌ Failed to load stage_up.mp3:', e);
         });
+        
+        // Add canplaythrough listener for audio context priming
+        this.stageUpAudio.addEventListener('canplaythrough', () => {
+          console.log('🎯 Stage up audio ready for instant playback');
+        }, { once: true });
         
         console.log('🎯 Stage up audio preloaded successfully');
       }
@@ -6624,9 +6721,15 @@ function render(){
     
     // Only add click handler if stack is not disabled
     if (!isDisabled) {
-      poleDiv.addEventListener('click', () => placeOnPole(idx));
+      poleDiv.addEventListener('click', () => {
+        // Prime audio context on first click to ensure instant playback
+        if (soundManager && soundManager.dropAudio && soundManager.dropAudio.readyState >= 2) {
+          // Audio is ready, we can play it instantly
+        }
+        placeOnPole(idx);
+      });
       
-      // Add touch event handling for better mobile experience
+          // Add touch event handling for better mobile experience
       let touchStartTime = 0;
       let touchStartY = 0;
       
@@ -6635,6 +6738,11 @@ function render(){
         touchStartY = e.touches[0].clientY;
         // Prevent default to avoid double-tap zoom on mobile
         e.preventDefault();
+        
+        // Prime audio context on first touch to ensure instant playback
+        if (soundManager && soundManager.dropAudio && soundManager.dropAudio.readyState >= 2) {
+          // Audio is ready, we can play it instantly
+        }
       }, { passive: false });
       
       poleDiv.addEventListener('touchend', (e) => {
@@ -6762,6 +6870,10 @@ function placeOnPole(idx){
     console.log('Cannot place piece on this pole, ignoring click');
     return;
   }
+  
+  // Play drop sound effect IMMEDIATELY after validation, before any animations
+  soundManager.playDropSound(nextPiece.w);
+  
   placing = true;
   lastPlacementTime = Date.now();
 
@@ -6815,9 +6927,6 @@ function placeOnPole(idx){
   // The CSS media queries will automatically apply the correct animation
   
   poleDiv.appendChild(animDisc);
-
-  // Play drop sound effect
-  soundManager.playDropSound(nextPiece.w);
 
   // Check if animations are disabled (speed = 0)
   const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
