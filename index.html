@@ -3188,9 +3188,7 @@
           <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
         
-        <div class="control-row" style="margin-top: 8px;">
-          <button id="testAudioContextBtn" class="button">Test Audio Context</button>
-        </div>
+
         
 
       </div>
@@ -3230,9 +3228,6 @@ class SoundManager {
       // Initialize audio context on first user interaction
   this.initAudioContext = this.initAudioContext.bind(this);
   this.addAudioInitListeners();
-  
-  // Also try to resume audio context immediately if possible
-  this.tryResumeAudioContextOnLoad();
   }
   
   addAudioInitListeners() {
@@ -3240,23 +3235,6 @@ class SoundManager {
     const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
     initEvents.forEach(event => {
       document.addEventListener(event, this.initAudioContext, { once: true, passive: true });
-    });
-    
-    // Add a listener that proactively resumes audio context on first user interaction
-    const resumeAudioContext = () => {
-      if (this.initialized && this.audioContext && this.audioContext.state === 'suspended') {
-        console.log('🔄 Audio context suspended, resuming on user interaction...');
-        this.audioContext.resume().then(() => {
-          console.log('✅ Audio context resumed successfully on user interaction');
-        }).catch(error => {
-          console.warn('⚠️ Failed to resume audio context on user interaction:', error);
-        });
-      }
-    };
-    
-    // Add to all interaction events to catch any user activity
-    initEvents.forEach(event => {
-      document.addEventListener(event, resumeAudioContext, { passive: true });
     });
   }
   
@@ -3308,9 +3286,6 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('drop');
     if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
     
     try {
       // Create gain node for volume control
@@ -3435,9 +3410,6 @@ class SoundManager {
   // Generate a beautiful, physical bell sound like Christmas music
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
-    
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
     
     try {
       // Create gain node for volume control
@@ -3604,9 +3576,6 @@ class SoundManager {
   playPopMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
-    
     try {
       // Create gain node for volume control
       const gainNode = this.audioContext.createGain();
@@ -3756,69 +3725,7 @@ class SoundManager {
     return this.usePopMergeSounds;
   }
   
-  // Ensure audio context is active (called by sound functions)
-  ensureAudioContextActive() {
-    if (!this.audioContext) {
-      console.log('ℹ️ Audio context not initialized yet');
-      return Promise.resolve();
-    }
-    
-    if (this.audioContext.state === 'running') {
-      console.log('✅ Audio context already running');
-      return Promise.resolve();
-    }
-    
-    if (this.audioContext.state === 'suspended') {
-      console.log('🔄 Audio context suspended, attempting to resume...');
-      return this.audioContext.resume().then(() => {
-        console.log('✅ Audio context resumed successfully');
-        return true;
-      }).catch(error => {
-        console.warn('⚠️ Failed to resume audio context:', error);
-        return false;
-      });
-    }
-    
-    console.log(`ℹ️ Audio context in unexpected state: ${this.audioContext.state}`);
-    return Promise.resolve();
-  }
-  
-  // Try to resume audio context on page load (for immediate sound playback)
-  tryResumeAudioContextOnLoad() {
-    // Wait a bit for the page to fully load, then try to resume audio context
-    setTimeout(() => {
-      if (this.audioContext && this.audioContext.state === 'suspended') {
-        console.log('🔄 Attempting to resume audio context on page load...');
-        this.forceResumeAudioContext();
-      }
-    }, 1000); // Wait 1 second after page load
-  }
-  
-  // Force resume audio context with retry logic
-  forceResumeAudioContext() {
-    if (!this.audioContext) return;
-    
-    const attemptResume = (attempt = 1, maxAttempts = 3) => {
-      console.log(`🔄 Attempt ${attempt} to resume audio context...`);
-      
-      this.audioContext.resume().then(() => {
-        console.log('✅ Audio context resumed successfully');
-      }).catch(error => {
-        console.warn(`⚠️ Attempt ${attempt} failed:`, error);
-        
-        if (attempt < maxAttempts) {
-          // Retry after a short delay
-          setTimeout(() => {
-            attemptResume(attempt + 1, maxAttempts);
-          }, 200 * attempt); // Increasing delay between attempts
-        } else {
-          console.log('ℹ️ Max attempts reached, will resume on user interaction');
-        }
-      });
-    };
-    
-    attemptResume();
-  }
+
   
   // Get current merge sound type preference
   getMergeSoundType() {
@@ -3977,9 +3884,6 @@ class SoundManager {
     const actualVolume = this.getActualVolume('bomb');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
-    
     try {
       // Create audio element for the bomb sound if not already created
       if (!this.bombAudio) {
@@ -4010,9 +3914,6 @@ class SoundManager {
     // Check individual sound type volume - use 'other' category as requested
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
     
     try {
       // Create audio element for the purchase sound if not already created
@@ -4104,8 +4005,12 @@ class SoundManager {
     const actualVolume = this.getActualVolume('coin');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure Web Audio API context is running (this will wake up drop/merge sounds too)
-    this.ensureAudioContextActive();
+    // Ensure audio context is running (some browsers suspend it)
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(error => {
+        console.warn('⚠️ Failed to resume audio context:', error);
+      });
+    }
     
     try {
       // Pick a random coin sound (1-7 for 7 sounds)
@@ -4181,9 +4086,6 @@ class SoundManager {
     const actualVolume = this.getActualVolume('coin');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure Web Audio API context is running (this will wake up drop/merge sounds too)
-    this.ensureAudioContextActive();
-    
     // Validate sound index is within range (1-7)
     if (soundIndex < 1 || soundIndex > 7) {
       console.warn(`⚠️ Invalid coin sound index: ${soundIndex}, using random fallback`);
@@ -4224,25 +4126,7 @@ class SoundManager {
     }
   }
   
-  // Test method to verify audio context state (for debugging)
-  testAudioContextState() {
-    if (!this.audioContext) {
-      console.log('❌ Audio context not initialized');
-      return;
-    }
-    
-    console.log('🔍 Audio context state:', this.audioContext.state);
-    console.log('🔍 Audio context sample rate:', this.audioContext.sampleRate);
-    console.log('🔍 Audio context current time:', this.audioContext.currentTime);
-    
-    if (this.audioContext.state === 'suspended') {
-      console.log('⚠️ Audio context is suspended - attempting to resume...');
-      this.forceResumeAudioContext();
-    } else if (this.audioContext.state === 'running') {
-      console.log('✅ Audio context is running - testing a sound...');
-      this.playDropSound(1);
-    }
-  }
+
   
   // Prevent multiple simultaneous coin sound calls
   isPlayingCoinSound = false;
@@ -4309,9 +4193,6 @@ class SoundManager {
     // Check individual sound type volume
     const actualVolume = this.getActualVolume('other');
     if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Ensure audio context is running (some browsers suspend it)
-    this.ensureAudioContextActive();
     
     try {
       // Create audio element for the stage up sound if not already created
@@ -4911,32 +4792,7 @@ function setupAutoSave() {
     if (document.hidden) {
       console.log('🔄 Page hidden - saving game state...');
       saveGameState();
-    } else {
-      console.log('🔄 Page visible - checking audio context state...');
-      // Proactively resume audio context when page becomes visible
-      if (soundManager.audioContext && soundManager.audioContext.state === 'suspended') {
-        soundManager.audioContext.resume().catch(error => {
-          console.warn('⚠️ Failed to resume audio context on page visibility change:', error);
-        });
-      }
     }
-  });
-  
-  // Add page focus/blur handlers for better audio context management
-  window.addEventListener('focus', () => {
-    console.log('🔄 Window focused - checking audio context state...');
-    // Resume audio context when window gains focus
-    if (soundManager.audioContext && soundManager.audioContext.state === 'suspended') {
-      soundManager.audioContext.resume().catch(error => {
-        console.warn('⚠️ Failed to resume audio context on window focus:', error);
-      });
-    }
-  });
-  
-  window.addEventListener('blur', () => {
-    console.log('🔄 Window blurred - audio context may be suspended...');
-    // Note: We don't suspend here as browsers handle this automatically
-    // But we can log it for debugging
   });
 }
 
@@ -8081,11 +7937,7 @@ function logProbabilityState() {
 const testProbBtn = document.getElementById('testProbBtn');
 testProbBtn.addEventListener('click', testProbabilityDistribution);
 
-// Test audio context button
-const testAudioContextBtn = document.getElementById('testAudioContextBtn');
-testAudioContextBtn.addEventListener('click', () => {
-  soundManager.testAudioContextState();
-});
+
 
 
 
