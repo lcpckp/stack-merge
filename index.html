@@ -3377,16 +3377,54 @@ class SoundManager {
     }
   }
   
-  // Generate a peaceful, raindrop-like merge sound effect - ULTRA SIMPLE
+  // Generate a peaceful, raindrop-like merge sound effect with cascade progression
   playMergeSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
     try {
-      // Just create and play - no complex logic
-      const mergeAudio = new Audio('sounds/cork1.wav');
+      // Get the current merge count for cascade sounds
+      const mergeCount = this.getCurrentMergeCount();
+      
+      // Determine which cork sound to play based on cascade position
+      let corkSoundFile;
+      if (mergeCount <= 1) {
+        corkSoundFile = 'sounds/cork0.wav'; // First merge
+      } else if (mergeCount <= 10) {
+        corkSoundFile = `sounds/cork${mergeCount - 1}.wav`; // cork1.wav through cork9.wav
+      } else {
+        corkSoundFile = 'sounds/cork9.wav'; // Any remaining merges use cork9
+      }
+      
+      console.log(`🔗 Playing cascade merge sound: ${corkSoundFile} (merge #${mergeCount})`);
+      
+      // Create and play the appropriate cork sound
+      const mergeAudio = new Audio(corkSoundFile);
       mergeAudio.volume = this.getActualVolume('merge');
-      mergeAudio.play();
+      
+      // Add error handling for audio loading
+      mergeAudio.addEventListener('error', (e) => {
+        console.warn(`⚠️ Failed to load cork sound: ${corkSoundFile}`, e);
+        // Fallback to cork1.wav if the specific cork sound fails
+        if (corkSoundFile !== 'sounds/cork1.wav') {
+          console.log('🔄 Falling back to cork1.wav');
+          const fallbackAudio = new Audio('sounds/cork1.wav');
+          fallbackAudio.volume = this.getActualVolume('merge');
+          fallbackAudio.play().catch(err => console.log('Fallback audio also failed:', err));
+        }
+      });
+      
+      mergeAudio.play().catch(error => {
+        console.warn(`⚠️ Failed to play cork sound: ${corkSoundFile}`, error);
+        // Fallback to cork1.wav if playback fails
+        if (corkSoundFile !== 'sounds/cork1.wav') {
+          console.log('🔄 Falling back to cork1.wav');
+          const fallbackAudio = new Audio('sounds/cork1.wav');
+          fallbackAudio.volume = this.getActualVolume('merge');
+          fallbackAudio.play().catch(err => console.log('Fallback audio also failed:', err));
+        }
+      });
     } catch (error) {
+      console.warn('⚠️ Error in playMergeSound:', error);
       // Silent fail - no console spam
     }
   }
@@ -3611,8 +3649,9 @@ class SoundManager {
     if (!this.initialized || this.isMuted) return;
     
     try {
-      // Just create and play - no complex logic
-      const coinAudio = new Audio('sounds/coin1.wav');
+      // Randomly select one of the 7 coin sounds
+      const coinNumber = Math.floor(Math.random() * 7) + 1;
+      const coinAudio = new Audio(`sounds/coin${coinNumber}.wav`);
       coinAudio.volume = this.getActualVolume('coin');
       coinAudio.play();
     } catch (error) {
@@ -6742,6 +6781,10 @@ function areAnyAnimationsRunning() {
 async function animateMergeCascade(index){
   console.log('Starting merge cascade for pole:', index);
   
+  // Reset merge count for new cascade
+  soundManager.setCurrentMergeCount(0);
+  console.log('🔄 Starting new merge cascade - reset merge count to 0');
+  
   // Global timeout to prevent infinite hanging
   const globalTimeout = setTimeout(() => {
     console.error('Merge cascade global timeout - forcing completion');
@@ -6821,6 +6864,7 @@ async function animateMergeCascade(index){
     
     // Set the merge count for cascading sound effects
     soundManager.setCurrentMergeCount(mergeCount);
+    console.log(`🔗 Cascade merge #${mergeCount}: Setting merge count for sound effects`);
     
     // Play merge sound effect for the newly created block
     soundManager.playMergeSound(newW);
