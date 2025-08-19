@@ -4218,6 +4218,103 @@ class SoundManager {
       console.error('❌ Failed to play bomb sound:', error);
     }
   }
+
+  // Preload bomb audio for better performance
+  preloadBombAudio() {
+    try {
+      if (!this.bombAudio) {
+        this.bombAudio = new Audio('sounds/bomb.mp3');
+        this.bombAudio.preload = 'auto';
+        
+        // Force load the audio by setting source and triggering load
+        this.bombAudio.load();
+        
+        // Add error handling
+        this.bombAudio.addEventListener('error', (e) => {
+          console.error('❌ Failed to load bomb.mp3:', e);
+        });
+        
+        console.log('💥 Bomb audio preloaded successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to preload bomb audio:', error);
+    }
+  }
+
+  // Preload purchase audio for better performance
+  preloadPurchaseAudio() {
+    try {
+      if (!this.purchaseAudio) {
+        this.purchaseAudio = new Audio('sounds/purchase.wav');
+        this.purchaseAudio.preload = 'auto';
+        
+        // Force load the audio by setting source and triggering load
+        this.purchaseAudio.load();
+        
+        // Add error handling
+        this.purchaseAudio.addEventListener('error', (e) => {
+          console.error('❌ Failed to load purchase.wav:', e);
+        });
+        
+        console.log('💰 Purchase audio preloaded successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to preload purchase audio:', error);
+    }
+  }
+
+  // Preload stage up audio for better performance
+  preloadStageUpAudio() {
+    try {
+      if (!this.stageUpAudio) {
+        this.stageUpAudio = new Audio('sounds/stage_up.mp3');
+        this.stageUpAudio.preload = 'auto';
+        
+        // Force load the audio by setting source and triggering load
+        this.stageUpAudio.load();
+        
+        // Add error handling
+        this.stageUpAudio.addEventListener('error', (e) => {
+          console.error('❌ Failed to load stage_up.mp3:', e);
+        });
+        
+        console.log('🎯 Stage up audio preloaded successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to preload stage up audio:', error);
+    }
+  }
+
+  // Play purchase sound effect
+  playPurchaseSound() {
+    if (!this.initialized || this.isMuted) return;
+    
+    // Check individual sound type volume
+    const actualVolume = this.getActualVolume('other');
+    if (actualVolume === 0) return; // Skip if this sound type is muted
+    
+    try {
+      // Create audio element for the purchase sound if not already created
+      if (!this.purchaseAudio) {
+        this.purchaseAudio = new Audio('sounds/purchase.wav');
+        this.purchaseAudio.preload = 'auto'; // Preload the audio
+      }
+      
+      // Apply individual sound type volume
+      this.purchaseAudio.volume = actualVolume;
+      
+      // Reset audio to beginning and play
+      this.purchaseAudio.currentTime = 0;
+      this.purchaseAudio.play().catch(error => {
+        console.error('❌ Failed to play purchase audio file:', error);
+      });
+      
+      console.log('💰 Purchase sound played successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to play purchase sound:', error);
+    }
+  }
 }
 
 // Initialize sound manager
@@ -5262,8 +5359,15 @@ function showGoldEarned(amount) {
 }
 
 function handleBombConversion() {
+  console.log('💣 Bomb conversion button clicked!');
+  console.log('Next queue:', nextQueue);
+  console.log('Current gold:', gold);
+  console.log('Bomb conversion cost:', bombConversionCost);
+  console.log('Bomb selected:', bombSelected);
+  
   // Check if there's a next block to work with
   if (nextQueue.length === 0) {
+    console.log('❌ No blocks in next queue');
     return;
   }
   
@@ -5363,6 +5467,11 @@ function handleBombConversion() {
 }
 
 function handleTrashButton() {
+  console.log('🗑️ Trash button clicked!');
+  console.log('Next queue:', nextQueue);
+  console.log('Current gold:', gold);
+  console.log('Trash button cost:', trashButtonCost);
+  
   // Check if player has enough gold
   if (gold < trashButtonCost) {
     // Show feedback that they don't have enough gold
@@ -5432,6 +5541,11 @@ function handleTrashButton() {
 
 function updateBombConversionButtonState() {
   // Always update when called since we call this strategically
+  console.log('🔧 updateBombConversionButtonState called');
+  console.log('Bomb conversion button element:', bombConversionBtn);
+  console.log('Bomb conversion button mobile element:', bombConversionBtnMobile);
+  console.log('Current state - bombSelected:', bombSelected, 'gold:', gold, 'bombConversionCost:', bombConversionCost);
+  
   if (bombConversionBtn) {
     // If a bomb is selected, the button should always be enabled for undo
     if (bombSelected) {
@@ -5439,7 +5553,8 @@ function updateBombConversionButtonState() {
       bombConversionBtn.classList.remove('affordable');
       bombConversionBtn.classList.add('undo-mode');
       bombConversionBtn.title = "Press again to undo bomb selection";
-              bombConversionBtn.querySelector('.powerup-emoji').textContent = "↩️";
+      const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "↩️";
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -5450,7 +5565,8 @@ function updateBombConversionButtonState() {
         bombConversionBtn.classList.remove('affordable');
         bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Next block is already a bomb";
-        bombConversionBtn.querySelector('.powerup-emoji').textContent = "💣";
+        const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "💣";
       } else {
         // Next block is not a bomb, check if player has enough gold
         const hasEnoughGold = gold >= bombConversionCost;
@@ -5466,7 +5582,8 @@ function updateBombConversionButtonState() {
         }
         bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
-        bombConversionBtn.querySelector('.powerup-emoji').textContent = "💣";
+        const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "💣";
       }
     }
     
@@ -5476,13 +5593,15 @@ function updateBombConversionButtonState() {
   
   // Also update mobile button if it exists
   if (bombConversionBtnMobile) {
+    console.log('🔧 Updating mobile bomb conversion button state');
     // If a bomb is selected, the button should always be enabled for undo
     if (bombSelected) {
       bombConversionBtnMobile.disabled = false;
       bombConversionBtnMobile.classList.remove('affordable');
       bombConversionBtnMobile.classList.add('undo-mode');
       bombConversionBtnMobile.title = "Press again to undo bomb selection";
-              bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "↩️";
+      const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "↩️";
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -5493,7 +5612,8 @@ function updateBombConversionButtonState() {
         bombConversionBtnMobile.classList.remove('affordable');
         bombConversionBtnMobile.classList.remove('undo-mode');
         bombConversionBtnMobile.title = "Next block is already a bomb";
-        bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "💣";
+        const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "💣";
       } else {
         // Next block is not a bomb, check if player has enough gold
         const hasEnoughGold = gold >= bombConversionCost;
@@ -5506,7 +5626,8 @@ function updateBombConversionButtonState() {
         }
         bombConversionBtnMobile.classList.remove('undo-mode');
         bombConversionBtnMobile.title = "Convert next block to bomb (press again to undo)";
-        bombConversionBtnMobile.querySelector('.powerup-emoji').textContent = "💣";
+        const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "💣";
       }
     }
   }
@@ -5514,8 +5635,11 @@ function updateBombConversionButtonState() {
 
 function updateTrashButtonState() {
   // Always update when called since we call this strategically
-  console.log(`updateTrashButtonState called - gold: ${gold}, trashButtonCost: ${trashButtonCost}, lastGoldAmount: ${lastGoldAmount}`);
-  console.log(`trashButton element:`, trashButton);
+  console.log(`🔧 updateTrashButtonState called - gold: ${gold}, trashButtonCost: ${trashButtonCost}, lastGoldAmount: ${lastGoldAmount}`);
+  console.log(`Trash button element:`, trashButton);
+  console.log(`Mobile trash button element:`, trashButtonMobile);
+  console.log('Next queue length:', nextQueue.length);
+  
   if (trashButton) {
     const hasEnoughGold = gold >= trashButtonCost;
     console.log(`Trash button - hasEnoughGold: ${hasEnoughGold}, will disable: ${!hasEnoughGold}`);
@@ -5541,6 +5665,7 @@ function updateTrashButtonState() {
   
   // Also update mobile button if it exists
   if (trashButtonMobile) {
+    console.log('🔧 Updating mobile trash button state');
     const hasEnoughGold = gold >= trashButtonCost;
     trashButtonMobile.disabled = !hasEnoughGold;
     
@@ -5617,6 +5742,13 @@ const bombCostElMobile = document.getElementById('bombCostMobile');
 const trashButtonMobile = document.getElementById('trashButtonMobile');
 const trashCostElMobile = document.getElementById('trashCostMobile');
 
+// Log button element status for debugging
+console.log('🔍 Button element status:');
+console.log('Bomb conversion button:', bombConversionBtn ? '✅ Found' : '❌ Not found');
+console.log('Trash button:', trashButton ? '✅ Found' : '❌ Not found');
+console.log('Mobile bomb conversion button:', bombConversionBtnMobile ? '✅ Found' : '❌ Not found');
+console.log('Mobile trash button:', trashButtonMobile ? '✅ Found' : '❌ Not found');
+
 // Debug pane DOM refs
 debugPane = document.getElementById('debugPane');
 debugClose = document.getElementById('debugClose');
@@ -5669,28 +5801,52 @@ function openHelp(){
   helpBtn.classList.remove('help-glow');
 }
 function closeHelp(){ helpModal.classList.add('hidden'); }
-helpBtn.addEventListener('click', openHelp);
-helpClose.addEventListener('click', closeHelp);
-helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+if (helpBtn) {
+  helpBtn.addEventListener('click', openHelp);
+} else {
+  console.log('⚠️ Help button not found');
+}
+
+if (helpClose) {
+  helpClose.addEventListener('click', closeHelp);
+} else {
+  console.log('⚠️ Help close button not found');
+}
+
+if (helpModal) {
+  helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
+} else {
+  console.log('⚠️ Help modal not found');
+}
 
 // Sound button event listener
-soundBtn.addEventListener('click', () => {
-  openSoundControlModal();
-});
+if (soundBtn) {
+  soundBtn.addEventListener('click', () => {
+    openSoundControlModal();
+  });
+} else {
+  console.log('⚠️ Sound button not found');
+}
 
 // Merge sound button event listener
 const mergeSoundBtn = document.getElementById('mergeSoundBtn');
-mergeSoundBtn.addEventListener('click', () => {
-  const usePopSounds = soundManager.toggleMergeSoundType();
-  mergeSoundBtn.textContent = '🎵'; // Always show music note
-  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
-});
+if (mergeSoundBtn) {
+  mergeSoundBtn.addEventListener('click', () => {
+    const usePopSounds = soundManager.toggleMergeSoundType();
+    mergeSoundBtn.textContent = '🎵'; // Always show music note
+    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+  });
+} else {
+  console.log('⚠️ Merge sound button not found');
+}
 
 // Set initial merge sound button state
 if (mergeSoundBtn) {
   const usePopSounds = soundManager.getMergeSoundType();
   mergeSoundBtn.textContent = '🎵'; // Always show music note
   mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+} else {
+  console.log('⚠️ Merge sound button not found for state initialization');
 }
 
 // Set initial sound button state
@@ -5698,18 +5854,41 @@ if (soundBtn) {
   const isMuted = soundManager.getMuteState();
   soundBtn.textContent = isMuted ? '🔇' : '🔊';
   soundBtn.title = 'Sound Controls';
+} else {
+  console.log('⚠️ Sound button not found for state initialization');
 }
-window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) closeHelp(); });
+window.addEventListener('keydown', (e) => { 
+  if (e.key === 'Escape' && helpModal && !helpModal.classList.contains('hidden')) {
+    closeHelp();
+  }
+});
 
 // Bomb conversion button event listener
-bombConversionBtn.addEventListener('click', handleBombConversion);
+if (bombConversionBtn) {
+  bombConversionBtn.addEventListener('click', handleBombConversion);
+} else {
+  console.error('❌ Bomb conversion button not found!');
+}
 
 // Trash button event listener
-trashButton.addEventListener('click', handleTrashButton);
+if (trashButton) {
+  trashButton.addEventListener('click', handleTrashButton);
+} else {
+  console.error('❌ Trash button not found!');
+}
 
 // Mobile button event listeners
-bombConversionBtnMobile.addEventListener('click', handleBombConversion);
-trashButtonMobile.addEventListener('click', handleTrashButton);
+if (bombConversionBtnMobile) {
+  bombConversionBtnMobile.addEventListener('click', handleBombConversion);
+} else {
+  console.error('❌ Mobile bomb conversion button not found!');
+}
+
+if (trashButtonMobile) {
+  trashButtonMobile.addEventListener('click', handleTrashButton);
+} else {
+  console.error('❌ Mobile trash button not found!');
+}
 
 // Game over popup - any click anywhere closes it
 const gameOverButton = document.getElementById('gameOverButton');
@@ -5720,23 +5899,31 @@ if (gameOverButton) {
       gameOverButton.classList.remove('show');
     }
   });
+} else {
+  console.log('⚠️ Game over button not found');
 }
 
 // Add button event listener for new game
 const addBtn = document.getElementById('addBtn');
 if (addBtn) {
   addBtn.addEventListener('click', openNewGameModal);
+} else {
+  console.log('⚠️ Add button not found');
 }
 
 // New game modal button event listeners
 const confirmNewGameBtn = document.getElementById('confirmNewGameBtn');
 if (confirmNewGameBtn) {
   confirmNewGameBtn.addEventListener('click', handleNewGameConfirmation);
+} else {
+  console.log('⚠️ Confirm new game button not found');
 }
 
 const cancelNewGameBtn = document.getElementById('cancelNewGameBtn');
 if (cancelNewGameBtn) {
   cancelNewGameBtn.addEventListener('click', handleNewGameCancel);
+} else {
+  console.log('⚠️ Cancel new game button not found');
 }
 
 // Close new game modal when clicking outside
@@ -5747,6 +5934,8 @@ if (newGameModal) {
       closeNewGameModal();
     }
   });
+} else {
+  console.log('⚠️ New game modal not found');
 }
 
 // Close new game modal with Escape key
@@ -5953,8 +6142,25 @@ function initializeSoundControlModal() {
 }
 
 // Initialize button states
-updateBombConversionButtonState();
-updateTrashButtonState();
+console.log('🔧 Initializing button states...');
+console.log('Bomb conversion button element:', bombConversionBtn);
+console.log('Trash button element:', trashButton);
+console.log('Mobile bomb conversion button element:', bombConversionBtnMobile);
+console.log('Mobile trash button element:', trashButtonMobile);
+
+try {
+  updateBombConversionButtonState();
+  console.log('✅ Bomb conversion button state initialized');
+} catch (error) {
+  console.error('❌ Error initializing bomb conversion button state:', error);
+}
+
+try {
+  updateTrashButtonState();
+  console.log('✅ Trash button state initialized');
+} catch (error) {
+  console.error('❌ Error initializing trash button state:', error);
+}
 
 // Initialize cost displays
 if (bombCostEl) {
@@ -5971,20 +6177,28 @@ if (trashCostElMobile) {
 }
 
 // Debug button wiring
-debugBtn.addEventListener('click', openDebugPane);
+if (debugBtn) {
+  debugBtn.addEventListener('click', openDebugPane);
+} else {
+  console.log('⚠️ Debug button not found');
+}
 
 // Simple title selection detection to reveal debug button
 document.addEventListener('DOMContentLoaded', () => {
   const titleElement = document.querySelector('h1');
   const debugBtn = document.getElementById('debugBtn');
   
-  titleElement.addEventListener('mouseup', () => {
-    const selection = window.getSelection();
-    if (selection.toString().toLowerCase().includes('merge')) {
-      debugBtn.style.display = 'block';
-      console.log('Debug button revealed!');
-    }
-  });
+  if (titleElement && debugBtn) {
+    titleElement.addEventListener('mouseup', () => {
+      const selection = window.getSelection();
+      if (selection.toString().toLowerCase().includes('merge')) {
+        debugBtn.style.display = 'block';
+        console.log('Debug button revealed!');
+      }
+    });
+  } else {
+    console.log('⚠️ Title element or debug button not found for selection detection');
+  }
   
   // Initialize sound control modal after DOM is loaded
   initializeSoundControlModal();
@@ -8131,7 +8345,8 @@ testProbBtn.addEventListener('click', testProbabilityDistribution);
 
 // Cascade test button
 const cascadeTestBtn = document.getElementById('cascadeTestBtn');
-cascadeTestBtn.addEventListener('click', () => {
+if (cascadeTestBtn) {
+  cascadeTestBtn.addEventListener('click', () => {
   // Clear the first column (pole 0)
   poles[0] = [];
   
@@ -8151,12 +8366,17 @@ cascadeTestBtn.addEventListener('click', () => {
   saveGameState();
   
   console.log('Cascade test stack created: 512 → 256 → 128 → 64 → 32 → 16 → 8 → 4 → 2 → 1');
-});
+  });
+} else {
+  console.log('⚠️ Cascade test button not found');
+}
 
 // Probability test modal close button
 const probTestClose = document.getElementById('probTestClose');
 if (probTestClose) {
   probTestClose.addEventListener('click', hideProbabilityTestModal);
+} else {
+  console.log('⚠️ Probability test close button not found');
 }
 
 // Close probability test modal when clicking outside
@@ -8167,6 +8387,8 @@ if (probTestModal) {
       hideProbabilityTestModal();
     }
   });
+} else {
+  console.log('⚠️ Probability test modal not found');
 }
 
 
@@ -8208,11 +8430,15 @@ try {
   console.log('✅ Game display rendered');
   
   // Initialize help button glow for new players
-  if (!hasHelpButtonBeenClicked()) {
-    console.log('🆕 New player detected - adding help button glow');
-    helpBtn.classList.add('help-glow');
+  if (helpBtn) {
+    if (!hasHelpButtonBeenClicked()) {
+      console.log('🆕 New player detected - adding help button glow');
+      helpBtn.classList.add('help-glow');
+    } else {
+      console.log('👤 Returning player - help button glow disabled');
+    }
   } else {
-    console.log('👤 Returning player - help button glow disabled');
+    console.log('⚠️ Help button not found for glow initialization');
   }
   
 
