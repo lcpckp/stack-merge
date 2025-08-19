@@ -835,7 +835,7 @@
     display: flex; 
     justify-content: center; 
     align-items: center;
-    gap: 18px;
+    gap: 18px; 
     margin-top: 18px; 
   }
   
@@ -1447,6 +1447,23 @@
   .block-item[data-value="8192"] { background: #64748b; color: #fff; }
   .block-item[data-value="16384"] { background: #fff; color: #000; }
   
+  /* Largest merge block styling - same colors as block-item */
+  .largest-merge-block[data-value="1"] { background: #cfef08; color: #000; }
+  .largest-merge-block[data-value="2"] { background: #10B981; color: #fff; }
+  .largest-merge-block[data-value="4"] { background: #2563EB; color: #fff; }
+  .largest-merge-block[data-value="8"] { background: #7C3AED; color: #fff; }
+  .largest-merge-block[data-value="16"] { background: #581C87; color: #fff; }
+  .largest-merge-block[data-value="32"] { background: #D946EF; color: #fff; }
+  .largest-merge-block[data-value="64"] { background: #EC4899; color: #fff; }
+  .largest-merge-block[data-value="128"] { background: #e86758; color: #fff; }
+  .largest-merge-block[data-value="256"] { background: #F59E0B; color: #fff; }
+  .largest-merge-block[data-value="512"] { background: #ea580c; color: #fff; }
+  .largest-merge-block[data-value="1024"] { background: #dc2626; color: #fff; }
+  .largest-merge-block[data-value="2048"] { background: #9d174d; color: #fff; }
+  .largest-merge-block[data-value="4096"] { background: #7c2d6d; color: #fff; }
+  .largest-merge-block[data-value="8192"] { background: #64748b; color: #fff; }
+  .largest-merge-block[data-value="16384"] { background: #fff; color: #000; }
+  
   /* Dynamic gold glow effect for white blocks (16384+) in the game */
   .disc.white-block-glow {
     --glow-intensity: 1;
@@ -1570,6 +1587,36 @@
     font-family: var(--font-family);
     text-align: center;
     margin: 0;
+  }
+
+  .largest-merge-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .largest-merge-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: var(--font-family);
+    text-align: center;
+    margin: 0;
+  }
+
+  .largest-merge-block {
+    width: 40px;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    font-family: var(--font-family);
   }
 
   .new-game-btn {
@@ -2750,6 +2797,10 @@
   <!-- Game Over Button Overlay -->
   <div id="gameOverButton" class="game-over-button-overlay">
     <div class="game-over-text">Game Over</div>
+    <div class="largest-merge-info">
+      <div class="largest-merge-label">Largest Merge:</div>
+      <div id="largestMergeBlock" class="largest-merge-block"></div>
+    </div>
   </div>
 
   <!-- New Game Confirmation Modal -->
@@ -3297,10 +3348,13 @@ class SoundManager {
     
     // Log iOS detection status
     if (this.isIOS) {
-      console.log('🍎 iOS device detected - audio will require user interaction');
-      console.log('🍎 iOS audio status:', this.getIOSAudioStatus());
+      this.showDebugMessage('🍎 iOS device detected - audio will require user interaction');
+      this.showDebugMessage('🍎 iOS audio status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+      
+      // Try to aggressively unlock iOS audio
+      this.aggressivelyUnlockIOSAudio();
     } else {
-      console.log('🖥️ Non-iOS device detected - audio should work normally');
+      this.showDebugMessage('🖥️ Non-iOS device detected - audio should work normally');
     }
     
     // Debug localStorage to check for corrupted settings
@@ -3358,14 +3412,54 @@ class SoundManager {
         const silentAudio = new Audio();
         silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
         silentAudio.volume = 0;
-        silentAudio.play().then(() => {
-          console.log('🎵 iOS audio context primed successfully');
-          this.audioContextPrimed = true;
-          console.log('🍎 iOS audio context status:', this.getIOSAudioStatus());
-        }).catch(error => {
-          console.warn('⚠️ iOS audio context priming failed:', error);
-          console.log('🍎 iOS audio context failure status:', this.getIOSAudioStatus());
-        });
+        
+        // Try multiple approaches for iOS audio unlock
+        const unlockAudio = async () => {
+          try {
+            // Method 1: Try to play the silent audio
+            await silentAudio.play();
+            console.log('🎵 iOS audio context primed successfully with silent audio');
+            this.audioContextPrimed = true;
+            console.log('🍎 iOS audio context status:', this.getIOSAudioStatus());
+          } catch (error) {
+            console.warn('⚠️ Silent audio method failed, trying alternative approach:', error);
+            
+            // Method 2: Try creating and playing a real audio file
+            try {
+              const testAudio = new Audio('sounds/click2.wav');
+              testAudio.volume = 0;
+              await testAudio.play();
+              console.log('🎵 iOS audio context primed successfully with real audio file');
+              this.audioContextPrimed = true;
+              console.log('🍎 iOS audio context status:', this.getIOSAudioStatus());
+            } catch (error2) {
+              console.warn('⚠️ Real audio method also failed:', error2);
+              
+              // Method 3: Try using Web Audio API
+              try {
+                if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                  const AudioContextClass = AudioContext || webkitAudioContext;
+                  const audioContext = new AudioContextClass();
+                  await audioContext.resume();
+                  console.log('🎵 iOS audio context primed successfully with Web Audio API');
+                  this.audioContextPrimed = true;
+                  console.log('🍎 iOS audio context status:', this.getIOSAudioStatus());
+                } else {
+                  throw new Error('Web Audio API not available');
+                }
+              } catch (error3) {
+                console.error('❌ All iOS audio context priming methods failed:', error3);
+                console.log('🍎 iOS audio context failure status:', this.getIOSAudioStatus());
+                
+                // As a last resort, mark as primed and hope for the best
+                console.warn('⚠️ Marking audio context as primed anyway - this may not work');
+                this.audioContextPrimed = true;
+              }
+            }
+          }
+        };
+        
+        unlockAudio();
       } else {
         // For non-iOS, just mark as primed
         this.audioContextPrimed = true;
@@ -3387,6 +3481,53 @@ class SoundManager {
         console.log('🍎 iOS audio unlocked! Audio status:', this.getIOSAudioStatus());
       }
     }
+  }
+  
+  // Aggressively try to unlock iOS audio (called during initialization)
+  aggressivelyUnlockIOSAudio() {
+    if (!this.isIOS) return;
+    
+    this.showDebugMessage('🍎 Aggressively attempting to unlock iOS audio...');
+    
+    // Try multiple methods to unlock audio
+    const methods = [
+      // Method 1: Silent audio
+      () => {
+        const audio = new Audio();
+        audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+        audio.volume = 0;
+        return audio.play();
+      },
+      // Method 2: Real audio file
+      () => {
+        const audio = new Audio('sounds/click2.wav');
+        audio.volume = 0;
+        return audio.play();
+      },
+      // Method 3: Web Audio API
+      () => {
+        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+          const AudioContextClass = AudioContext || webkitAudioContext;
+          const audioContext = new AudioContextClass();
+          return audioContext.resume();
+        }
+        throw new Error('Web Audio API not available');
+      }
+    ];
+    
+    // Try each method
+    methods.forEach((method, index) => {
+      setTimeout(() => {
+        method().then(() => {
+          this.showDebugMessage(`🍎 iOS audio unlock method ${index + 1} succeeded!`);
+          this.audioContextPrimed = true;
+          this.userInteracted = true;
+          this.showDebugMessage('🍎 iOS audio aggressively unlocked! Status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+        }).catch(error => {
+          this.showDebugMessage(`🍎 iOS audio unlock method ${index + 1} failed: ${error.message}`);
+        });
+      }, index * 1000); // Try each method 1 second apart
+    });
   }
   
   // Check if audio can be played on this device
@@ -3414,36 +3555,177 @@ class SoundManager {
     };
   }
   
-  // Test iOS audio system
-  testIOSAudio() {
+  // Force unlock iOS audio (for testing purposes)
+  forceUnlockIOSAudio() {
     if (!this.isIOS) {
-      console.log('🖥️ Not an iOS device, no need to test iOS audio');
+      this.showDebugMessage('🖥️ Not an iOS device, no need to force unlock');
       return;
     }
     
-    console.log('🍎 Testing iOS audio system...');
-    console.log('🍎 Current status:', this.getIOSAudioStatus());
+    this.showDebugMessage('🍎 Force unlocking iOS audio...');
+    
+    // Reset flags
+    this.audioContextPrimed = false;
+    this.userInteracted = true;
+    
+    // Try aggressive unlock
+    this.aggressivelyUnlockIOSAudio();
+    
+    // Also try immediate unlock
+    setTimeout(() => {
+      this.showDebugMessage('🍎 Attempting immediate audio unlock...');
+      this.primeAudioContext();
+    }, 500);
+    
+    // Check status after a delay
+    setTimeout(() => {
+      this.showDebugMessage('🍎 Force unlock complete. Final status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+    }, 3000);
+  }
+  
+  // Show debug message in visual window
+  showDebugMessage(message) {
+    console.log(message); // Still log to console
+    
+    // Create or update debug window
+    let debugWindow = document.getElementById('iosDebugWindow');
+    if (!debugWindow) {
+      debugWindow = document.createElement('div');
+      debugWindow.id = 'iosDebugWindow';
+      debugWindow.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        background: #1f2937;
+        border: 2px solid #8b5cf6;
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        font-family: monospace;
+        font-size: 14px;
+        z-index: 10000;
+        overflow-y: auto;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      `;
+      
+      // Add close button
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕ Close';
+      closeBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ef4444;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      `;
+      closeBtn.onclick = () => debugWindow.remove();
+      debugWindow.appendChild(closeBtn);
+      
+      // Add title
+      const title = document.createElement('h3');
+      title.textContent = '🍎 iOS Audio Debug Window';
+      title.style.cssText = `
+        margin: 0 0 15px 0;
+        color: #8b5cf6;
+        font-size: 18px;
+        text-align: center;
+      `;
+      debugWindow.appendChild(title);
+      
+      // Add content area
+      const content = document.createElement('div');
+      content.id = 'iosDebugContent';
+      content.style.cssText = `
+        white-space: pre-wrap;
+        line-height: 1.4;
+        margin-top: 10px;
+      `;
+      content.innerHTML = '🍎 iOS Audio Debug Started...\n';
+      debugWindow.appendChild(content);
+      
+      document.body.appendChild(debugWindow);
+    }
+    
+    // Add message to content
+    const content = document.getElementById('iosDebugContent');
+    if (content) {
+      const timestamp = new Date().toLocaleTimeString();
+      content.innerHTML += `[${timestamp}] ${message}\n`;
+      content.scrollTop = content.scrollHeight; // Auto-scroll to bottom
+    }
+  }
+  
+  // Clear debug window
+  clearDebugWindow() {
+    const content = document.getElementById('iosDebugContent');
+    if (content) {
+      content.innerHTML = '';
+    }
+  }
+  
+  // Test iOS audio system
+  testIOSAudio() {
+    if (!this.isIOS) {
+      this.showDebugMessage('🖥️ Not an iOS device, no need to test iOS audio');
+      return;
+    }
+    
+    this.showDebugMessage('🍎 Testing iOS audio system...');
+    this.showDebugMessage('🍎 Current status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
     
     if (!this.userInteracted) {
-      console.log('🍎 iOS audio test: User has not interacted yet - this is normal');
-      console.log('🍎 iOS audio test: Try clicking/touching any button or the game area');
+      this.showDebugMessage('🍎 iOS audio test: User has not interacted yet - this is normal');
+      this.showDebugMessage('🍎 iOS audio test: Try clicking/touching any button or the game area');
       return;
     }
     
     if (!this.audioContextPrimed) {
-      console.log('🍎 iOS audio test: User has interacted but audio context not primed');
-      console.log('🍎 iOS audio test: This might indicate an issue with audio context priming');
+      this.showDebugMessage('🍎 iOS audio test: User has interacted but audio context not primed');
+      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with audio context priming');
+      
+      // Try to prime the audio context again
+      this.showDebugMessage('🍎 iOS audio test: Attempting to prime audio context again...');
+      this.primeAudioContext();
       return;
     }
     
     if (!this.canPlayAudio()) {
-      console.log('🍎 iOS audio test: Audio should be ready but canPlayAudio() returns false');
-      console.log('🍎 iOS audio test: This might indicate an issue with the audio system');
+      this.showDebugMessage('🍎 iOS audio test: Audio should be ready but canPlayAudio() returns false');
+      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with the audio system');
       return;
     }
     
-    console.log('🍎 iOS audio test: All checks passed! Audio should work');
-    console.log('🍎 iOS audio test: Try playing a sound to verify');
+    this.showDebugMessage('🍎 iOS audio test: All checks passed! Audio should work');
+    this.showDebugMessage('🍎 iOS audio test: Now testing actual sound playback...');
+    
+    // Actually try to play sounds to test if they work
+    try {
+      this.showDebugMessage('🍎 iOS audio test: Testing drop sound...');
+      this.playDropSound(1);
+      
+      setTimeout(() => {
+        this.showDebugMessage('🍎 iOS audio test: Testing merge sound...');
+        this.playMergeSound(2);
+      }, 500);
+      
+      setTimeout(() => {
+        this.showDebugMessage('🍎 iOS audio test: Testing coin sound...');
+        this.playCoinSound();
+      }, 1000);
+      
+      this.showDebugMessage('🍎 iOS audio test: Sound tests initiated. Check debug window for results.');
+    } catch (error) {
+      this.showDebugMessage('🍎 iOS audio test: Error during sound testing: ' + error.message);
+    }
   }
   
   // Debug localStorage to check for corrupted settings
@@ -3670,7 +3952,7 @@ class SoundManager {
 
   
 
-  
+
   // Set master volume (0.0 to 1.0)
   setVolume(volume) {
     this.volume = Math.max(0, Math.min(1, volume));
@@ -3911,10 +4193,6 @@ class SoundManager {
       // Silent fail - no console spam
     }
   }
-  
-
-  
-
   
 
   
@@ -4215,20 +4493,20 @@ function saveGameState() {
     
     const gameState = {
       poles: poles,
-      score: score,
-      gold: gold,
-      blocksDropped: blocksDropped,
-      currentTargetBlockSize: currentTargetBlockSize,
-      currentStage: currentStage,
-      weights: weights,
-      probabilities: probabilities,
-      nextQueue: nextQueue,
-      bombConversionCost: bombConversionCost,
-      trashButtonCost: trashButtonCost,
-      bombConversionPresses: bombConversionPresses,
-      trashButtonPresses: trashButtonPresses,
-      bombSelected: bombSelected,
-      previousBombCost: previousBombCost,
+      score: score || 0,
+      gold: gold || 0,
+      blocksDropped: blocksDropped || 0,
+      currentTargetBlockSize: currentTargetBlockSize || STARTING_BLOCK_SIZE,
+      currentStage: currentStage || 1,
+      weights: weights || [1, 2],
+      probabilities: probabilities || [0.5, 0.5],
+      nextQueue: nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()],
+      bombConversionCost: bombConversionCost || 25,
+      trashButtonCost: trashButtonCost || 25,
+      bombConversionPresses: bombConversionPresses || 0,
+      trashButtonPresses: trashButtonPresses || 0,
+      bombSelected: bombSelected || false,
+      previousBombCost: previousBombCost || bombConversionCost,
       usePopMergeSounds: soundManager.getMergeSoundType(),
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
@@ -5991,7 +6269,16 @@ function initializeSoundControlModal() {
     testIOSAudioBtn.addEventListener('click', () => {
       if (soundManager) {
         soundManager.markUserInteraction();
-        soundManager.testIOSAudio();
+        console.log('🍎 iOS Audio Test Button clicked');
+        console.log('🍎 Current iOS audio status:', soundManager.getIOSAudioStatus());
+        
+        // First try to force unlock audio
+        soundManager.forceUnlockIOSAudio();
+        
+        // Then run the test after a delay
+        setTimeout(() => {
+          soundManager.testIOSAudio();
+        }, 1000);
       }
     });
   }
@@ -7320,10 +7607,10 @@ async function animateMergeCascade(index){
     const isBombMerge = a.bomb || b.bomb;
     poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge });
     
-    // Increment merge count for cascading sound effects
+    // Increment merge count for cascade sound effects
     mergeCount++;
     
-    // Set the merge count for cascading sound effects
+    // Set the merge count for cascade sound effects
     soundManager.setCurrentMergeCount(mergeCount);
     console.log(`🔗 Cascade merge #${mergeCount}: Setting merge count for sound effects`);
     
@@ -7443,7 +7730,20 @@ function showGameOver(){
     }, 200);
   }
   
-      // Add glowing effect to the ➕ button to guide user to start new game
+  // Calculate and display the largest merge block
+  const largestMergeBlock = document.getElementById('largestMergeBlock');
+  if (largestMergeBlock && weights && weights.length > 0) {
+    const highestBlock = Math.max(...weights);
+    largestMergeBlock.textContent = highestBlock;
+    largestMergeBlock.setAttribute('data-value', highestBlock);
+    
+    // Handle large numbers with k notation
+    if (highestBlock >= 1000) {
+      largestMergeBlock.textContent = (highestBlock / 1000).toFixed(1) + 'k';
+    }
+  }
+  
+  // Add glowing effect to the ➕ button to guide user to start new game
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
     addBtn.classList.add('game-over-glow');
@@ -7466,6 +7766,13 @@ function resetGame(isFreshGame = true){
   const gameOverButton = document.getElementById('gameOverButton');
   if (gameOverButton) {
     gameOverButton.classList.remove('show');
+  }
+  
+  // Clear the largest merge block display
+  const largestMergeBlock = document.getElementById('largestMergeBlock');
+  if (largestMergeBlock) {
+    largestMergeBlock.textContent = '';
+    largestMergeBlock.removeAttribute('data-value');
   }
   
       // Remove glowing effect from the ➕ button
