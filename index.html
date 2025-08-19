@@ -3279,12 +3279,10 @@
 // Sound Manager for Stack Merge Game
 class SoundManager {
   constructor() {
-    this.audioContext = null;
-    this.masterGain = null;
     this.isMuted = false;
-    this.usePopMergeSounds = true; // true = pop sounds (default), false = musical sounds
+    this.usePopMergeSounds = true; // true = cork sounds (default), false = musical sounds
     this.volume = 0.3; // Default volume (30%)
-    this.initialized = false;
+    this.initialized = true; // Always initialized since we use simple audio files
     
     // Individual sound type volumes (0-5 scale, converted to 0.0-1.0 internally)
     this.soundVolumes = {
@@ -3298,9 +3296,8 @@ class SoundManager {
     // Debug localStorage to check for corrupted settings
     this.debugLocalStorage();
     
-    // Initialize audio context on first user interaction
-    this.initAudioContext = this.initAudioContext.bind(this);
-    this.addAudioInitListeners();
+    // Preload audio files for better performance
+    this.preloadAudioFiles();
   }
   
   // Debug localStorage to check for corrupted settings
@@ -3350,88 +3347,25 @@ class SoundManager {
     }
   }
   
-  addAudioInitListeners() {
-    // Add listeners for user interaction to initialize audio context
-    const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
-    initEvents.forEach(event => {
-      document.addEventListener(event, this.initAudioContext, { once: true, passive: true });
-    });
-  }
-  
-  initAudioContext() {
-    if (this.initialized) return;
-    
+  // Preload audio files for better performance
+  preloadAudioFiles() {
     try {
-      // Create audio context
-      this.audioContext = new AudioContext();
+      // Preload cork sounds (0-9)
+      for (let i = 0; i <= 9; i++) {
+        const corkAudio = new Audio(`sounds/cork${i}.wav`);
+        corkAudio.load();
+      }
       
-      // Create master gain node for volume control
-      this.masterGain = this.audioContext.createGain();
-      this.masterGain.connect(this.audioContext.destination);
-      this.masterGain.gain.value = this.volume;
-      
-      this.initialized = true;
-      console.log('🎵 Sound system initialized successfully');
-      
-      // Preload bomb audio for better performance
+      // Preload other sound files
       this.preloadBombAudio();
-      
-      // Preload purchase audio for better performance
       this.preloadPurchaseAudio();
-      
-      // Preload stage up audio for better performance
       this.preloadStageUpAudio();
-      
-      // Preload coin audio for better performance
       this.preloadCoinAudio();
       
-      // Remove init listeners since we're now initialized
-      this.removeAudioInitListeners();
-      
-      // Audio context monitoring
-      this.setupAudioMonitoring();
+      console.log('🎵 Audio files preloaded successfully');
       
     } catch (error) {
-      console.error('❌ Failed to initialize audio context:', error);
-    }
-  }
-  
-  // Audio context monitoring
-  setupAudioMonitoring() {
-    if (!this.audioContext) return;
-    
-    // Monitor audio context state changes and auto-resume if suspended
-    this.audioContext.addEventListener('statechange', () => {
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-    });
-    
-    // Resume audio context when page becomes visible or gains focus
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-    });
-    
-    window.addEventListener('focus', () => {
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-      }
-    });
-  }
-  
-  removeAudioInitListeners() {
-    const initEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
-    initEvents.forEach(event => {
-      document.removeEventListener(event, this.initAudioContext);
-    });
-  }
-  
-  // Ensure audio context is running (called by new game functions)
-  ensureAudioContextRunning() {
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
+      console.error('❌ Failed to preload audio files:', error);
     }
   }
   
@@ -3466,326 +3400,91 @@ class SoundManager {
     const actualVolume = this.getActualVolume('merge');
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
-    // Ensure audio context is running before playing merge sounds
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
-    }
-    
-    // Choose between musical and pop-like sounds based on user preference
+    // Choose between musical and cork-like sounds based on user preference
     if (this.usePopMergeSounds) {
-      console.log('💨 Playing pop merge sound');
-      this.playPopMergeSound(blockValue, actualVolume);
+      console.log('🍾 Playing cork merge sound');
+      this.playCorkMergeSound(blockValue, actualVolume);
     } else {
       console.log('🎵 Playing musical merge sound');
       this.playMusicalMergeSound(blockValue, actualVolume);
     }
   }
   
-  // Generate a beautiful, physical bell sound like Christmas music
+  // Play musical merge sound effect using audio files
   playMusicalMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
-    // Ensure audio context is running
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
-    }
-    
     try {
-      // Create gain node for volume control
-      const gainNode = this.audioContext.createGain();
-      gainNode.connect(this.masterGain);
+      // Get the merge count from the current cascade
+      const mergeCount = this.getCurrentMergeCount();
       
-      // Apply individual sound type volume
-      gainNode.gain.value = volume;
+      // For musical sounds, we'll use the same cork system but with different audio files
+      // or we could use the same cork system but with different audio files
+      let soundNumber = Math.min(mergeCount - 1, 9);
       
-      // Calculate frequency based on block value using a beautiful major scale
-      // Map block values to create a Christmas bell-like progression
-      const getFrequencyForBlock = (value) => {
-        // Chromatic scale: moves up in half-steps (semitones) for smooth progression
-        // Uses A4 (440Hz) as reference and moves up in 12-tone equal temperament
-        const bellScale = {
-          1: 440.00,   // A4 (reference pitch - bright start)
-          2: 466.16,   // A#4/Bb4 (half-step up)
-          4: 493.88,   // B4 (half-step up)
-          8: 523.25,   // C5 (half-step up)
-          16: 554.37,  // C#5/Db5 (half-step up)
-          32: 587.33,  // D5 (half-step up)
-          64: 622.25,  // D#5/Eb5 (half-step up)
-          128: 659.25, // E5 (half-step up)
-          256: 698.46, // F5 (half-step up)
-          512: 739.99, // F#5/Gb5 (half-step up)
-          1024: 783.99, // G5 (half-step up)
-          2048: 830.61, // G#5/Ab5 (half-step up)
-          4096: 880.00, // A5 (octave up - half-step progression)
-          8192: 932.33, // A#5/Bb5 (half-step up)
-          16384: 987.77, // B5 (half-step up)
-          32768: 1046.50, // C6 (half-step up)
-          65536: 1108.73, // C#6/Db6 (half-step up)
-          131072: 1174.66, // D6 (half-step up)
-          262144: 1244.51, // D#6/Eb6 (half-step up)
-          524288: 1318.51, // E6 (half-step up)
-          1048576: 1396.91, // F6 (half-step up)
-          2097152: 1479.98, // F#6/Gb6 (half-step up)
-          4194304: 1567.98, // G6 (half-step up)
-          8388608: 1661.22, // G#6/Ab6 (half-step up)
-          16777216: 1760.00, // A6 (octave up - half-step progression)
-          33554432: 1864.66, // A#6/Bb6 (half-step up)
-          67108864: 1975.53, // B6 (half-step up)
-          134217728: 2093.00, // C7 (half-step up)
-          268435456: 2217.46, // C#7/Db7 (half-step up)
-          536870912: 2349.32, // D7 (half-step up)
-          1073741824: 2489.02, // D#7/Eb7 (half-step up)
-          2147483648: 2637.02, // E7 (half-step up)
-          4294967296: 2793.83, // F7 (half-step up)
-          8589934592: 2959.96, // F#7/Gb7 (half-step up)
-          17179869184: 3135.96, // G7 (half-step up)
-          34359738368: 3322.44, // G#7/Ab7 (half-step up)
-          68719476736: 3520.00, // A7 (octave up - half-step progression)
-          137438953472: 3729.31, // A#7/Bb7 (half-step up)
-          274877906944: 3951.07, // B7 (half-step up)
-          549755813888: 4186.00, // C8 (half-step up)
-          1099511627776: 4434.92, // C#8/Db8 (half-step up)
-          2199023255552: 4698.64, // D8 (half-step up)
-          4398046511104: 4978.03, // D#8/Eb8 (half-step up)
-          8796093022208: 5274.04, // E8 (half-step up)
-          17592186044416: 5587.66, // F8 (half-step up)
-          35184372088832: 5919.91, // F#8/Gb8 (half-step up)
-          70368744177664: 6271.93, // G8 (half-step up)
-          140737488355328: 6644.88, // G#8/Ab8 (half-step up)
-          281474976710656: 7040.00, // A8 (octave up - half-step progression)
-          562949953421312: 7458.62, // A#8/Bb8 (half-step up)
-          1125899906842624: 7902.13, // B8 (half-step up)
-          2251799813685248: 8372.00, // C9 (half-step up)
-          4503599627370496: 8869.84, // C#9/Db9 (half-step up)
-          9007199254740992: 9397.27, // D9 (half-step up)
-          18014398509481984: 9956.06, // D#9/Eb9 (half-step up)
-          36028797018963968: 10548.08, // E9 (half-step up)
-          72057594037927936: 11175.32, // F9 (half-step up)
-          144115188075855872: 11839.82, // F#9/Gb9 (half-step up)
-          288230376151711744: 12543.85, // G9 (half-step up)
-          576460752303423488: 13289.75, // G#9/Ab9 (half-step up)
-          1152921504606846976: 14080.00, // A9 (octave up - half-step progression)
-          2305843009213693952: 14917.24, // A#9/Bb9 (half-step up)
-          4611686018427387904: 15804.27, // B9 (half-step up)
-          9223372036854775808: 16744.00, // C10 (half-step up - final progression)
-        };
-        
-        // Return the mapped frequency or fallback to a calculated frequency for very large values
-        if (bellScale[value]) {
-          return bellScale[value];
-        } else {
-          // For extremely large values beyond our scale, use chromatic octave calculation
-          const octave = Math.floor(Math.log2(value) / 12); // 12 notes per chromatic scale
-          const baseNote = value % 12;
-          const baseFreq = bellScale[Math.pow(2, baseNote)] || 440.00;
-          return baseFreq * Math.pow(2, octave);
-        }
-      };
+      // Create audio element for the musical sound (using cork sounds for now)
+      const musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
+      musicalAudio.volume = volume;
       
-      const frequency = getFrequencyForBlock(blockValue);
+      // Play the sound
+      musicalAudio.play().catch(error => {
+        console.error('❌ Failed to play musical merge sound:', error);
+      });
       
-      // Create a crystal clear, pure bell sound
-      const mainOsc = this.audioContext.createOscillator();
-      const harmonicOsc1 = this.audioContext.createOscillator();
-      
-      // Main bell tone - pure sine wave for crystal clarity
-      mainOsc.type = 'sine'; // Pure sine wave for clear, bell-like sound
-      mainOsc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
-      
-      // Single harmonic - octave above for clear resonance
-      harmonicOsc1.type = 'sine';
-      harmonicOsc1.frequency.setValueAtTime(frequency * 2, this.audioContext.currentTime);
-      
-      // Create separate gain nodes for different layers
-      const mainGain = this.audioContext.createGain();
-      const harmonicGain1 = this.audioContext.createGain();
-      
-      // Connect the audio chain
-      mainOsc.connect(mainGain);
-      mainGain.connect(gainNode);
-      
-      harmonicOsc1.connect(harmonicGain1);
-      harmonicGain1.connect(gainNode);
-      
-      // Volume envelope: crystal clear bell with natural decay (scaled by volume)
-      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.001); // Use volume parameter
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0); // Natural bell decay
-      
-      // Separate gain control for clear bell balance (scaled by volume)
-      mainGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      mainGain.gain.linearRampToValueAtTime(volume * 0.9, this.audioContext.currentTime + 0.001); // Scale main tone by volume
-      mainGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
-      
-      harmonicGain1.gain.setValueAtTime(0, this.audioContext.currentTime);
-      harmonicGain1.gain.linearRampToValueAtTime(volume * 0.3, this.audioContext.currentTime + 0.001); // Scale harmonic by volume
-      harmonicGain1.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1.0);
-      
-      // Start both oscillators
-      mainOsc.start(this.audioContext.currentTime);
-      harmonicOsc1.start(this.audioContext.currentTime);
-      
-      // Stop after clear bell resonance duration
-      mainOsc.stop(this.audioContext.currentTime + 1.0);
-      harmonicOsc1.stop(this.audioContext.currentTime + 1.0);
-      
-      // Clean up nodes after playback
-      const cleanup = () => {
-        mainOsc.disconnect();
-        harmonicOsc1.disconnect();
-        mainGain.disconnect();
-        harmonicGain1.disconnect();
-        gainNode.disconnect();
-      };
-      
-      // Set timeout to ensure cleanup happens
-      setTimeout(cleanup, 1050);
-      
-      // Log successful sound playback (only in development)
-      if (console && console.log) {
-        console.log(`🔔 Beautiful bell merge sound played successfully for block value ${blockValue} at ${Math.round(frequency)} Hz`);
-      }
+      console.log(`🎵 Playing musical sound for merge ${mergeCount}`);
       
     } catch (error) {
-      console.error('❌ Failed to play merge sound:', error);
+      console.error('❌ Failed to create musical merge sound:', error);
     }
   }
   
-  // Generate a satisfying pop merge sound effect with frequency variation based on block value
-  playPopMergeSound(blockValue = 1, volume = 1.0) {
+  // Play cork merge sound effect using audio files
+  playCorkMergeSound(blockValue = 1, volume = 1.0) {
     if (!this.initialized || this.isMuted) return;
     
-    // Ensure audio context is running
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
-    }
-    
     try {
-      // Create gain node for volume control
-      const gainNode = this.audioContext.createGain();
-      gainNode.connect(this.masterGain);
+      // Get the merge count from the current cascade
+      const mergeCount = this.getCurrentMergeCount();
       
-      // Apply individual sound type volume with base boost for merge sounds
-      const baseVolume = volume * 2.5; // 2.5x base boost for merge sounds
-      gainNode.gain.value = baseVolume;
+      // Determine which cork sound to use (0-9, with 9+ repeating cork9)
+      let corkNumber = Math.min(mergeCount - 1, 9);
       
-      // Calculate frequency based on block value - higher blocks = higher pitch
-      const getPopFrequency = (value) => {
-        // Map block values to create a satisfying pitch progression
-        // Start with lower frequencies for small blocks, higher for big blocks
-        const baseFreq = 200; // Base frequency for value 1
-        const freqMultiplier = Math.log2(value) * 0.3 + 1; // Logarithmic scaling
-        return Math.min(baseFreq * freqMultiplier, 1200); // Cap at 1200Hz to avoid harshness
-      };
+      // Create audio element for the cork sound
+      const corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
+      corkAudio.volume = volume;
       
-      const frequency = getPopFrequency(blockValue);
+      // Play the sound
+      corkAudio.play().catch(error => {
+        console.error('❌ Failed to play cork merge sound:', error);
+      });
       
-      // Create a pop sound using a combination of oscillators and noise
-      const mainOsc = this.audioContext.createOscillator();
-      const noiseSource = this.audioContext.createBufferSource();
-      
-      // Main oscillator for the pop tone (more subtle)
-      mainOsc.type = 'sine';
-      mainOsc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
-      
-      // Create a more percussive noise burst for the "pop" character
-      const noiseBuffer = this.audioContext.createBuffer(1, 256, this.audioContext.sampleRate); // Shorter for more percussive
-      const noiseData = noiseBuffer.getChannelData(0);
-      
-      // Fill buffer with more aggressive, percussive noise
-      for (let i = 0; i < noiseData.length; i++) {
-        // Create a sharp, percussive noise envelope
-        const envelope = Math.exp(-i * 0.08); // Much faster decay for sharpness
-        noiseData[i] = (Math.random() * 2 - 1) * envelope * 0.8; // Increased volume for more impact
-      }
-      
-      noiseSource.buffer = noiseBuffer;
-      
-      // Create filters for more percussive pop character
-      const lowPassFilter = this.audioContext.createBiquadFilter();
-      lowPassFilter.type = 'lowpass';
-      lowPassFilter.frequency.setValueAtTime(frequency * 3, this.audioContext.currentTime); // Higher cutoff for more high-end
-      lowPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Lower Q for wider passband
-      
-      const highPassFilter = this.audioContext.createBiquadFilter();
-      highPassFilter.type = 'highpass';
-      highPassFilter.frequency.setValueAtTime(frequency * 0.3, this.audioContext.currentTime); // Lower cutoff for more bass
-      highPassFilter.Q.setValueAtTime(0.3, this.audioContext.currentTime); // Lower Q for wider passband
-      
-      // Create separate gain nodes for tone vs noise
-      const toneGain = this.audioContext.createGain();
-      const noiseGain = this.audioContext.createGain();
-      
-      // Connect the audio chain with separate gain control
-      mainOsc.connect(toneGain);
-      toneGain.connect(gainNode);
-      
-      noiseSource.connect(lowPassFilter);
-      lowPassFilter.connect(highPassFilter);
-      highPassFilter.connect(noiseGain);
-      noiseGain.connect(gainNode);
-      
-      // Volume envelope: very quick attack, fast decay for pop (scaled by baseVolume)
-      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(baseVolume, this.audioContext.currentTime + 0.001); // Use baseVolume parameter
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06); // Faster decay for more percussive
-      
-      // Separate gain control for tone vs noise (scaled by baseVolume)
-      toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      toneGain.gain.linearRampToValueAtTime(baseVolume * 0.15, this.audioContext.currentTime + 0.001); // Scale tone by baseVolume
-      toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
-      
-      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(baseVolume * 0.8, this.audioContext.currentTime + 0.001); // Scale noise by baseVolume
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
-      
-      // Start both sources
-      mainOsc.start(this.audioContext.currentTime);
-      noiseSource.start(this.audioContext.currentTime);
-      
-      // Stop after shorter duration for more percussive pop
-      mainOsc.stop(this.audioContext.currentTime + 0.06);
-      noiseSource.stop(this.audioContext.currentTime + 0.06);
-      
-      // Clean up nodes after playback
-      const cleanup = () => {
-        mainOsc.disconnect();
-        noiseSource.disconnect();
-        lowPassFilter.disconnect();
-        highPassFilter.disconnect();
-        toneGain.disconnect();
-        noiseGain.disconnect();
-        gainNode.disconnect();
-      };
-      
-      // Set timeout to ensure cleanup happens
-      setTimeout(cleanup, 80);
-      
-      // Log successful sound playback (only in development)
-      if (console && console.log) {
-        console.log(`💨 Pop merge sound played successfully for block value ${blockValue} at ${Math.round(frequency)} Hz`);
-      }
+      console.log(`🍾 Playing cork${corkNumber}.wav for merge ${mergeCount}`);
       
     } catch (error) {
-      console.error('❌ Failed to play pop merge sound:', error);
+      console.error('❌ Failed to create cork merge sound:', error);
     }
+  }
+  
+  // Get the current merge count for cascading sounds
+  getCurrentMergeCount() {
+    // This will be set by the merge cascade function
+    return this.currentMergeCount || 1;
+  }
+  
+  // Set the current merge count for cascading sounds
+  setCurrentMergeCount(count) {
+    this.currentMergeCount = count;
   }
   
   // Set master volume (0.0 to 1.0)
   setVolume(volume) {
     this.volume = Math.max(0, Math.min(1, volume));
-    if (this.masterGain) {
-      this.masterGain.gain.value = this.volume;
-    }
     this.saveSoundSettings();
   }
   
   // Toggle mute state
   toggleMute() {
     this.isMuted = !this.isMuted;
-    if (this.masterGain) {
-      this.masterGain.gain.value = this.isMuted ? 0 : this.volume;
-    }
     this.saveSoundSettings();
     return this.isMuted;
   }
@@ -3802,10 +3501,10 @@ class SoundManager {
   
 
   
-  // Toggle between musical and pop merge sounds
+  // Toggle between musical and cork merge sounds
   toggleMergeSoundType() {
     this.usePopMergeSounds = !this.usePopMergeSounds;
-    console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'pop' : 'musical'} merge sounds`);
+    console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'cork' : 'musical'} merge sounds`);
     this.saveSoundSettings();
     return this.usePopMergeSounds;
   }
@@ -4644,7 +4343,7 @@ function restoreGameState(gameState) {
     if (mergeSoundBtn) {
       const usePopSounds = soundManager.getMergeSoundType();
       mergeSoundBtn.textContent = '🎵'; // Always show music note
-      mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+      mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
     }
     
     // Update sound button to reflect restored mute state
@@ -5807,7 +5506,6 @@ const grantScoreBtn = document.getElementById('grantScoreBtn');
 debugAiToggle = document.getElementById('debugAiToggle');
 debugSpeedSlider = document.getElementById('debugSpeedSlider');
 debugSpeedLabel = document.getElementById('debugSpeedLabel');
-
 // Emergency reset keyboard shortcut (Ctrl+R)
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'r') {
@@ -5869,9 +5567,9 @@ if (soundBtn) {
 const mergeSoundBtn = document.getElementById('mergeSoundBtn');
 if (mergeSoundBtn) {
   mergeSoundBtn.addEventListener('click', () => {
-    const usePopSounds = soundManager.toggleMergeSoundType();
-    mergeSoundBtn.textContent = '🎵'; // Always show music note
-    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+      const usePopSounds = soundManager.toggleMergeSoundType();
+  mergeSoundBtn.textContent = '🎵'; // Always show music note
+  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
   });
 } else {
   console.log('⚠️ Merge sound button not found');
@@ -5881,7 +5579,7 @@ if (mergeSoundBtn) {
 if (mergeSoundBtn) {
   const usePopSounds = soundManager.getMergeSoundType();
   mergeSoundBtn.textContent = '🎵'; // Always show music note
-  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
 } else {
   console.log('⚠️ Merge sound button not found for state initialization');
 }
@@ -6736,7 +6434,7 @@ function updateDebugMuteStatus() {
   if (mergeSoundBtn) {
     const usePopSounds = soundManager.getMergeSoundType();
     mergeSoundBtn.textContent = '🎵'; // Always show music note
-    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
   }
 }
 
@@ -7470,11 +7168,16 @@ async function animateMergeCascade(index){
     const isBombMerge = a.bomb || b.bomb;
     poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge });
     
+    // Increment merge count for cascading sound effects
+    mergeCount++;
+    
+    // Set the merge count for cascading sound effects
+    soundManager.setCurrentMergeCount(mergeCount);
+    
     // Play merge sound effect for the newly created block
     soundManager.playMergeSound(newW);
     
     // Earn gold for this merge (increases by 1 for each merge in the cascade, multiplied by current stage)
-    mergeCount++;
     const baseGoldEarned = mergeCount;
     // Stage 1: 1x multiplier, Stage 2+: 10x multiplier
     const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
@@ -8176,7 +7879,7 @@ const initMergeSoundBtn = document.getElementById('mergeBtn');
 if (initMergeSoundBtn) {
   const usePopSounds = soundManager.getMergeSoundType();
   initMergeSoundBtn.textContent = '🎵'; // Always show music note
-  initMergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to pop merge sounds';
+  initMergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
 }
 
 
@@ -8488,3 +8191,4 @@ try {
 </script>
 </body>
 </html>
+
