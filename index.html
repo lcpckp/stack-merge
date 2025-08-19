@@ -2839,6 +2839,9 @@
         <button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px;">
           Reset Audio Settings
         </button>
+        <button id="testIOSAudioBtn" class="sound-control-mute" style="background: #8b5cf6; border-color: #7c3aed; min-width: 120px; margin-top: 8px;">
+          Test iOS Audio
+        </button>
       </div>
     </div>
   </div>
@@ -3287,6 +3290,19 @@ class SoundManager {
       other: 3      // Other sounds (stage up, etc.)
     };
     
+    // iOS detection and audio context management
+    this.isIOS = this.detectIOS();
+    this.audioContextPrimed = false;
+    this.userInteracted = false;
+    
+    // Log iOS detection status
+    if (this.isIOS) {
+      console.log('🍎 iOS device detected - audio will require user interaction');
+      console.log('🍎 iOS audio status:', this.getIOSAudioStatus());
+    } else {
+      console.log('🖥️ Non-iOS device detected - audio should work normally');
+    }
+    
     // Debug localStorage to check for corrupted settings
     this.debugLocalStorage();
     
@@ -3297,6 +3313,12 @@ class SoundManager {
     this.waitForSoundsReady().then(() => {
       console.log('🎵 Sound system fully initialized and ready!');
       console.log('🎵 Sound system status:', this.getSoundSystemStatus());
+      
+      // Log iOS-specific status if this is an iOS device
+      if (this.isIOS) {
+        console.log('🍎 iOS audio system status after initialization:', this.getIOSAudioStatus());
+        console.log('🍎 iOS users: Click/touch any button or game area to enable audio');
+      }
     });
     
     // Log preloading progress every 2 seconds until complete
@@ -3305,10 +3327,123 @@ class SoundManager {
       if (progress === 100) {
         clearInterval(progressInterval);
         console.log('🎵 All sounds fully loaded!');
+        
+        // Log iOS-specific status when preloading is complete
+        if (this.isIOS) {
+          console.log('🍎 iOS: All sounds preloaded. Audio will work after user interaction.');
+        }
       } else {
         console.log(`🎵 Preloading progress: ${progress}% (${this.getLoadedSoundCount()}/22 sounds ready)`);
       }
     }, 2000);
+  }
+  
+  // Detect iOS devices
+  detectIOS() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    return /iPad|iPhone|iPod/.test(userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+  
+  // Prime audio context for iOS compatibility
+  primeAudioContext() {
+    if (this.audioContextPrimed) return;
+    
+    try {
+      console.log('🎵 Priming audio context for iOS compatibility...');
+      
+      // Create a silent audio context to unlock audio on iOS
+      if (this.isIOS) {
+        // For iOS, we need to create and play a silent audio file
+        const silentAudio = new Audio();
+        silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+        silentAudio.volume = 0;
+        silentAudio.play().then(() => {
+          console.log('🎵 iOS audio context primed successfully');
+          this.audioContextPrimed = true;
+          console.log('🍎 iOS audio context status:', this.getIOSAudioStatus());
+        }).catch(error => {
+          console.warn('⚠️ iOS audio context priming failed:', error);
+          console.log('🍎 iOS audio context failure status:', this.getIOSAudioStatus());
+        });
+      } else {
+        // For non-iOS, just mark as primed
+        this.audioContextPrimed = true;
+        console.log('🎵 Non-iOS device, audio context ready');
+      }
+    } catch (error) {
+      console.warn('⚠️ Audio context priming error:', error);
+    }
+  }
+  
+  // Mark that user has interacted (required for iOS audio)
+  markUserInteraction() {
+    if (!this.userInteracted) {
+      console.log('🎵 User interaction detected, enabling audio playback');
+      this.userInteracted = true;
+      this.primeAudioContext();
+      
+      if (this.isIOS) {
+        console.log('🍎 iOS audio unlocked! Audio status:', this.getIOSAudioStatus());
+      }
+    }
+  }
+  
+  // Check if audio can be played on this device
+  canPlayAudio() {
+    if (this.isIOS && !this.userInteracted) {
+      console.log('🎵 iOS device requires user interaction before playing audio');
+      return false;
+    }
+    if (this.isIOS && this.userInteracted && !this.audioContextPrimed) {
+      console.log('🎵 iOS device: user has interacted but audio context not yet primed');
+      return false;
+    }
+    return this.initialized && !this.isMuted && this.audioContextPrimed;
+  }
+  
+  // Get iOS-specific audio status for debugging
+  getIOSAudioStatus() {
+    return {
+      isIOS: this.isIOS,
+      userInteracted: this.userInteracted,
+      audioContextPrimed: this.audioContextPrimed,
+      canPlayAudio: this.canPlayAudio(),
+      initialized: this.initialized,
+      isMuted: this.isMuted
+    };
+  }
+  
+  // Test iOS audio system
+  testIOSAudio() {
+    if (!this.isIOS) {
+      console.log('🖥️ Not an iOS device, no need to test iOS audio');
+      return;
+    }
+    
+    console.log('🍎 Testing iOS audio system...');
+    console.log('🍎 Current status:', this.getIOSAudioStatus());
+    
+    if (!this.userInteracted) {
+      console.log('🍎 iOS audio test: User has not interacted yet - this is normal');
+      console.log('🍎 iOS audio test: Try clicking/touching any button or the game area');
+      return;
+    }
+    
+    if (!this.audioContextPrimed) {
+      console.log('🍎 iOS audio test: User has interacted but audio context not primed');
+      console.log('🍎 iOS audio test: This might indicate an issue with audio context priming');
+      return;
+    }
+    
+    if (!this.canPlayAudio()) {
+      console.log('🍎 iOS audio test: Audio should be ready but canPlayAudio() returns false');
+      console.log('🍎 iOS audio test: This might indicate an issue with the audio system');
+      return;
+    }
+    
+    console.log('🍎 iOS audio test: All checks passed! Audio should work');
+    console.log('🍎 iOS audio test: Try playing a sound to verify');
   }
   
   // Debug localStorage to check for corrupted settings
@@ -3439,7 +3574,12 @@ class SoundManager {
   
   // Play the click2.wav sound effect for drops - using preloaded audio
   playDropSound(blockValue = 1) {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) {
+      if (this.isIOS) {
+        console.log('🍎 iOS: Drop sound skipped - audio not ready. Status:', this.getIOSAudioStatus());
+      }
+      return;
+    }
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -3467,7 +3607,12 @@ class SoundManager {
   
   // Generate a peaceful, raindrop-like merge sound effect with cascade progression
   playMergeSound(blockValue = 1) {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) {
+      if (this.isIOS) {
+        console.log('🍎 iOS: Merge sound skipped - audio not ready. Status:', this.getIOSAudioStatus());
+      }
+      return;
+    }
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -3737,7 +3882,7 @@ class SoundManager {
   
   // Play a random coin sound effect when gold is earned - using preloaded audio
   playCoinSound() {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) return;
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -3778,12 +3923,10 @@ class SoundManager {
 
   
 
-  
-
 
   // Load and play the stage up sound effect from audio file - using preloaded audio
   playStageProgressionSound() {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) return;
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -3811,7 +3954,7 @@ class SoundManager {
 
   // Load and play the bomb explosion sound effect from audio file - using preloaded audio
   playBombSound() {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) return;
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -3845,7 +3988,7 @@ class SoundManager {
 
   // Play purchase sound effect - using preloaded audio
   playPurchaseSound() {
-    if (!this.initialized || this.isMuted) return;
+    if (!this.canPlayAudio()) return;
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
@@ -5502,7 +5645,12 @@ function openHelp(){
 }
 function closeHelp(){ helpModal.classList.add('hidden'); }
 if (helpBtn) {
-  helpBtn.addEventListener('click', openHelp);
+  helpBtn.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    openHelp();
+  });
 } else {
   console.log('⚠️ Help button not found');
 }
@@ -5521,9 +5669,12 @@ if (helpModal) {
 
 // Sound button event listener
 if (soundBtn) {
-  soundBtn.addEventListener('click', () => {
-    openSoundControlModal();
-  });
+        soundBtn.addEventListener('click', () => {
+        if (soundManager) {
+          soundManager.markUserInteraction();
+        }
+        openSoundControlModal();
+      });
 } else {
   console.log('⚠️ Sound button not found');
 }
@@ -5532,9 +5683,12 @@ if (soundBtn) {
 const mergeSoundBtn = document.getElementById('mergeSoundBtn');
 if (mergeSoundBtn) {
   mergeSoundBtn.addEventListener('click', () => {
-      const usePopSounds = soundManager.toggleMergeSoundType();
-  mergeSoundBtn.textContent = '🎵'; // Always show music note
-  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    const usePopSounds = soundManager.toggleMergeSoundType();
+    mergeSoundBtn.textContent = '🎵'; // Always show music note
+    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
   });
 } else {
   console.log('⚠️ Merge sound button not found');
@@ -5565,27 +5719,47 @@ window.addEventListener('keydown', (e) => {
 
 // Bomb conversion button event listener
 if (bombConversionBtn) {
-  bombConversionBtn.addEventListener('click', handleBombConversion);
+  bombConversionBtn.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    handleBombConversion();
+  });
 } else {
   console.error('❌ Bomb conversion button not found!');
 }
 
 // Trash button event listener
 if (trashButton) {
-  trashButton.addEventListener('click', handleTrashButton);
+  trashButton.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    handleTrashButton();
+  });
 } else {
   console.error('❌ Trash button not found!');
 }
 
 // Mobile button event listeners
 if (bombConversionBtnMobile) {
-  bombConversionBtnMobile.addEventListener('click', handleBombConversion);
+  bombConversionBtnMobile.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    handleBombConversion();
+  });
 } else {
   console.error('❌ Mobile bomb conversion button not found!');
 }
 
 if (trashButtonMobile) {
-  trashButtonMobile.addEventListener('click', handleTrashButton);
+  trashButtonMobile.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    handleTrashButton();
+  });
 } else {
   console.error('❌ Mobile trash button not found!');
 }
@@ -5603,10 +5777,29 @@ if (gameOverButton) {
   console.log('⚠️ Game over button not found');
 }
 
+// Global user interaction detection for iOS audio compatibility
+document.addEventListener('click', () => {
+  if (soundManager) {
+    soundManager.markUserInteraction();
+  }
+});
+
+// Touch event detection for mobile devices
+document.addEventListener('touchstart', () => {
+  if (soundManager) {
+    soundManager.markUserInteraction();
+  }
+}, { passive: true });
+
 // Add button event listener for new game
 const addBtn = document.getElementById('addBtn');
 if (addBtn) {
-  addBtn.addEventListener('click', openNewGameModal);
+  addBtn.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    openNewGameModal();
+  });
 } else {
   console.log('⚠️ Add button not found');
 }
@@ -5614,7 +5807,12 @@ if (addBtn) {
 // New game modal button event listeners
 const confirmNewGameBtn = document.getElementById('confirmNewGameBtn');
 if (confirmNewGameBtn) {
-  confirmNewGameBtn.addEventListener('click', handleNewGameConfirmation);
+  confirmNewGameBtn.addEventListener('click', () => {
+    if (soundManager) {
+      soundManager.markUserInteraction();
+    }
+    handleNewGameConfirmation();
+  });
 } else {
   console.log('⚠️ Confirm new game button not found');
 }
@@ -5690,6 +5888,9 @@ function initializeSoundControlModal() {
     masterMuteBtn.classList.toggle('muted', isMuted);
     
     masterMuteBtn.addEventListener('click', () => {
+      if (soundManager) {
+        soundManager.markUserInteraction();
+      }
       const isMuted = soundManager.toggleMute();
       masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
       masterMuteBtn.classList.toggle('muted', isMuted);
@@ -5720,6 +5921,12 @@ function initializeSoundControlModal() {
       value.textContent = currentVolume;
       
       slider.addEventListener('input', (e) => {
+        if (soundManager) {
+          soundManager.markUserInteraction();
+          if (soundManager.isIOS) {
+            console.log(`🍎 iOS: ${soundType} volume slider interaction - audio should now be enabled`);
+          }
+        }
         const newVolume = parseInt(e.target.value);
         console.log(`🎚️ ${soundType} volume slider changed to: ${newVolume}`);
         soundManager.setSoundVolume(soundType, newVolume);
@@ -5733,6 +5940,11 @@ function initializeSoundControlModal() {
       slider.addEventListener('change', (e) => {
         const finalVolume = parseInt(e.target.value);
         console.log(`🎵 ${soundType} volume slider released at: ${finalVolume}`);
+        
+        // iOS-specific logging
+        if (soundManager && soundManager.isIOS) {
+          console.log(`🍎 iOS: ${soundType} volume slider released. Audio status:`, soundManager.getIOSAudioStatus());
+        }
         
         // Test the volume change only when slider is released
         testVolumeChange(soundType, finalVolume);
@@ -5752,6 +5964,9 @@ function initializeSoundControlModal() {
   const resetAudioBtn = document.getElementById('resetAudioBtn');
   if (resetAudioBtn) {
     resetAudioBtn.addEventListener('click', () => {
+      if (soundManager) {
+        soundManager.markUserInteraction();
+      }
       console.log('🔄 Reset audio settings button clicked');
       if (soundManager && typeof soundManager.resetAudioSettings === 'function') {
         soundManager.resetAudioSettings();
@@ -5766,6 +5981,17 @@ function initializeSoundControlModal() {
         console.log('✅ Audio settings reset and UI updated');
       } else {
         console.error('❌ Sound manager not available or reset method missing');
+      }
+    });
+  }
+  
+  // Test iOS audio button
+  const testIOSAudioBtn = document.getElementById('testIOSAudioBtn');
+  if (testIOSAudioBtn) {
+    testIOSAudioBtn.addEventListener('click', () => {
+      if (soundManager) {
+        soundManager.markUserInteraction();
+        soundManager.testIOSAudio();
       }
     });
   }
@@ -5882,6 +6108,11 @@ function testVolumeChange(soundType, volume) {
   // Test playing a sound if the volume is not 0
   if (actualVolume > 0) {
     console.log(`🎵 ${soundType} volume is not muted, sound should play`);
+    
+    // iOS-specific logging
+    if (soundManager && soundManager.isIOS) {
+      console.log(`🍎 iOS: Testing ${soundType} sound. Audio status:`, soundManager.getIOSAudioStatus());
+    }
     
     // Play a test sound based on the sound type
     switch (soundType) {
@@ -6531,8 +6762,8 @@ function render(){
     if (!isDisabled) {
       poleDiv.addEventListener('click', () => {
         // Prime audio context on first click to ensure instant playback
-        if (soundManager && soundManager.dropAudio && soundManager.dropAudio.readyState >= 2) {
-          // Audio is ready, we can play it instantly
+        if (soundManager) {
+          soundManager.markUserInteraction();
         }
         placeOnPole(idx);
       });
@@ -6548,8 +6779,8 @@ function render(){
         e.preventDefault();
         
         // Prime audio context on first touch to ensure instant playback
-        if (soundManager && soundManager.dropAudio && soundManager.dropAudio.readyState >= 2) {
-          // Audio is ready, we can play it instantly
+        if (soundManager) {
+          soundManager.markUserInteraction();
         }
       }, { passive: false });
       
