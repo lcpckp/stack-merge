@@ -3362,9 +3362,9 @@ class SoundManager {
           console.error(`❌ Failed to load cork${i}.wav:`, e);
         });
         
-        // Add canplaythrough listener for audio context priming
+        // Audio context priming - simplified
         corkAudio.addEventListener('canplaythrough', () => {
-          console.log(`🍾 Cork audio ${i} ready for instant playback`);
+          console.log(`🍾 Cork audio ${i} ready`);
         }, { once: true });
         
         this.corkAudios.push(corkAudio);
@@ -3396,8 +3396,7 @@ class SoundManager {
       // Prime the audio context by playing and immediately pausing
       // This ensures the audio context is ready for instant playback
       this.dropAudio.addEventListener('canplaythrough', () => {
-        // Audio is ready, we can now play it instantly
-        console.log('📦 Drop audio ready for instant playback');
+        console.log('📦 Drop audio ready');
       }, { once: true });
       
       console.log('📦 Drop audio preloaded successfully');
@@ -3415,22 +3414,20 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Use preloaded audio if available, otherwise create fresh
-      let dropAudio;
-      if (this.dropAudio && this.dropAudio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        dropAudio = this.dropAudio.cloneNode();
+      // Simplified approach: use preloaded if ready, otherwise direct creation
+      if (this.dropAudio && this.dropAudio.readyState >= 2) {
+        // Use preloaded audio
+        const audio = this.dropAudio.cloneNode();
+        audio.volume = actualVolume;
+        audio.play().catch(console.error);
       } else {
-        // Fallback to creating fresh audio if preloaded isn't ready
-        dropAudio = new Audio('sounds/click2.wav');
+        // Fallback to direct creation (like your original fast implementation)
+        const dropAudio = new Audio('sounds/click2.wav');
+        dropAudio.volume = actualVolume;
+        dropAudio.play().catch(console.error);
       }
       
-      dropAudio.volume = actualVolume; // Apply individual sound type volume
-      
-      // Play the sound immediately
-      dropAudio.play().catch(error => {
-        console.error('❌ Failed to play drop sound:', error);
-      });
+      console.log(`📦 Playing drop sound for block ${blockValue} at volume ${actualVolume}`);
       
     } catch (error) {
       console.error('❌ Failed to create drop sound:', error);
@@ -3471,22 +3468,18 @@ class SoundManager {
       // or we could use the same cork system but with different audio files
       let soundNumber = Math.min(mergeCount - 1, 9);
       
-      // Use preloaded audio if available, otherwise create fresh
-      let musicalAudio;
+      // Simplified approach: use preloaded if ready, otherwise direct creation
       if (this.corkAudios && this.corkAudios[soundNumber] && this.corkAudios[soundNumber].readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        musicalAudio = this.corkAudios[soundNumber].cloneNode();
+        // Use preloaded audio
+        const audio = this.corkAudios[soundNumber].cloneNode();
+        audio.volume = actualVolume;
+        audio.play().catch(console.error);
       } else {
-        // Fallback to creating fresh audio if preloaded isn't ready
-        musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
+        // Fallback to direct creation (like your original fast implementation)
+        const musicalAudio = new Audio(`sounds/cork${soundNumber}.wav`);
+        musicalAudio.volume = actualVolume;
+        musicalAudio.play().catch(console.error);
       }
-      
-      musicalAudio.volume = actualVolume;
-      
-      // Play the sound immediately
-      musicalAudio.play().catch(error => {
-        console.error('❌ Failed to play musical merge sound:', error);
-      });
       
       console.log(`🎵 Playing musical sound for merge ${mergeCount}`);
       
@@ -3510,22 +3503,18 @@ class SoundManager {
       // Determine which cork sound to use (0-9, with 9+ repeating cork9)
       let corkNumber = Math.min(mergeCount - 1, 9);
       
-      // Use preloaded audio if available, otherwise create fresh
-      let corkAudio;
+      // Simplified approach: use preloaded if ready, otherwise direct creation
       if (this.corkAudios && this.corkAudios[corkNumber] && this.corkAudios[corkNumber].readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        corkAudio = this.corkAudios[corkNumber].cloneNode();
+        // Use preloaded audio
+        const audio = this.corkAudios[corkNumber].cloneNode();
+        audio.volume = actualVolume;
+        audio.play().catch(console.error);
       } else {
-        // Fallback to creating fresh audio if preloaded isn't ready
-        corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
+        // Fallback to direct creation (like your original fast implementation)
+        const corkAudio = new Audio(`sounds/cork${corkNumber}.wav`);
+        corkAudio.volume = actualVolume;
+        corkAudio.play().catch(console.error);
       }
-      
-      corkAudio.volume = actualVolume;
-      
-      // Play the sound immediately
-      corkAudio.play().catch(error => {
-        console.error('❌ Failed to play cork merge sound:', error);
-      });
       
       console.log(`🍾 Playing cork${corkNumber}.wav for merge ${mergeCount}`);
       
@@ -3768,9 +3757,9 @@ class SoundManager {
           console.error(`❌ Failed to load coin${i}.wav:`, e);
         });
         
-        // Add canplaythrough listener for audio context priming
+        // Audio context priming - simplified
         coinAudio.addEventListener('canplaythrough', () => {
-          console.log(`🪙 Coin audio ${i} ready for instant playback`);
+          console.log(`🪙 Coin audio ${i} ready`);
         }, { once: true });
         
         this.coinAudios.push(coinAudio);
@@ -3797,111 +3786,27 @@ class SoundManager {
       // Pick a random coin sound (1-7 for 7 sounds)
       const randomIndex = Math.floor(Math.random() * 7) + 1;
       
-      // Use preloaded audio if available, otherwise create fresh
-      let coinAudio;
+      // Simplified approach: use preloaded if ready, otherwise direct creation
       if (this.coinAudios && this.coinAudios[randomIndex - 1] && this.coinAudios[randomIndex - 1].readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        coinAudio = this.coinAudios[randomIndex - 1].cloneNode();
+        // Use preloaded audio
+        const audio = this.coinAudios[randomIndex - 1].cloneNode();
+        audio.volume = actualVolume;
+        audio.play().catch(console.error);
       } else {
-        // Fallback to creating fresh audio if preloaded isn't ready
-        coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
+        // Fallback to direct creation (like your original fast implementation)
+        const coinAudio = new Audio(`sounds/coin${randomIndex}.wav`);
+        coinAudio.volume = actualVolume;
+        coinAudio.play().catch(console.error);
       }
       
-      coinAudio.volume = actualVolume; // Apply individual sound type volume
-      
-      // Track if we've already played or failed to prevent duplicates
-      let hasPlayed = false;
-      let hasFailed = false;
-      
-      // Add error handling
-      coinAudio.addEventListener('error', (e) => {
-        console.error(`❌ Audio error for coin${randomIndex}:`, e);
-        if (!hasPlayed && !hasFailed) {
-          hasFailed = true;
-          this.playCoinSoundFallback(randomIndex);
-        }
-      });
-      
-      // Try to play immediately first (most common success case)
-      coinAudio.play().then(() => {
-        if (!hasPlayed) {
-          hasPlayed = true;
-          console.log(`🪙 Coin sound ${randomIndex} played successfully (immediate)`);
-        }
-      }).catch(error => {
-        console.log(`ℹ️ Immediate play failed for coin${randomIndex}, waiting for load...`);
-        
-        // Only set up the load listener if immediate play failed
-        if (!hasPlayed && !hasFailed) {
-          // Ensure audio is loaded before trying again
-          coinAudio.addEventListener('canplaythrough', () => {
-            if (!hasPlayed && !hasFailed) {
-              coinAudio.play().then(() => {
-                hasPlayed = true;
-                console.log(`🪙 Coin sound ${randomIndex} played successfully (after load)`);
-              }).catch(error => {
-                console.error(`❌ Failed to play coin audio ${randomIndex} after load:`, error);
-                if (!hasPlayed && !hasFailed) {
-                  hasFailed = true;
-                  this.playCoinSoundFallback(randomIndex);
-                }
-              });
-            }
-          });
-          
-          // Set a timeout in case the audio doesn't load
-          setTimeout(() => {
-            if (!hasPlayed && !hasFailed && coinAudio.readyState < 2) {
-              console.warn(`⚠️ Coin audio ${randomIndex} taking too long to load, trying fallback`);
-              hasFailed = true;
-              this.playCoinSoundFallback(randomIndex);
-            }
-          }, 150); // Increased timeout slightly for better reliability
-        }
-      });
+      console.log(`🪙 Playing coin sound ${randomIndex} at volume ${actualVolume}`);
       
     } catch (error) {
       console.error('❌ Failed to create coin sound:', error);
-      // Try fallback with a different random sound
-      this.playCoinSoundFallback(Math.floor(Math.random() * 7) + 1);
     }
   }
   
-  // Fallback method using preloaded audio if fresh creation fails
-  playCoinSoundFallback(soundIndex) {
-    if (!this.coinAudios || this.coinAudios.length === 0) return;
-    
-    // Check individual sound type volume
-    const actualVolume = this.getActualVolume('coin');
-    if (actualVolume === 0) return; // Skip if this sound type is muted
-    
-    // Validate sound index is within range (1-7)
-    if (soundIndex < 1 || soundIndex > 7) {
-      console.warn(`⚠️ Invalid coin sound index: ${soundIndex}, using random fallback`);
-      soundIndex = Math.floor(Math.random() * 7) + 1;
-    }
-    
-    try {
-      const coinAudio = this.coinAudios[soundIndex - 1]; // Convert to 0-based index
-      if (coinAudio) {
-        // Apply individual sound type volume
-        coinAudio.volume = actualVolume;
-        coinAudio.currentTime = 0;
-        
-        // Play the fallback sound
-        coinAudio.play().then(() => {
-          console.log(`🪙 Coin sound ${soundIndex} played via fallback`);
-        }).catch(error => {
-          console.error(`❌ Fallback also failed for coin sound ${soundIndex}:`, error);
-          // Don't retry again to prevent infinite loops
-        });
-      } else {
-        console.warn(`⚠️ No preloaded audio found for coin sound ${soundIndex}`);
-      }
-    } catch (error) {
-      console.error(`❌ Fallback method failed for coin sound ${soundIndex}:`, error);
-    }
-  }
+
   
   // Test method to verify all coin sounds are working (for debugging)
   testAllCoinSounds() {
@@ -3917,25 +3822,7 @@ class SoundManager {
   
 
   
-  // Prevent multiple simultaneous coin sound calls
-  isPlayingCoinSound = false;
-  
-  // Safe coin sound method that prevents duplicates
-  playCoinSoundSafe() {
-    if (this.isPlayingCoinSound) {
-      console.log('🔄 Coin sound already playing, skipping duplicate call');
-      return;
-    }
-    
-    this.isPlayingCoinSound = true;
-    
-    // Reset flag after a short delay to allow for natural sound duration
-    setTimeout(() => {
-      this.isPlayingCoinSound = false;
-    }, 300); // Most coin sounds are shorter than 300ms
-    
-    this.playCoinSound();
-  }
+
   
   // Test method to verify stage up sound is working (for debugging)
   testStageUpSound() {
@@ -3984,20 +3871,18 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Create audio element for the stage up sound if not already created
-      if (!this.stageUpAudio) {
-        this.stageUpAudio = new Audio('sounds/stage_up.mp3');
-        this.stageUpAudio.preload = 'auto'; // Preload the audio
+      // Simplified approach: use preloaded if ready, otherwise direct creation
+      if (this.stageUpAudio && this.stageUpAudio.readyState >= 2) {
+        // Use preloaded audio
+        this.stageUpAudio.volume = actualVolume;
+        this.stageUpAudio.currentTime = 0;
+        this.stageUpAudio.play().catch(console.error);
+      } else {
+        // Fallback to direct creation (like your original fast implementation)
+        const stageUpAudio = new Audio('sounds/stage_up.mp3');
+        stageUpAudio.volume = actualVolume;
+        stageUpAudio.play().catch(console.error);
       }
-      
-      // Apply individual sound type volume
-      this.stageUpAudio.volume = actualVolume;
-      
-      // Reset audio to beginning and play
-      this.stageUpAudio.currentTime = 0;
-      this.stageUpAudio.play().catch(error => {
-        console.error('❌ Failed to play stage up audio file:', error);
-      });
       
       console.log('🎯 Stage up sound played successfully');
       
@@ -4015,20 +3900,18 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Create audio element for the bomb sound if not already created
-      if (!this.bombAudio) {
-        this.bombAudio = new Audio('sounds/bomb.mp3');
-        this.bombAudio.preload = 'auto'; // Preload the audio
+      // Simplified approach: use preloaded if ready, otherwise direct creation
+      if (this.bombAudio && this.bombAudio.readyState >= 2) {
+        // Use preloaded audio
+        this.bombAudio.volume = actualVolume;
+        this.bombAudio.currentTime = 0;
+        this.bombAudio.play().catch(console.error);
+      } else {
+        // Fallback to direct creation (like your original fast implementation)
+        const bombAudio = new Audio('sounds/bomb.mp3');
+        bombAudio.volume = actualVolume;
+        bombAudio.play().catch(console.error);
       }
-      
-      // Apply individual sound type volume
-      this.bombAudio.volume = actualVolume;
-      
-      // Reset audio to beginning and play
-      this.bombAudio.currentTime = 0;
-      this.bombAudio.play().catch(error => {
-        console.error('❌ Failed to play bomb audio file:', error);
-      });
       
       console.log('💥 Bomb sound played successfully');
       
@@ -4052,9 +3935,9 @@ class SoundManager {
           console.error('❌ Failed to load bomb.mp3:', e);
         });
         
-        // Add canplaythrough listener for audio context priming
+        // Audio context priming - simplified
         this.bombAudio.addEventListener('canplaythrough', () => {
-          console.log('💥 Bomb audio ready for instant playback');
+          console.log('💥 Bomb audio ready');
         }, { once: true });
         
         console.log('💥 Bomb audio preloaded successfully');
@@ -4079,9 +3962,9 @@ class SoundManager {
           console.error('❌ Failed to load purchase.wav:', e);
         });
         
-        // Add canplaythrough listener for audio context priming
+        // Audio context priming - simplified
         this.purchaseAudio.addEventListener('canplaythrough', () => {
-          console.log('💰 Purchase audio ready for instant playback');
+          console.log('💰 Purchase audio ready');
         }, { once: true });
         
         console.log('💰 Purchase audio preloaded successfully');
@@ -4106,9 +3989,9 @@ class SoundManager {
           console.error('❌ Failed to load stage_up.mp3:', e);
         });
         
-        // Add canplaythrough listener for audio context priming
+        // Audio context priming - simplified
         this.stageUpAudio.addEventListener('canplaythrough', () => {
-          console.log('🎯 Stage up audio ready for instant playback');
+          console.log('🎯 Stage up audio ready');
         }, { once: true });
         
         console.log('🎯 Stage up audio preloaded successfully');
@@ -4127,20 +4010,18 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Create audio element for the purchase sound if not already created
-      if (!this.purchaseAudio) {
-        this.purchaseAudio = new Audio('sounds/purchase.wav');
-        this.purchaseAudio.preload = 'auto'; // Preload the audio
+      // Simplified approach: use preloaded if ready, otherwise direct creation
+      if (this.purchaseAudio && this.purchaseAudio.readyState >= 2) {
+        // Use preloaded audio
+        this.purchaseAudio.volume = actualVolume;
+        this.purchaseAudio.currentTime = 0;
+        this.purchaseAudio.play().catch(console.error);
+      } else {
+        // Fallback to direct creation (like your original fast implementation)
+        const purchaseAudio = new Audio('sounds/purchase.wav');
+        purchaseAudio.volume = actualVolume;
+        purchaseAudio.play().catch(console.error);
       }
-      
-      // Apply individual sound type volume
-      this.purchaseAudio.volume = actualVolume;
-      
-      // Reset audio to beginning and play
-      this.purchaseAudio.currentTime = 0;
-      this.purchaseAudio.play().catch(error => {
-        console.error('❌ Failed to play purchase audio file:', error);
-      });
       
       console.log('💰 Purchase sound played successfully');
       
