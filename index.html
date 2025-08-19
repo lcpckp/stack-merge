@@ -234,7 +234,10 @@
   .next-row { display:flex; align-items:center; gap:12px; }
   .next-disc { width:108px; height:45px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:24px; box-shadow:0 3px 0 rgba(0,0,0,0.25); transition: transform calc(0.18s * var(--animation-speed, 1)) ease; font-family: var(--font-family); transform-origin: center center; }
   .next-disc.current { outline:3px solid #fff; outline-offset:3px; }
-  .next-disc.consume-out { animation: nextConsume calc(0.18s * var(--animation-speed, 1)) ease forwards; }
+  .next-disc.consume-out { 
+    animation: nextConsume calc(0.18s * var(--animation-speed, 1)) ease forwards; 
+    transition: none; /* Disable transition during animation to prevent conflicts */
+  }
   @keyframes nextConsume {
     0% { transform: scale(1); opacity: 1; }
     100% { transform: scale(0.85); opacity: 0; }
@@ -1250,6 +1253,16 @@
     will-change: transform, opacity, filter;
   }
   
+  /* Disable transitions during animations to prevent conflicts */
+  .disc.merge-out,
+  .disc.merge-in,
+  .disc.bomb-explosion,
+  .disc.bomb-ripple,
+  .disc.stage-explosion,
+  .disc.clear-out {
+    transition: none;
+  }
+  
 
 
   /* special clear animation for high-value blocks */
@@ -1758,6 +1771,7 @@
   
   .next-disc.consume-out {
     animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
+    transition: none; /* Disable transition during animation to prevent conflicts */
   }
   
   /* Fix drop animation for mobile - override default with higher specificity */
@@ -2200,6 +2214,7 @@
   
   .next-disc.consume-out {
     animation-duration: calc(0.15s * var(--animation-speed, 1)); /* Slightly faster on mobile */
+    transition: none; /* Disable transition during animation to prevent conflicts */
   }
   
   /* Extra small mobile uses same drop animation approach */
@@ -2492,18 +2507,22 @@
   accent-color: #0ea5e9;
 }
 
-.sound-control-value {
-  background: var(--panel);
-  color: var(--text);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  min-width: 40px;
+.sound-control-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.sound-control-controls .volume-value {
+  min-width: 30px;
   text-align: center;
-  font-family: var(--font-family);
-  border: 1px solid #475569;
+  font-weight: 600;
+  color: var(--text);
   flex-shrink: 0;
 }
+
+
 
 .sound-control-mute {
   background: #334155;
@@ -2595,8 +2614,29 @@
     width: 100%;
   }
   
-  .sound-control-value {
-    align-self: center;
+  /* Create a horizontal container for slider + value on mobile */
+  .sound-control-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .sound-control-controls .sound-control-slider {
+    flex: 1;
+  }
+  
+  .sound-control-controls .volume-value {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  
+  /* For rows with just a button (like master mute), center the button */
+  .sound-control-row:has(.sound-control-mute) {
+    align-items: center;
   }
   
   .sound-control-mute {
@@ -2725,8 +2765,10 @@
             <span class="sound-control-emoji">📦</span>
             <span>Drops</span>
           </div>
-          <input type="range" id="dropVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
-          <div class="sound-control-value" id="dropVolumeValue">3</div>
+          <div class="sound-control-controls">
+            <input type="range" id="dropVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
+            <span id="dropVolumeValue" class="volume-value"></span>
+          </div>
         </div>
         
         <div class="sound-control-row">
@@ -2734,8 +2776,10 @@
             <span class="sound-control-emoji">🔗</span>
             <span>Merges</span>
           </div>
-          <input type="range" id="mergeVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
-          <div class="sound-control-value" id="mergeVolumeValue">3</div>
+          <div class="sound-control-controls">
+            <input type="range" id="mergeVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
+            <span id="mergeVolumeValue" class="volume-value"></span>
+          </div>
         </div>
         
         <div class="sound-control-row">
@@ -2743,8 +2787,10 @@
             <span class="sound-control-emoji">💰</span>
             <span>Gold Coins</span>
           </div>
-          <input type="range" id="coinVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
-          <div class="sound-control-value" id="coinVolumeValue">3</div>
+          <div class="sound-control-controls">
+            <input type="range" id="coinVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
+            <span id="coinVolumeValue" class="volume-value"></span>
+          </div>
         </div>
         
         <div class="sound-control-row">
@@ -2752,8 +2798,10 @@
             <span class="sound-control-emoji">💥</span>
             <span>Bombs</span>
           </div>
-          <input type="range" id="bombVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
-          <div class="sound-control-value" id="bombVolumeValue">3</div>
+          <div class="sound-control-controls">
+            <input type="range" id="bombVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
+            <span id="bombVolumeValue" class="volume-value"></span>
+          </div>
         </div>
         
         <div class="sound-control-row">
@@ -2761,8 +2809,10 @@
             <span class="sound-control-emoji">🚀</span>
             <span>Other</span>
           </div>
-          <input type="range" id="otherVolumeSlider" class="sound-control-slider" min="0" max="5" value="3" step="1">
-          <div class="sound-control-value" id="otherVolumeValue">3</div>
+          <div class="sound-control-controls">
+            <input type="range" id="otherVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
+            <span id="otherVolumeValue" class="volume-value"></span>
+          </div>
         </div>
       </div>
       
@@ -3279,7 +3329,7 @@ class SoundManager {
     });
   }
   
-  // Generate a satisfying, rich drop sound effect like placing a block
+  // Play the click2.wav sound effect for drops
   playDropSound(blockValue = 1) {
     if (!this.initialized || this.isMuted) return;
     
@@ -3288,104 +3338,17 @@ class SoundManager {
     if (actualVolume === 0) return; // Skip if this sound type is muted
     
     try {
-      // Create gain node for volume control
-      const gainNode = this.audioContext.createGain();
-      gainNode.connect(this.masterGain);
+      // Create a fresh audio element for this sound
+      const dropAudio = new Audio('sounds/click2.wav');
+      dropAudio.volume = actualVolume; // Apply individual sound type volume
       
-      // Apply individual sound type volume
-      gainNode.gain.value = actualVolume;
-      
-      // Create an authentic IBM Model M mechanical keyboard sound
-      const mainOsc = this.audioContext.createOscillator();
-      const noiseSource = this.audioContext.createBufferSource();
-      
-      // Main oscillator - deep, resonant base (Model M signature)
-      mainOsc.type = 'sine';
-      const baseFreq = 75 + (Math.random() * 20 - 10); // 65-85Hz range for that deep thock
-      mainOsc.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime);
-      
-      // Add subtle frequency drift for mechanical realism
-      mainOsc.frequency.exponentialRampToValueAtTime(baseFreq * 1.05, this.audioContext.currentTime + 0.08);
-      
-      // Create the characteristic Model M "thock" noise
-      const noiseBuffer = this.audioContext.createBuffer(1, 1024, this.audioContext.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      
-      // Fill buffer with rich, mechanical noise
-      for (let i = 0; i < noiseData.length; i++) {
-        // Create a mechanical, resonant envelope
-        const envelope = Math.exp(-i * 0.008); // Slow decay for resonance
-        noiseData[i] = (Math.random() * 2 - 1) * envelope * 0.8; // Rich mechanical noise
-      }
-      
-      noiseSource.buffer = noiseBuffer;
-      
-      // Create filters for authentic Model M sound
-      const lowPassFilter = this.audioContext.createBiquadFilter();
-      lowPassFilter.type = 'lowpass';
-      lowPassFilter.frequency.setValueAtTime(800, this.audioContext.currentTime); // Lower cutoff for warmth
-      lowPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Natural resonance
-      
-      const highPassFilter = this.audioContext.createBiquadFilter();
-      highPassFilter.type = 'highpass';
-      highPassFilter.frequency.setValueAtTime(60, this.audioContext.currentTime); // Very low cutoff for deep bass
-      highPassFilter.Q.setValueAtTime(0.5, this.audioContext.currentTime); // Natural resonance
-      
-      // Create gain nodes
-      const toneGain = this.audioContext.createGain();
-      const noiseGain = this.audioContext.createGain();
-      
-      // Connect the audio chain
-      mainOsc.connect(toneGain);
-      toneGain.connect(gainNode);
-      
-      noiseSource.connect(lowPassFilter);
-      lowPassFilter.connect(highPassFilter);
-      highPassFilter.connect(noiseGain);
-      noiseGain.connect(gainNode);
-      
-      // Volume envelope: Model M signature attack and decay (scaled by volume)
-      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(actualVolume, this.audioContext.currentTime + 0.001); // Use actual volume
-      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12); // Long, resonant decay
-      
-      // Separate gain control for tone vs noise (scaled by volume)
-      toneGain.gain.linearRampToValueAtTime(actualVolume * 0.5, this.audioContext.currentTime + 0.001); // Scale tone by volume
-      toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
-      
-      noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(actualVolume * 0.625, this.audioContext.currentTime + 0.001); // Scale noise by volume
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
-      
-      // Start sources
-      mainOsc.start(this.audioContext.currentTime);
-      noiseSource.start(this.audioContext.currentTime);
-      
-      // Stop after natural Model M duration
-      mainOsc.stop(this.audioContext.currentTime + 0.12);
-      noiseSource.stop(this.audioContext.currentTime + 0.12);
-      
-      // Clean up nodes after playback
-      const cleanup = () => {
-        mainOsc.disconnect();
-        noiseSource.disconnect();
-        lowPassFilter.disconnect();
-        highPassFilter.disconnect();
-        toneGain.disconnect();
-        noiseGain.disconnect();
-        gainNode.disconnect();
-      };
-      
-      // Set timeout to ensure cleanup happens
-      setTimeout(cleanup, 130);
-      
-      // Log successful sound playback (only in development)
-      if (console && console.log) {
-        console.log(`🔊 Rich, satisfying drop sound played successfully for block value ${blockValue}`);
-      }
+      // Play the sound
+      dropAudio.play().catch(error => {
+        console.error('❌ Failed to play drop sound:', error);
+      });
       
     } catch (error) {
-      console.error('❌ Failed to play drop sound:', error);
+      console.error('❌ Failed to create drop sound:', error);
     }
   }
   
@@ -3581,8 +3544,9 @@ class SoundManager {
       const gainNode = this.audioContext.createGain();
       gainNode.connect(this.masterGain);
       
-      // Apply individual sound type volume
-      gainNode.gain.value = volume;
+      // Apply individual sound type volume with base boost for merge sounds
+      const baseVolume = volume * 2.5; // 2.5x base boost for merge sounds
+      gainNode.gain.value = baseVolume;
       
       // Calculate frequency based on block value - higher blocks = higher pitch
       const getPopFrequency = (value) => {
@@ -3640,18 +3604,18 @@ class SoundManager {
       highPassFilter.connect(noiseGain);
       noiseGain.connect(gainNode);
       
-      // Volume envelope: very quick attack, fast decay for pop (scaled by volume)
+      // Volume envelope: very quick attack, fast decay for pop (scaled by baseVolume)
       gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.001); // Use volume parameter
+      gainNode.gain.linearRampToValueAtTime(baseVolume, this.audioContext.currentTime + 0.001); // Use baseVolume parameter
       gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06); // Faster decay for more percussive
       
-      // Separate gain control for tone vs noise (scaled by volume)
+      // Separate gain control for tone vs noise (scaled by baseVolume)
       toneGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      toneGain.gain.linearRampToValueAtTime(volume * 0.15, this.audioContext.currentTime + 0.001); // Scale tone by volume
+      toneGain.gain.linearRampToValueAtTime(baseVolume * 0.15, this.audioContext.currentTime + 0.001); // Scale tone by baseVolume
       toneGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
       
       noiseGain.gain.setValueAtTime(0, this.audioContext.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(volume * 0.8, this.audioContext.currentTime + 0.001); // Scale noise by volume
+      noiseGain.gain.linearRampToValueAtTime(baseVolume * 0.8, this.audioContext.currentTime + 0.001); // Scale noise by baseVolume
       noiseGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.06);
       
       // Start both sources
@@ -3789,14 +3753,22 @@ class SoundManager {
       const volume = this.soundVolumes[soundType];
       let actualVolume;
       
-      // Drop and merge sounds get enhanced volume range (0.0-2.0) for more impact
-      if (soundType === 'drop' || soundType === 'merge') {
-        actualVolume = volume === 0 ? 0 : (volume / 5) * 2.0; // 0 = mute, 1-5 = 0.4 to 2.0
+      if (soundType === 'merge') {
+        // Enhanced volume scaling for merge sounds: 0 = mute, 1 = quiet, 5 = very loud
+        // This gives merge sounds much more presence while keeping the same user control
+        // Map 0-5 to 0-1 with a curve that emphasizes higher volumes
+        actualVolume = volume === 0 ? 0 : Math.pow(volume / 5, 0.7); // Curved mapping for more presence
       } else {
-        actualVolume = volume === 0 ? 0 : volume / 5; // 0 = mute, 1-5 = 0.2 to 1.0
+        // Standard 5-level scaling for all other sounds (drop, coin, bomb, other): 0 = mute, 1 = very quiet, 5 = loud
+        // Map 0-5 to 0-1 linearly
+        actualVolume = volume === 0 ? 0 : volume / 5;
       }
       
-      console.log(`✅ ${soundType} has specific volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
+      if (soundType === 'merge') {
+        console.log(`✅ ${soundType} has enhanced volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%) [curved mapping for more presence]`);
+      } else {
+        console.log(`✅ ${soundType} has standard volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
+      }
       return actualVolume;
     }
     
@@ -3804,11 +3776,7 @@ class SoundManager {
     const fallbackVolume = this.soundVolumes.other || 3;
     let fallbackActual;
     
-    if (soundType === 'drop' || soundType === 'merge') {
-      fallbackActual = fallbackVolume === 0 ? 0 : (fallbackVolume / 5) * 2.0;
-    } else {
-      fallbackActual = fallbackVolume === 0 ? 0 : fallbackVolume / 5;
-    }
+    fallbackActual = fallbackVolume === 0 ? 0 : fallbackVolume / 5;
     
     console.log(`🔄 ${soundType} using fallback volume: ${fallbackVolume} → ${fallbackActual} (${Math.round(fallbackActual * 100)}%)`);
     return fallbackActual;
@@ -5761,6 +5729,11 @@ function initializeSoundControlModal() {
   // Master mute button
   const masterMuteBtn = document.getElementById('masterMuteBtn');
   if (masterMuteBtn) {
+    // Initialize master mute button state
+    const isMuted = soundManager.isMuted;
+    masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+    masterMuteBtn.classList.toggle('muted', isMuted);
+    
     masterMuteBtn.addEventListener('click', () => {
       const isMuted = soundManager.toggleMute();
       masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
@@ -5785,17 +5758,29 @@ function initializeSoundControlModal() {
     const value = document.getElementById(`${soundType}VolumeValue`);
     
     if (slider && value) {
+      // Initialize slider and value display with current volume from sound manager
+      const currentVolume = soundManager.getSoundVolume(soundType);
+      console.log(`🎚️ Initializing ${soundType} slider to ${currentVolume}`);
+      slider.value = currentVolume;
+      value.textContent = currentVolume;
+      
       slider.addEventListener('input', (e) => {
         const newVolume = parseInt(e.target.value);
         console.log(`🎚️ ${soundType} volume slider changed to: ${newVolume}`);
         soundManager.setSoundVolume(soundType, newVolume);
         value.textContent = newVolume;
         
-        // Test the volume change immediately
-        testVolumeChange(soundType, newVolume);
-        
         // Save game state to cookies to persist the volume change
         saveGameState();
+      });
+      
+      // Play test sound only when slider is released (change event)
+      slider.addEventListener('change', (e) => {
+        const finalVolume = parseInt(e.target.value);
+        console.log(`🎵 ${soundType} volume slider released at: ${finalVolume}`);
+        
+        // Test the volume change only when slider is released
+        testVolumeChange(soundType, finalVolume);
       });
     }
   });
@@ -5846,6 +5831,26 @@ function initializeSoundControlModal() {
       closeSoundControlModal();
     }
   });
+  
+  // Function to update volume sliders with current values
+  this.updateVolumeSliders = () => {
+    console.log('🔄 Updating volume sliders with current values...');
+    const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
+    soundTypes.forEach(soundType => {
+      const slider = document.getElementById(`${soundType}VolumeSlider`);
+      const value = document.getElementById(`${soundType}VolumeValue`);
+      
+      if (slider && value) {
+        const currentVolume = soundManager.getSoundVolume(soundType);
+        console.log(`🎚️ Setting ${soundType} slider to ${currentVolume}`);
+        slider.value = currentVolume;
+        value.textContent = currentVolume;
+      } else {
+        console.warn(`⚠️ Missing elements for ${soundType}: slider=${!!slider}, value=${!!value}`);
+      }
+    });
+    console.log('✅ Volume sliders update complete');
+  };
 }
 
 // Initialize button states
@@ -6915,18 +6920,24 @@ function waitForAnimation(element){
       return;
     }
     
-    // Add multiple event listeners to catch different animation end events
-    const handleAnimationEnd = () => {
-      console.log('Animation ended for element:', element);
-      resolve();
-    };
-    
-    element.addEventListener('animationend', handleAnimationEnd, { once: true });
-    element.addEventListener('webkitAnimationEnd', handleAnimationEnd, { once: true });
-    
-    // Also check if animation is actually running
+    // CRITICAL FIX: Check if animation is already running BEFORE setting up listeners
     const computedStyle = window.getComputedStyle(element);
     const animationName = computedStyle.animationName;
+    const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
+    const animationDelay = parseFloat(computedStyle.animationDelay) || 0;
+    const totalAnimationTime = (animationDuration + animationDelay) * 1000; // Convert to ms
+    
+    console.log('Animation check for element:', element, {
+      animationName,
+      animationDuration: animationDuration + 's',
+      animationDelay: animationDelay + 's',
+      totalAnimationTime: totalAnimationTime + 'ms',
+      computedStyle: {
+        transform: computedStyle.transform,
+        opacity: computedStyle.opacity,
+        filter: computedStyle.filter
+      }
+    });
     
     if (animationName === 'none') {
       console.log('No animation detected, resolving immediately');
@@ -6934,11 +6945,71 @@ function waitForAnimation(element){
       return;
     }
     
-    // Fallback timeout to prevent hanging
-    setTimeout(() => {
-      console.log('Animation timeout fallback triggered for:', animationName);
+    // Check if animation has already completed by looking at animation state
+    // This prevents the race condition where animation finishes before we start listening
+    if (totalAnimationTime <= 100) {
+      console.log(`Very short animation detected (${totalAnimationTime}ms), resolving immediately`);
+      setTimeout(resolve, totalAnimationTime + 10); // Wait for animation to complete + small buffer
+      return;
+    }
+    
+    // Add multiple event listeners to catch different animation end events
+    const handleAnimationEnd = (event) => {
+      console.log('Animation ended for element:', element, 'Event type:', event.type, 'Animation name:', event.animationName);
       resolve();
-    }, 1500); // 1.5 second timeout
+    };
+    
+    // Add more comprehensive event listeners
+    element.addEventListener('animationend', handleAnimationEnd, { once: true });
+    element.addEventListener('webkitAnimationEnd', handleAnimationEnd, { once: true });
+    element.addEventListener('mozAnimationEnd', handleAnimationEnd, { once: true });
+    element.addEventListener('MSAnimationEnd', handleAnimationEnd, { once: true });
+    
+    // Also listen for animation iteration and start events for debugging
+    element.addEventListener('animationstart', (event) => {
+      console.log('Animation started for element:', element, 'Animation name:', event.animationName);
+    }, { once: true });
+    
+    element.addEventListener('animationiteration', (event) => {
+      console.log('Animation iteration for element:', element, 'Animation name:', event.animationName);
+    }, { once: true });
+    
+    // Fallback timeout to prevent hanging - use actual animation duration + buffer
+    const timeoutDuration = Math.max(1500, totalAnimationTime + 500); // At least 1.5s, or animation time + 500ms buffer
+    
+    // Add a more robust fallback that checks animation state periodically
+    const checkAnimationState = () => {
+      const currentStyle = window.getComputedStyle(element);
+      const currentAnimationName = currentStyle.animationName;
+      
+      if (currentAnimationName === 'none') {
+        console.log(`Animation state check: ${animationName} completed naturally`);
+        resolve();
+        return;
+      }
+      
+      // Check if we're past the expected animation time
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= totalAnimationTime + 100) { // Add 100ms buffer
+        console.log(`Animation state check: ${animationName} should be complete after ${elapsed}ms, forcing resolution`);
+        resolve();
+        return;
+      }
+      
+      // Continue checking
+      setTimeout(checkAnimationState, 50); // Check every 50ms
+    };
+    
+    const startTime = Date.now();
+    
+    // Start the periodic check
+    setTimeout(checkAnimationState, 50);
+    
+    // Traditional timeout fallback as backup
+    setTimeout(() => {
+      console.log(`Animation timeout fallback triggered for: ${animationName} (after ${timeoutDuration}ms)`);
+      resolve();
+    }, timeoutDuration);
   });
 }
 
@@ -7022,6 +7093,9 @@ async function animateMergeCascade(index){
       topEl.classList.add('merge-out');
       await new Promise(resolve => setTimeout(resolve, 25)); // Reduced delay for snappier effect
       belowEl.classList.add('merge-out');
+      
+      // Small delay to ensure CSS classes are applied and animations start
+      await new Promise(resolve => setTimeout(resolve, 10));
       
       // Wait for both animations to complete with error handling
       await Promise.all([
@@ -7107,6 +7181,10 @@ async function animateMergeCascade(index){
         // Add glow effect for the new merged block
         mergedEl.classList.add('merging');
         mergedEl.classList.add('merge-in');
+        
+        // Small delay to ensure CSS class is applied and animation starts
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
         await waitForAnimation(mergedEl);
         mergedEl.classList.remove('merge-in');
         mergedEl.classList.remove('merging');
@@ -7298,6 +7376,9 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
   if (third) third.classList.add('shift-left');
 
   // wait for ALL animations to complete before proceeding
+  // Small delay to ensure CSS classes are applied and animations start
+  await new Promise(resolve => setTimeout(resolve, 10));
+  
   const animations = [];
   if (current) animations.push(waitForAnimation(current));
   if (second) animations.push(waitForAnimation(second));
@@ -7341,10 +7422,14 @@ async function animateStageProgression(index, mergedIndex, weight){
     return;
   }
 
-  // Let the new block behave like a normal merge result first
-  mergedEl.classList.add('merge-in');
-  await waitForAnimation(mergedEl);
-  mergedEl.classList.remove('merge-in');
+        // Let the new block behave like a normal merge result first
+      mergedEl.classList.add('merge-in');
+      
+      // Small delay to ensure CSS class is applied and animation starts
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      await waitForAnimation(mergedEl);
+      mergedEl.classList.remove('merge-in');
 
   // Now treat the target block like a bomb - make it explode and clear the entire stack
   const allDiscs = Array.from(poleDiv.querySelectorAll('.disc'));
@@ -7430,6 +7515,10 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
 
   // Let the new block behave like a normal merge result first
   mergedEl.classList.add('merge-in');
+  
+  // Small delay to ensure CSS class is applied and animation starts
+  await new Promise(resolve => setTimeout(resolve, 10));
+  
   await waitForAnimation(mergedEl);
   mergedEl.classList.remove('merge-in');
 
