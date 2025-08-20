@@ -3346,7 +3346,7 @@ class SoundManager {
     this.audioContextPrimed = false;
     this.userInteracted = false;
     
-    // Log iOS detection status
+    // Log iOS detection status (console only, no debug window)
     if (this.isIOS) {
       console.log('🍎 iOS device detected - audio will require user interaction');
       console.log('🍎 iOS audio status:', this.getIOSAudioStatus());
@@ -3484,13 +3484,13 @@ class SoundManager {
   aggressivelyUnlockIOSAudio() {
     if (!this.isIOS) return;
     
-    this.showDebugMessage('🍎 Aggressively attempting to unlock iOS audio...');
+    console.log('🍎 Aggressively attempting to unlock iOS audio...');
     
     // Try multiple methods to unlock audio
     const methods = [
       // Method 1: Silent audio with user gesture simulation
       () => {
-        this.showDebugMessage('🍎 Method 1: Silent audio with user gesture simulation...');
+        console.log('🍎 Method 1: Silent audio with user gesture simulation...');
         return new Promise((resolve, reject) => {
           try {
             const audio = new Audio();
@@ -3514,7 +3514,7 @@ class SoundManager {
       
       // Method 2: Real audio file with volume 0
       () => {
-        this.showDebugMessage('🍎 Method 2: Real audio file with volume 0...');
+        console.log('🍎 Method 2: Real audio file with volume 0...');
         return new Promise((resolve, reject) => {
           try {
             const audio = new Audio('sounds/click2.wav');
@@ -3535,7 +3535,7 @@ class SoundManager {
       
       // Method 3: Web Audio API with resume
       () => {
-        this.showDebugMessage('🍎 Method 3: Web Audio API with resume...');
+        console.log('🍎 Method 3: Web Audio API with resume...');
         return new Promise((resolve, reject) => {
           try {
             if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
@@ -3545,11 +3545,11 @@ class SoundManager {
               // Try to resume the context
               if (audioContext.state === 'suspended') {
                 audioContext.resume().then(() => {
-                  this.showDebugMessage('🍎 Web Audio API context resumed successfully');
+                  console.log('🍎 Web Audio API context resumed successfully');
                   resolve();
                 }).catch(reject);
               } else {
-                this.showDebugMessage('🍎 Web Audio API context already running');
+                console.log('🍎 Web Audio API context already running');
                 resolve();
               }
             } else {
@@ -3563,7 +3563,7 @@ class SoundManager {
       
       // Method 4: Create and destroy multiple audio objects to trigger unlock
       () => {
-        this.showDebugMessage('🍎 Method 4: Multiple audio object creation...');
+        console.log('🍎 Method 4: Multiple audio object creation...');
         return new Promise((resolve, reject) => {
           try {
             // Create multiple audio objects to try to trigger unlock
@@ -3578,7 +3578,7 @@ class SoundManager {
             // Try to play them all
             Promise.all(audioObjects.map(audio => audio.play().catch(() => {})))
               .then(() => {
-                this.showDebugMessage('🍎 Multiple audio objects method completed');
+                console.log('🍎 Multiple audio objects method completed');
                 resolve();
               })
               .catch(resolve); // Don't fail if some don't work
@@ -3590,7 +3590,7 @@ class SoundManager {
       
       // Method 5: iOS Safari specific audio context unlock
       () => {
-        this.showDebugMessage('🍎 Method 5: iOS Safari specific audio context...');
+        console.log('🍎 Method 5: iOS Safari specific audio context...');
         return new Promise((resolve, reject) => {
           try {
             this.unlockIOSSafariAudio();
@@ -3612,20 +3612,20 @@ class SoundManager {
     // Try each method with better error handling
     methods.forEach((method, index) => {
       setTimeout(() => {
-        this.showDebugMessage(`🍎 Trying iOS audio unlock method ${index + 1}...`);
+        console.log(`🍎 Trying iOS audio unlock method ${index + 1}...`);
         method().then(() => {
-          this.showDebugMessage(`🍎 iOS audio unlock method ${index + 1} succeeded!`);
+          console.log(`🍎 iOS audio unlock method ${index + 1} succeeded!`);
           this.audioContextPrimed = true;
           this.userInteracted = true;
-          this.showDebugMessage('🍎 iOS audio aggressively unlocked! Status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+          console.log('🍎 iOS audio aggressively unlocked! Status:', this.getIOSAudioStatus());
           
           // Force a test sound to verify it's actually working
           setTimeout(() => {
-            this.showDebugMessage('🍎 Testing if audio actually works after unlock...');
+            console.log('🍎 Testing if audio actually works after unlock...');
             this.playDropSound(1);
           }, 500);
         }).catch(error => {
-          this.showDebugMessage(`🍎 iOS audio unlock method ${index + 1} failed: ${error.message}`);
+          console.log(`🍎 iOS audio unlock method ${index + 1} failed: ${error.message}`);
         });
       }, index * 1500); // Try each method 1.5 seconds apart
     });
@@ -3637,7 +3637,7 @@ class SoundManager {
   unlockIOSSafariAudio() {
     if (!this.isIOS) return;
     
-    this.showDebugMessage('🍎 Trying iOS Safari specific audio unlock...');
+    console.log('🍎 Trying iOS Safari specific audio unlock...');
     
     try {
       // For iOS Safari, try creating an audio context and immediately resuming it
@@ -3660,12 +3660,12 @@ class SoundManager {
         
         // Try to resume the context
         audioContext.resume().then(() => {
-          this.showDebugMessage('🍎 iOS Safari audio context unlocked successfully!');
+          console.log('🍎 iOS Safari audio context unlocked successfully!');
           this.audioContextPrimed = true;
           this.userInteracted = true;
-          this.showDebugMessage('🍎 iOS Safari audio status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+          console.log('🍎 iOS Safari audio status:', this.getIOSAudioStatus());
         }).catch(error => {
-          this.showDebugMessage('🍎 iOS Safari audio context resume failed: ' + error.message);
+          console.log('🍎 iOS Safari audio context resume failed:', error.message);
         });
         
         // Clean up
@@ -3674,10 +3674,10 @@ class SoundManager {
         }, 1000);
         
       } else {
-        this.showDebugMessage('🍎 webkitAudioContext not available');
+        console.log('🍎 webkitAudioContext not available');
       }
     } catch (error) {
-      this.showDebugMessage('🍎 iOS Safari unlock method failed: ' + error.message);
+      console.log('🍎 iOS Safari unlock method failed:', error.message);
     }
   }
   
