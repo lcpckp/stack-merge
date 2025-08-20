@@ -498,8 +498,8 @@
     align-items:center; 
     justify-content:center; 
     z-index:1000; 
-    /* Ensure backdrop respects safe areas */
-    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-left, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-right, 0px);
+    /* Ensure backdrop respects safe areas with extra buffer for mobile UI controls */
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) calc(env(safe-area-inset-left, 0px) + 16px) calc(env(safe-area-inset-bottom, 0px) + 20px) calc(env(safe-area-inset-right, 0px) + 16px);
     box-sizing: border-box;
   }
   .modal { 
@@ -510,8 +510,8 @@
     padding:24px 28px; 
     box-shadow:0 15px 45px rgba(0,0,0,0.4); 
     font-family: var(--font-family); 
-    /* Ensure modal respects safe areas */
-    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 80px);
+    /* Ensure modal respects safe areas with extra buffer for mobile UI controls */
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 120px);
   }
   .modal h2 { margin:0 0 12px; font-size:24px; font-family: var(--font-family); }
   .modal p, .modal li { font-size:16px; line-height:1.5; font-family: var(--font-family); }
@@ -522,7 +522,7 @@
   @media (max-width: 768px) {
     /* Ensure modal is properly positioned on mobile with safe areas */
     .help-modal {
-      max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 80px);
+      max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 120px);
       margin: 0;
       padding: 20px;
       /* Ensure content is properly spaced from edges */
@@ -593,7 +593,7 @@
   /* Enhanced Help Modal Styles */
   .help-modal { 
     width: min(900px, 95vw); 
-    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 80px); 
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 120px); 
     overflow-y: auto; 
     /* Hide scrollbar while maintaining scroll functionality */
     scrollbar-width: none; /* Firefox */
@@ -603,9 +603,62 @@
     position: relative;
   }
   
+  /* Modal Close Button - Desktop: floating in top-right of modal bounds */
+  .help-modal-close-btn {
+    position: fixed;
+    top: calc(50vh - min(calc(100vh - 80px)/2, 45vh) + 20px);
+    right: calc(50vw - min(450px, 47.5vw) + 20px);
+    padding: 10px 20px;
+    min-width: auto;
+    height: auto;
+    border-radius: 8px;
+    background: #334155;
+    color: var(--text);
+    border: 1px solid #475569;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+  }
+  
+  .help-modal-close-btn:hover {
+    background: #475569;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+  
+  .help-modal-close-btn:active {
+    transform: translateY(0);
+    background: #334155;
+  }
+  
   /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
   .help-modal::-webkit-scrollbar {
     display: none;
+  }
+  
+  /* Reset Data Button Styling */
+  #resetDataBtn {
+    background-color: #dc2626 !important;
+    color: white !important;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  
+  #resetDataBtn:hover {
+    background-color: #b91c1c !important;
+    transform: translateY(-1px);
+  }
+  
+  #resetDataBtn:active {
+    transform: translateY(0);
   }
   
   .help-grid { 
@@ -1672,6 +1725,96 @@
     color: var(--text);
   }
 
+  /* Update Modal Styling */
+  .update-modal {
+    max-width: 500px;
+    text-align: center;
+    border: 2px solid rgba(59, 130, 246, 0.8); /* Blue border for updates */
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); /* Blue-tinted shadow */
+    background: rgba(30, 41, 59, 0.95); /* Semi-transparent panel background */
+    backdrop-filter: blur(8px); /* Add subtle blur effect */
+    transition: all 0.3s ease;
+  }
+
+  .update-modal:hover {
+    border-color: rgba(59, 130, 246, 1); /* Solid blue on hover */
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); /* Enhanced shadow on hover */
+  }
+
+  .update-modal h2 {
+    margin-bottom: 20px;
+    color: var(--text);
+    font-size: 24px;
+  }
+
+  .update-modal h3 {
+    margin: 0 0 12px 0;
+    color: #60a5fa; /* Light blue for the update title */
+    font-size: 20px;
+  }
+
+  .update-content {
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .update-content p {
+    margin: 8px 0;
+    line-height: 1.5;
+  }
+
+  .update-content em {
+    color: #94a3b8; /* Muted color for the "more updates" text */
+    font-size: 14px;
+  }
+
+  .update-got-it-btn {
+    background: #10B981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+  }
+
+  .update-got-it-btn:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .update-got-it-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  /* Mobile responsive for update modal */
+  @media (max-width: 768px) {
+    .update-modal {
+      max-width: 95vw;
+      margin: 20px;
+    }
+    
+    .update-modal h2 {
+      font-size: 22px;
+    }
+    
+    .update-modal h3 {
+      font-size: 18px;
+    }
+    
+    .update-got-it-btn {
+      padding: 10px 20px;
+      font-size: 15px;
+    }
+  }
+
   .new-game-buttons {
     display: flex;
     gap: 16px;
@@ -2038,9 +2181,29 @@
     -ms-overflow-style: none; /* Internet Explorer 10+ */
   }
   
+  /* Mobile responsive for help modal actions */
+  .help-modal .actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .help-modal .actions button {
+    width: 100%;
+  }
+  
   /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) on mobile */
   .help-modal::-webkit-scrollbar {
     display: none;
+  }
+  
+  /* Mobile responsive for floating close button - screen corner with safe area */
+  .help-modal-close-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 24px);
+    right: calc(env(safe-area-inset-right, 0px) + 20px);
+    padding: 10px 16px;
+    font-size: 16px;
   }
   
   .help-grid {
@@ -2145,6 +2308,15 @@
   .help-modal {
     width: 98vw;
     padding: 16px;
+  }
+  
+  /* Extra small mobile floating close button - screen corner with safe area */
+  .help-modal-close-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    right: calc(env(safe-area-inset-right, 0px) + 16px);
+    padding: 8px 12px;
+    font-size: 14px;
   }
   
   .help-modal .help-content [style*="gap: 80px"] {
@@ -2890,9 +3062,10 @@
         <button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px;">
           Reset Audio Settings
         </button>
-        <button id="testIOSAudioBtn" class="sound-control-mute" style="background: #8b5cf6; border-color: #7c3aed; min-width: 120px; margin-top: 8px;">
-          Test iOS Audio
+        <button id="testAudioBtn" class="sound-control-mute" style="background: #10b981; border-color: #059669; min-width: 120px; margin-top: 8px;">
+          Test Audio (Debug)
         </button>
+
       </div>
     </div>
   </div>
@@ -2951,6 +3124,7 @@
   <!-- Help modal (hidden by default) -->
   <div id="helpModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="modal help-modal">
+      <button id="helpClose" class="help-modal-close-btn" title="Close help guide">❌ Close</button>
       <h2 id="helpTitle">How to Play</h2>
       
       <div class="help-grid">
@@ -3195,8 +3369,8 @@
 
 
 
-      <div class="actions">
-        <button id="helpClose" class="ai-btn">Close</button>
+      <div class="actions" style="justify-content: flex-start;">
+        <button id="resetDataBtn" class="ai-btn" style="background-color: #dc2626; color: white;" title="Clear all game data and cookies">Clear Local Data</button>
       </div>
     </div>
   </div>
@@ -3341,16 +3515,8 @@ class SoundManager {
       other: 3      // Other sounds (stage up, etc.)
     };
     
-      // iOS detection and audio context management
-  this.isIOS = this.detectIOS();
-  this.userInteracted = false;
-  
-  // Log iOS detection status
-  if (this.isIOS) {
-    console.log('🍎 iOS device detected - audio will require user interaction');
-  } else {
-    console.log('🖥️ Non-iOS device detected - audio should work normally');
-  }
+    // Universal audio unlock flag (works across all devices)
+    this.audioUnlocked = false;
     
     // Debug localStorage to check for corrupted settings
     this.debugLocalStorage();
@@ -3362,11 +3528,6 @@ class SoundManager {
     this.waitForSoundsReady().then(() => {
       console.log('🎵 Sound system fully initialized and ready!');
       console.log('🎵 Sound system status:', this.getSoundSystemStatus());
-      
-      // Log iOS-specific status if this is an iOS device
-      if (this.isIOS) {
-        console.log('🍎 iOS users: Click/touch any button or game area to enable audio');
-      }
     });
     
     // Log preloading progress every 2 seconds until complete
@@ -3375,144 +3536,58 @@ class SoundManager {
       if (progress === 100) {
         clearInterval(progressInterval);
         console.log('🎵 All sounds fully loaded!');
-        
-        // Log iOS-specific status when preloading is complete
-        if (this.isIOS) {
-          console.log('🍎 iOS: All sounds preloaded. Audio will work after user interaction.');
-        }
       } else {
         console.log(`🎵 Preloading progress: ${progress}% (${this.getLoadedSoundCount()}/22 sounds ready)`);
       }
     }, 2000);
   }
   
-  // Detect iOS devices
-  detectIOS() {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    return /iPad|iPhone|iPod/.test(userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
+
   
-  // iOS audio unlock is handled by user interaction + iOS-friendly bypass logic
-  // No complex priming needed - just let the user interact and play sounds
+
   
-  // Mark that user has interacted (required for iOS audio)
-  markUserInteraction() {
-    if (!this.userInteracted) {
-      console.log('🎵 User interaction detected, enabling audio playback');
-      this.userInteracted = true;
-      
-      if (this.isIOS) {
-        console.log('🍎 iOS audio unlocked!');
-      }
+  // Universal audio unlock method (works on all devices including iOS)
+  unlockAudio() {
+    if (this.audioUnlocked) {
+      return Promise.resolve();
     }
+
+    console.log('🎵 Unlocking audio silently...');
+    
+    // Simple silent unlock - just mark as unlocked
+    // The first actual game sound will handle any browser audio context unlocking
+    this.audioUnlocked = true;
+    console.log('✅ Audio unlocked (silent mode)');
+    return Promise.resolve();
   }
-  
-  // Log when any sound is played (for debugging which method works)
-  logSoundPlayed(soundType, method, success = true) {
-    if (this.isIOS) {
-      console.log(`🔊 ${soundType} sound played via ${method} - Success: ${success}`);
+
+  // Debug popup helper for iOS testing (disabled for normal gameplay)
+  showDebugPopup(message) {
+    // Only console log now - no more popups
+    console.log(message);
+  }
+
+  // Helper method to safely play audio with proper promise handling
+  safePlayAudio(audio) {
+    // Simplified - just console log for debugging
+    console.log(`🎵 Playing: ${audio.src ? audio.src.split('/').pop() : 'no src'} (vol: ${audio.volume})`);
+    
+    const playPromise = audio.play();
+    if (playPromise) {
+      return playPromise.then(() => {
+        console.log('✅ Audio played successfully');
+      }).catch((error) => {
+        console.log(`❌ Audio failed: ${error.message}`);
+        throw error;
+      });
     }
+    // Return resolved promise for older browsers
+    return Promise.resolve();
   }
-  
-  // iOS audio unlock is handled by user interaction + iOS-friendly bypass logic
-  // No complex unlocking needed - just let the user interact and play sounds
-  
+
   // Check if audio can be played on this device
   canPlayAudio() {
-    if (this.isIOS && !this.userInteracted) {
-      return false;
-    }
-    
-    // For iOS, if user has interacted, audio should work
-    if (this.isIOS && this.userInteracted) {
-      return this.initialized && !this.isMuted;
-    }
-    
-    // For non-iOS devices, use the standard check
-    return this.initialized && !this.isMuted;
-  }
-  
-  // Simple iOS status for debugging
-  getIOSAudioStatus() {
-    return {
-      isIOS: this.isIOS,
-      userInteracted: this.userInteracted,
-      canPlayAudio: this.canPlayAudio(),
-      initialized: this.initialized,
-      isMuted: this.isMuted
-    };
-  }
-  
-  // Simple test method
-  testIOSAudio() {
-    if (!this.isIOS) {
-      console.log('🖥️ Not an iOS device');
-      return;
-    }
-    
-    console.log('🍎 Testing iOS audio...');
-    console.log('🍎 Status:', this.getIOSAudioStatus());
-    
-    // Test both sounds
-    this.playDropSound(1);
-    setTimeout(() => this.playMergeSound(2), 500);
-  }
-  
-  // Test iOS audio system
-  testIOSAudio() {
-    if (!this.isIOS) {
-      this.showDebugMessage('🖥️ Not an iOS device, no need to test iOS audio');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 Testing iOS audio system...');
-    this.showDebugMessage('🍎 Current status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
-    
-    if (!this.userInteracted) {
-      this.showDebugMessage('🍎 iOS audio test: User has not interacted yet - this is normal');
-      this.showDebugMessage('🍎 iOS audio test: Try clicking/touching any button or the game area');
-      return;
-    }
-    
-    if (!this.audioContextPrimed) {
-      this.showDebugMessage('🍎 iOS audio test: User has interacted but audio context not primed');
-      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with audio context priming');
-      
-      // Try to prime the audio context again
-      this.showDebugMessage('🍎 iOS audio test: Attempting to prime audio context again...');
-      this.primeAudioContext();
-      return;
-    }
-    
-    if (!this.canPlayAudio()) {
-      this.showDebugMessage('🍎 iOS audio test: Audio should be ready but canPlayAudio() returns false');
-      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with the audio system');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 iOS audio test: All checks passed! Audio should work');
-    this.showDebugMessage('🍎 iOS audio test: Now testing actual sound playback...');
-    
-    // Actually try to play sounds to test if they work
-    try {
-      this.showDebugMessage('🍎 iOS audio test: Testing drop sound...');
-      this.playDropSound(1);
-      
-      setTimeout(() => {
-        this.showDebugMessage('🍎 iOS audio test: Testing merge sound...');
-        this.playMergeSound(2);
-      }, 500);
-      
-      setTimeout(() => {
-        this.showDebugMessage('🍎 iOS audio test: Testing coin sound...');
-        this.playCoinSound();
-      }, 1000);
-      
-      this.showDebugMessage('🍎 iOS audio test: Sound tests initiated. Check debug window for results.');
-    } catch (error) {
-      this.showDebugMessage('🍎 iOS audio test: Error during sound testing: ' + error.message);
-    }
+    return this.initialized && !this.isMuted && this.audioUnlocked;
   }
   
   // Debug localStorage to check for corrupted settings
@@ -3562,157 +3637,83 @@ class SoundManager {
     }
   }
   
-  // Comprehensive audio preloading for maximum performance
+  // Simple, reliable audio system that works on all devices
   preloadAudioFiles() {
     try {
-      console.log('🎵 Starting comprehensive audio preloading...');
+      console.log('🎵 Starting simple audio system...');
       
-      // Preload all sound files for instant playback
-      this.audioCache = {
-        // Drop sounds
-        drop: new Audio('sounds/click2.wav'),
-        
-        // Merge cascade sounds (cork0.wav through cork9.wav)
-        cork0: new Audio('sounds/cork0.wav'),
-        cork1: new Audio('sounds/cork1.wav'),
-        cork2: new Audio('sounds/cork2.wav'),
-        cork3: new Audio('sounds/cork3.wav'),
-        cork4: new Audio('sounds/cork4.wav'),
-        cork5: new Audio('sounds/cork5.wav'),
-        cork6: new Audio('sounds/cork6.wav'),
-        cork7: new Audio('sounds/cork7.wav'),
-        cork8: new Audio('sounds/cork8.wav'),
-        cork9: new Audio('sounds/cork9.wav'),
-        
-        // Coin sounds (coin1.wav through coin7.wav)
-        coin1: new Audio('sounds/coin1.wav'),
-        coin2: new Audio('sounds/coin2.wav'),
-        coin3: new Audio('sounds/coin3.wav'),
-        coin4: new Audio('sounds/coin4.wav'),
-        coin5: new Audio('sounds/coin5.wav'),
-        coin6: new Audio('sounds/coin6.wav'),
-        coin7: new Audio('sounds/coin7.wav'),
-        
-        // Other sounds
-        bomb: new Audio('sounds/bomb.mp3'),
-        stageUp: new Audio('sounds/stage_up.mp3'),
-        purchase: new Audio('sounds/purchase.wav'),
-        purchase2: new Audio('sounds/purchase2.wav')
+      // Create simple audio objects - don't over-complicate
+      this.audioFiles = {
+        drop: 'sounds/click2.wav',
+        bomb: 'sounds/bomb.mp3',
+        stageUp: 'sounds/stage_up.mp3',
+        purchase: 'sounds/purchase.wav'
       };
       
-      // iOS-specific preloading approach
-      if (this.isIOS) {
-        console.log('🍎 iOS detected: Using iOS-specific audio preloading...');
-        
-        // For iOS, we need to be more careful about preloading
-        Object.values(this.audioCache).forEach(audio => {
-          audio.preload = 'metadata'; // Use metadata instead of auto for iOS
-          audio.volume = 0;
-          
-          // iOS Safari sometimes needs explicit load() calls
-          try {
-            audio.load();
-          } catch (e) {
-            console.log('🍎 iOS: Could not load audio file:', e);
-          }
-        });
-        
-        console.log('🍎 iOS: Audio preloading initiated with metadata preload');
-      } else {
-        // Non-iOS devices can use aggressive preloading
-        Object.values(this.audioCache).forEach(audio => {
-          audio.preload = 'auto';
-          audio.volume = 0;
-          audio.currentTime = 0; // Force load
-        });
-        
-        // Monitor loading progress for non-iOS
-        let loadedCount = 0;
-        const totalSounds = Object.keys(this.audioCache).length;
-        
-        Object.values(this.audioCache).forEach(audio => {
-          audio.addEventListener('canplaythrough', () => {
-            loadedCount++;
-            if (loadedCount === totalSounds) {
-              console.log('🎵 All sounds fully loaded and ready for instant playback!');
-            } else {
-              console.log(`🎵 Sound loaded: ${loadedCount}/${totalSounds}`);
-            }
-          });
-          
-          audio.addEventListener('error', (e) => {
-            console.warn('⚠️ Sound failed to load:', e);
-          });
-        });
+      // Cork sounds for merges
+      for (let i = 0; i <= 9; i++) {
+        this.audioFiles[`cork${i}`] = `sounds/cork${i}.wav`;
       }
       
-      console.log('🎵 Comprehensive audio preloading initiated - caching all sounds for instant playback');
+      // Coin sounds
+      for (let i = 1; i <= 7; i++) {
+        this.audioFiles[`coin${i}`] = `sounds/coin${i}.wav`;
+      }
+      
+      console.log('🎵 Simple audio system ready with', Object.keys(this.audioFiles).length, 'sound files');
       
     } catch (error) {
-      console.error('❌ Failed to preload audio files:', error);
-      // Fallback to minimal preloading if comprehensive preloading fails
-      this.audioCache = {};
+      console.error('❌ Failed to initialize audio system:', error);
+      this.audioFiles = {};
     }
+  }
+  
+  // Simple method to play any sound
+  playSound(soundKey, volumeType = 'other') {
+    if (!this.canPlayAudio()) {
+      return Promise.reject('Audio not available');
+    }
+    
+    if (!this.audioFiles[soundKey]) {
+      return Promise.reject(`Sound ${soundKey} not found`);
+    }
+    
+    const audio = new Audio(this.audioFiles[soundKey]);
+    audio.volume = this.getActualVolume(volumeType);
+    
+    return this.safePlayAudio(audio);
   }
   
 
   
-  // Play the click2.wav sound effect for drops - using preloaded audio
+  // Play the drop sound effect - simple and reliable
   playDropSound(blockValue = 1) {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping drop sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playDropSound(blockValue));
+      return;
     }
     
-    try {
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache.drop && this.audioCache.drop.readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const dropAudio = this.audioCache.drop.cloneNode();
-        dropAudio.volume = this.getActualVolume('drop');
-        dropAudio.play().then(() => {
-          this.logSoundPlayed('drop', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('drop', 'preloaded cache', false);
-          console.log('Drop sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const dropAudio = new Audio('sounds/click2.wav');
-        dropAudio.volume = this.getActualVolume('drop');
-        dropAudio.play().then(() => {
-          this.logSoundPlayed('drop', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('drop', 'fallback new audio', false);
-          console.log('Drop sound failed from fallback:', error.message);
-        });
-      }
-    } catch (error) {
-      // Silent fail - no console spam
-    }
+    // Use the simple playSound method
+    this.playSound('drop', 'drop').catch(error => {
+      console.log('Drop sound failed:', error);
+    });
   }
   
   // Generate a peaceful, raindrop-like merge sound effect with cascade progression
   playMergeSound(blockValue = 1) {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping merge sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playMergeSound(blockValue));
+      return;
     }
     
     try {
@@ -3731,30 +3732,10 @@ class SoundManager {
       
       console.log(`🔗 Playing cascade merge sound: ${corkSoundKey} (merge #${mergeCount})`);
       
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache[corkSoundKey] && this.audioCache[corkSoundKey].readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const mergeAudio = this.audioCache[corkSoundKey].cloneNode();
-        mergeAudio.volume = this.getActualVolume('merge');
-        mergeAudio.play().then(() => {
-          this.logSoundPlayed('merge', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('merge', 'preloaded cache', false);
-          console.log('Merge sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const fallbackSoundFile = `sounds/${corkSoundKey}.wav`;
-        console.log(`🔄 Falling back to creating new audio: ${fallbackSoundFile}`);
-        const mergeAudio = new Audio(fallbackSoundFile);
-        mergeAudio.volume = this.getActualVolume('merge');
-        mergeAudio.play().then(() => {
-          this.logSoundPlayed('merge', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('merge', 'fallback new audio', false);
-          console.log('Merge sound failed from fallback:', error.message);
-        });
-      }
+      // Use simple playSound method
+      this.playSound(corkSoundKey, 'merge').catch(error => {
+        console.log('Merge sound failed:', error);
+      });
     } catch (error) {
       console.warn('⚠️ Error in playMergeSound:', error);
       // Silent fail - no console spam
@@ -3976,19 +3957,16 @@ class SoundManager {
   
 
   
-  // Play a random coin sound effect when gold is earned - using preloaded audio
+  // Play a random coin sound effect when gold is earned
   playCoinSound() {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping coin sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playCoinSound());
+      return;
     }
     
     try {
@@ -3996,30 +3974,12 @@ class SoundManager {
       const coinNumber = Math.floor(Math.random() * 7) + 1;
       const coinKey = `coin${coinNumber}`;
       
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache[coinKey] && this.audioCache[coinKey].readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const coinAudio = this.audioCache[coinKey].cloneNode();
-        coinAudio.volume = this.getActualVolume('coin');
-        coinAudio.play().then(() => {
-          this.logSoundPlayed('coin', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('coin', 'preloaded cache', false);
-          console.log('Coin sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const coinAudio = new Audio(`sounds/coin${coinNumber}.wav`);
-        coinAudio.volume = this.getActualVolume('coin');
-        coinAudio.play().then(() => {
-          this.logSoundPlayed('coin', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('coin', 'fallback new audio', false);
-          console.log('Coin sound failed from fallback:', error.message);
-        });
-      }
+      // Use the simple playSound method
+      this.playSound(coinKey, 'coin').catch(error => {
+        console.log('Coin sound failed:', error);
+      });
     } catch (error) {
-      // Silent fail - no console spam
+      console.log('Error in playCoinSound:', error);
     }
   }
   
@@ -4031,90 +3991,40 @@ class SoundManager {
   
 
 
-  // Load and play the stage up sound effect from audio file - using preloaded audio
+  // Load and play the stage up sound effect
   playStageProgressionSound() {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping stage progression sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playStageProgressionSound());
+      return;
     }
     
-    try {
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache.stageUp && this.audioCache.stageUp.readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const stageUpAudio = this.audioCache.stageUp.cloneNode();
-        stageUpAudio.volume = this.getActualVolume('other');
-        stageUpAudio.play().then(() => {
-          this.logSoundPlayed('stage up', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('stage up', 'preloaded cache', false);
-          console.log('Stage up sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const stageUpAudio = new Audio('sounds/stage_up.mp3');
-        stageUpAudio.volume = this.getActualVolume('other');
-        stageUpAudio.play().then(() => {
-          this.logSoundPlayed('stage up', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('stage up', 'fallback new audio', false);
-          console.log('Stage up sound failed from fallback:', error.message);
-        });
-      }
-    } catch (error) {
-      // Silent fail - no console spam
-    }
+    // Use the simple playSound method
+    this.playSound('stageUp', 'other').catch(error => {
+      console.log('Stage up sound failed:', error);
+    });
   }
 
-  // Load and play the bomb explosion sound effect from audio file - using preloaded audio
+  // Load and play the bomb explosion sound effect
   playBombSound() {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping bomb sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playBombSound());
+      return;
     }
     
-    try {
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache.bomb && this.audioCache.bomb.readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const bombAudio = this.audioCache.bomb.cloneNode();
-        bombAudio.volume = this.getActualVolume('bomb');
-        bombAudio.play().then(() => {
-          this.logSoundPlayed('bomb', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('bomb', 'preloaded cache', false);
-          console.log('Bomb sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const bombAudio = new Audio('sounds/bomb.mp3');
-        bombAudio.volume = this.getActualVolume('bomb');
-        bombAudio.play().then(() => {
-          this.logSoundPlayed('bomb', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('bomb', 'fallback new audio', false);
-          console.log('Bomb sound failed from fallback:', error.message);
-        });
-      }
-    } catch (error) {
-      // Silent fail - no console spam
-    }
+    // Use the simple playSound method
+    this.playSound('bomb', 'bomb').catch(error => {
+      console.log('Bomb sound failed:', error);
+    });
   }
 
 
@@ -4123,47 +4033,22 @@ class SoundManager {
 
 
 
-  // Play purchase sound effect - using preloaded audio
+  // Play purchase sound effect
   playPurchaseSound() {
-    // For iOS, try to play even if checks fail (more aggressive approach)
-    if (!this.canPlayAudio() && !this.isIOS) {
+    if (!this.canPlayAudio()) {
       return;
     }
     
-    // Ensure sound system is ready
-    if (!this.areSoundsPreloaded()) {
-      if (!this.isIOS) {
-        console.log('🎵 Sounds not ready yet, skipping purchase sound');
-        return;
-      }
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playPurchaseSound());
+      return;
     }
     
-    try {
-      // Use preloaded audio for instant playback
-      if (this.audioCache && this.audioCache.purchase && this.audioCache.purchase.readyState >= 2) {
-        // Clone the preloaded audio to allow multiple simultaneous plays
-        const purchaseAudio = this.audioCache.purchase.cloneNode();
-        purchaseAudio.volume = this.getActualVolume('other');
-        purchaseAudio.play().then(() => {
-          this.logSoundPlayed('purchase', 'preloaded cache', true);
-        }).catch(error => {
-          this.logSoundPlayed('purchase', 'preloaded cache', false);
-          console.log('Purchase sound failed from cache:', error.message);
-        });
-      } else {
-        // Fallback to creating new audio if preloading failed
-        const purchaseAudio = new Audio('sounds/purchase.wav');
-        purchaseAudio.volume = this.getActualVolume('other');
-        purchaseAudio.play().then(() => {
-          this.logSoundPlayed('purchase', 'fallback new audio', true);
-        }).catch(error => {
-          this.logSoundPlayed('purchase', 'fallback new audio', false);
-          console.log('Purchase sound failed from fallback:', error.message);
-        });
-      }
-    } catch (error) {
-      // Silent fail - no console spam
-    }
+    // Use the simple playSound method
+    this.playSound('purchase', 'other').catch(error => {
+      console.log('Purchase sound failed:', error);
+    });
   }
 
   // Merge count tracking for cascade effects - COMPLETELY SEPARATE FROM AUDIO
@@ -4329,6 +4214,9 @@ const SAVE_COOKIE_NAME = 'stackMerge_save';
 const SAVE_COOKIE_EXPIRY_DAYS = 30;
 const MAX_COOKIE_SIZE = 3500; // Conservative limit to avoid issues
 
+// Update notification system
+let lastSeenUpdateTimestamp = 0; // Track when user last saw updates
+
 // Help button state cookie
 const HELP_BUTTON_COOKIE_NAME = 'stackMerge_helpClicked';
 const HELP_BUTTON_COOKIE_EXPIRY_DAYS = 365; // Keep for a year
@@ -4386,6 +4274,7 @@ function saveGameState() {
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
       currentActiveDecayFactor: currentActiveDecayFactor,
+      lastSeenUpdateTimestamp: lastSeenUpdateTimestamp || 0,
       timestamp: Date.now()
     };
     
@@ -4599,6 +4488,10 @@ function restoreGameState(gameState) {
       console.log('🔇 Restored master mute state:', gameState.isMuted);
     }
     
+    // Restore last seen update timestamp
+    lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
+    console.log('📰 Restored last seen update timestamp:', lastSeenUpdateTimestamp);
+    
     // Always update the merge sound button to reflect current state (including default)
     const mergeSoundBtn = document.getElementById('mergeSoundBtn');
     if (mergeSoundBtn) {
@@ -4753,6 +4646,233 @@ function loadGameState() {
     console.error('Error stack:', error.stack);
     clearGameSave();
     return false;
+  }
+}
+
+// Update notification system functions
+async function fetchUpdates() {
+  try {
+    console.log('📰 Fetching updates from updates.txt...');
+    const response = await fetch('updates.txt');
+    if (!response.ok) {
+      console.error('❌ Failed to fetch updates:', response.status);
+      return [];
+    }
+    
+    const text = await response.text();
+    const lines = text.split('\n');
+    const updates = [];
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Skip empty lines and comments
+      if (!trimmedLine || trimmedLine.startsWith('#')) continue;
+      
+      const parts = trimmedLine.split('|');
+      if (parts.length === 3) {
+        const timestamp = parseInt(parts[0]);
+        const title = parts[1];
+        const message = parts[2];
+        
+        if (!isNaN(timestamp)) {
+          updates.push({ timestamp, title, message });
+        }
+      }
+    }
+    
+    // Sort updates by timestamp (newest first)
+    updates.sort((a, b) => b.timestamp - a.timestamp);
+    console.log('📰 Parsed updates:', updates);
+    return updates;
+  } catch (error) {
+    console.error('❌ Error fetching updates:', error);
+    return [];
+  }
+}
+
+function checkForNewUpdates(updates) {
+  console.log('📰 Checking for new updates since:', lastSeenUpdateTimestamp);
+  console.log('📰 Available updates:', updates.length);
+  
+  // If this is a first-time user (lastSeenUpdateTimestamp is 0), only show the most recent update
+  if (lastSeenUpdateTimestamp === 0 && updates.length > 0) {
+    console.log('📰 First-time user - showing only the most recent update');
+    return [updates[0]]; // Only return the most recent update
+  }
+  
+  // Find updates newer than the last seen timestamp
+  const newUpdates = updates.filter(update => update.timestamp > lastSeenUpdateTimestamp);
+  console.log('📰 New updates found:', newUpdates.length);
+  
+  return newUpdates;
+}
+
+function showUpdateModal(updates) {
+  if (updates.length === 0) return;
+  
+  // Get the newest update to show
+  const latestUpdate = updates[0];
+  
+  console.log('📰 Showing update modal for:', latestUpdate.title);
+  
+  // Create modal HTML
+  const modalHtml = `
+    <div class="modal-backdrop" id="updateModalBackdrop">
+      <div class="modal update-modal">
+        <h2>Stack Merge Updates</h2>
+        <div class="update-content">
+          <h3>${latestUpdate.title}</h3>
+          <p>${latestUpdate.message}</p>
+          ${updates.length > 1 ? `<p><em>+ ${updates.length - 1} more update${updates.length > 2 ? 's' : ''} since your last visit</em></p>` : ''}
+        </div>
+        <div class="actions">
+          <button onclick="closeUpdateModal()" class="update-got-it-btn">Got it!</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to page
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // Update the last seen timestamp to current time
+  lastSeenUpdateTimestamp = Date.now();
+  
+  // Save the updated timestamp
+  saveGameState();
+}
+
+function closeUpdateModal() {
+  const backdrop = document.getElementById('updateModalBackdrop');
+  if (backdrop) {
+    backdrop.remove();
+  }
+}
+
+// Test function for debugging the update system
+async function testUpdateSystem() {
+  console.log('🧪 Testing update notification system...');
+  console.log('Current lastSeenUpdateTimestamp:', lastSeenUpdateTimestamp);
+  
+  const updates = await fetchUpdates();
+  console.log('Fetched updates:', updates);
+  
+  const newUpdates = checkForNewUpdates(updates);
+  console.log('New updates:', newUpdates);
+  
+  if (newUpdates.length > 0) {
+    console.log('Showing update modal...');
+    showUpdateModal(newUpdates);
+  } else {
+    console.log('No new updates to show');
+  }
+}
+
+// Function to reset update timestamp for testing
+function resetUpdateTimestamp() {
+  console.log('🔄 Resetting update timestamp for testing...');
+  lastSeenUpdateTimestamp = 0;
+  saveGameState();
+  console.log('✅ Update timestamp reset. Call testUpdateSystem() to see the modal.');
+}
+
+// Function to completely clear all game data (cookies AND localStorage)
+function clearAllGameData() {
+  console.log('🧹 CLEARING ALL GAME DATA...');
+  
+  // Clear cookies
+  try {
+    // Clear main save cookie and its chunks
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+      const cookieName = cookie.split('=')[0].trim();
+      if (cookieName.startsWith('stackMerge_')) {
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+        console.log(`🍪 Cleared cookie: ${cookieName}`);
+      }
+    });
+  } catch (e) {
+    console.log('❌ Error clearing cookies:', e);
+  }
+  
+  // Clear localStorage
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('stackMerge_')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+      console.log(`💾 Cleared localStorage: ${key}`);
+    });
+  } catch (e) {
+    console.log('❌ Error clearing localStorage:', e);
+  }
+  
+  // Reset the useLocalStorage flag
+  useLocalStorage = false;
+  
+  // Reset the update timestamp variable
+  lastSeenUpdateTimestamp = 0;
+  
+  console.log('✅ All game data cleared! Refresh the page to see the update modal.');
+  console.log('💡 Or call testUpdateSystem() to trigger it immediately.');
+}
+
+// Function to check current storage state
+function checkStorageState() {
+  console.log('🔍 CHECKING STORAGE STATE...');
+  console.log('Current useLocalStorage flag:', useLocalStorage);
+  console.log('Current lastSeenUpdateTimestamp:', lastSeenUpdateTimestamp);
+  
+  // Check cookies
+  console.log('\n🍪 COOKIES:');
+  const cookies = document.cookie.split(';');
+  const stackMergeCookies = cookies.filter(cookie => 
+    cookie.trim().split('=')[0].startsWith('stackMerge_')
+  );
+  if (stackMergeCookies.length > 0) {
+    stackMergeCookies.forEach(cookie => {
+      const [name, value] = cookie.split('=');
+      console.log(`  ${name.trim()}: ${value ? '✅ EXISTS' : '❌ EMPTY'}`);
+    });
+  } else {
+    console.log('  No stackMerge cookies found');
+  }
+  
+  // Check localStorage
+  console.log('\n💾 LOCALSTORAGE:');
+  const localStorageKeys = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('stackMerge_')) {
+        localStorageKeys.push(key);
+      }
+    }
+    
+    if (localStorageKeys.length > 0) {
+      localStorageKeys.forEach(key => {
+        const value = localStorage.getItem(key);
+        console.log(`  ${key}: ${value ? '✅ EXISTS' : '❌ EMPTY'}`);
+        if (key === 'stackMerge_save' && value) {
+          try {
+            const saveData = JSON.parse(value);
+            console.log(`    lastSeenUpdateTimestamp: ${saveData.lastSeenUpdateTimestamp || 0}`);
+          } catch (e) {
+            console.log('    Could not parse save data');
+          }
+        }
+      });
+    } else {
+      console.log('  No stackMerge localStorage keys found');
+    }
+  } catch (e) {
+    console.log('  localStorage not accessible:', e);
   }
 }
 
@@ -5799,9 +5919,7 @@ function openHelp(){
 function closeHelp(){ helpModal.classList.add('hidden'); }
 if (helpBtn) {
   helpBtn.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     openHelp();
   });
 } else {
@@ -5814,6 +5932,24 @@ if (helpClose) {
   console.log('⚠️ Help close button not found');
 }
 
+// Reset Local Data button event listener
+const resetDataBtn = document.getElementById('resetDataBtn');
+if (resetDataBtn) {
+  resetDataBtn.addEventListener('click', () => {
+    if (confirm('This will clear ALL game data (save progress, settings, etc.) Are you sure?')) {
+      clearAllGameData();
+      closeHelp(); // Close the help modal
+      
+      // Show update modal after a brief delay
+      setTimeout(() => {
+        testUpdateSystem();
+      }, 500);
+    }
+  });
+} else {
+  console.log('⚠️ Reset data button not found');
+}
+
 if (helpModal) {
   helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
 } else {
@@ -5823,9 +5959,7 @@ if (helpModal) {
 // Sound button event listener
 if (soundBtn) {
         soundBtn.addEventListener('click', () => {
-        if (soundManager) {
-          soundManager.markUserInteraction();
-        }
+
         openSoundControlModal();
       });
 } else {
@@ -5836,9 +5970,7 @@ if (soundBtn) {
 const mergeSoundBtn = document.getElementById('mergeSoundBtn');
 if (mergeSoundBtn) {
   mergeSoundBtn.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     const usePopSounds = soundManager.toggleMergeSoundType();
     mergeSoundBtn.textContent = '🎵'; // Always show music note
     mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
@@ -5873,9 +6005,7 @@ window.addEventListener('keydown', (e) => {
 // Bomb conversion button event listener
 if (bombConversionBtn) {
   bombConversionBtn.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     handleBombConversion();
   });
 } else {
@@ -5885,9 +6015,7 @@ if (bombConversionBtn) {
 // Trash button event listener
 if (trashButton) {
   trashButton.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     handleTrashButton();
   });
 } else {
@@ -5897,9 +6025,7 @@ if (trashButton) {
 // Mobile button event listeners
 if (bombConversionBtnMobile) {
   bombConversionBtnMobile.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     handleBombConversion();
   });
 } else {
@@ -5908,9 +6034,7 @@ if (bombConversionBtnMobile) {
 
 if (trashButtonMobile) {
   trashButtonMobile.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     handleTrashButton();
   });
 } else {
@@ -5930,17 +6054,17 @@ if (gameOverButton) {
   console.log('⚠️ Game over button not found');
 }
 
-// Global user interaction detection for iOS audio compatibility
+// Global user interaction detection for universal audio compatibility
 document.addEventListener('click', () => {
-  if (soundManager) {
-    soundManager.markUserInteraction();
+  if (soundManager && !soundManager.audioUnlocked) {
+    soundManager.unlockAudio();
   }
 });
 
 // Touch event detection for mobile devices
 document.addEventListener('touchstart', () => {
-  if (soundManager) {
-    soundManager.markUserInteraction();
+  if (soundManager && !soundManager.audioUnlocked) {
+    soundManager.unlockAudio();
   }
 }, { passive: true });
 
@@ -5948,9 +6072,7 @@ document.addEventListener('touchstart', () => {
 const addBtn = document.getElementById('addBtn');
 if (addBtn) {
   addBtn.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     openNewGameModal();
   });
 } else {
@@ -5961,9 +6083,7 @@ if (addBtn) {
 const confirmNewGameBtn = document.getElementById('confirmNewGameBtn');
 if (confirmNewGameBtn) {
   confirmNewGameBtn.addEventListener('click', () => {
-    if (soundManager) {
-      soundManager.markUserInteraction();
-    }
+
     handleNewGameConfirmation();
   });
 } else {
@@ -6041,9 +6161,7 @@ function initializeSoundControlModal() {
     masterMuteBtn.classList.toggle('muted', isMuted);
     
     masterMuteBtn.addEventListener('click', () => {
-      if (soundManager) {
-        soundManager.markUserInteraction();
-      }
+
       const isMuted = soundManager.toggleMute();
       masterMuteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
       masterMuteBtn.classList.toggle('muted', isMuted);
@@ -6074,12 +6192,7 @@ function initializeSoundControlModal() {
       value.textContent = currentVolume;
       
       slider.addEventListener('input', (e) => {
-        if (soundManager) {
-          soundManager.markUserInteraction();
-          if (soundManager.isIOS) {
-            console.log(`🍎 iOS: ${soundType} volume slider interaction - audio should now be enabled`);
-          }
-        }
+
         const newVolume = parseInt(e.target.value);
         console.log(`🎚️ ${soundType} volume slider changed to: ${newVolume}`);
         soundManager.setSoundVolume(soundType, newVolume);
@@ -6094,10 +6207,7 @@ function initializeSoundControlModal() {
         const finalVolume = parseInt(e.target.value);
         console.log(`🎵 ${soundType} volume slider released at: ${finalVolume}`);
         
-        // iOS-specific logging
-        if (soundManager && soundManager.isIOS) {
-          console.log(`🍎 iOS: ${soundType} volume slider released. Audio status:`, soundManager.getIOSAudioStatus());
-        }
+
         
         // Test the volume change only when slider is released
         testVolumeChange(soundType, finalVolume);
@@ -6117,9 +6227,7 @@ function initializeSoundControlModal() {
   const resetAudioBtn = document.getElementById('resetAudioBtn');
   if (resetAudioBtn) {
     resetAudioBtn.addEventListener('click', () => {
-      if (soundManager) {
-        soundManager.markUserInteraction();
-      }
+
       console.log('🔄 Reset audio settings button clicked');
       if (soundManager && typeof soundManager.resetAudioSettings === 'function') {
         soundManager.resetAudioSettings();
@@ -6137,18 +6245,18 @@ function initializeSoundControlModal() {
       }
     });
   }
-  
-  // Test iOS audio button
-  const testIOSAudioBtn = document.getElementById('testIOSAudioBtn');
-  if (testIOSAudioBtn) {
-    testIOSAudioBtn.addEventListener('click', () => {
+
+  // Test audio button for debugging
+  const testAudioBtn = document.getElementById('testAudioBtn');
+  if (testAudioBtn) {
+    testAudioBtn.addEventListener('click', () => {
       if (soundManager) {
-        soundManager.markUserInteraction();
-        console.log('🍎 iOS Audio Test Button clicked');
-        console.log('🍎 Current iOS audio status:', soundManager.getIOSAudioStatus());
-        
-        // Run the simple test
-        soundManager.testIOSAudio();
+        // Quick audio test - just play a drop sound
+        setTimeout(() => {
+          soundManager.playDropSound(1);
+        }, 100);
+      } else {
+        alert('❌ Sound manager not available');
       }
     });
   }
@@ -6266,10 +6374,7 @@ function testVolumeChange(soundType, volume) {
   if (actualVolume > 0) {
     console.log(`🎵 ${soundType} volume is not muted, sound should play`);
     
-    // iOS-specific logging
-    if (soundManager && soundManager.isIOS) {
-      console.log(`🍎 iOS: Testing ${soundType} sound. Audio status:`, soundManager.getIOSAudioStatus());
-    }
+
     
     // Play a test sound based on the sound type
     switch (soundType) {
@@ -6918,10 +7023,20 @@ function render(){
     // Only add click handler if stack is not disabled
     if (!isDisabled) {
       poleDiv.addEventListener('click', () => {
-        // Prime audio context on first click to ensure instant playback
-        if (soundManager) {
-          soundManager.markUserInteraction();
+        // Ensure audio is unlocked on first click
+        if (soundManager && !soundManager.audioUnlocked) {
+          soundManager.unlockAudio();
         }
+        
+        // Play drop sound IMMEDIATELY on click for iOS compatibility
+        // This happens before any game logic, in direct response to user interaction
+        if (soundManager && soundManager.canPlayAudio()) {
+          const nextPiece = nextQueue[0];
+          if (nextPiece) {
+            soundManager.playDropSound(nextPiece.w);
+          }
+        }
+        
         placeOnPole(idx);
       });
       
@@ -6936,9 +7051,7 @@ function render(){
         e.preventDefault();
         
         // Prime audio context on first touch to ensure instant playback
-        if (soundManager) {
-          soundManager.markUserInteraction();
-        }
+
       }, { passive: false });
       
       poleDiv.addEventListener('touchend', (e) => {
@@ -6949,6 +7062,19 @@ function render(){
         
         // Only trigger placement if it's a quick tap (not a swipe) and close to start position
         if (touchDuration < 300 && touchDistance < 20) {
+          // Ensure audio is unlocked on first touch
+          if (soundManager && !soundManager.audioUnlocked) {
+            soundManager.unlockAudio();
+          }
+          
+          // Play drop sound IMMEDIATELY on touch for iOS compatibility
+          if (soundManager && soundManager.canPlayAudio()) {
+            const nextPiece = nextQueue[0];
+            if (nextPiece) {
+              soundManager.playDropSound(nextPiece.w);
+            }
+          }
+          
           placeOnPole(idx);
         }
       });
@@ -7067,8 +7193,7 @@ function placeOnPole(idx){
     return;
   }
   
-  // Play drop sound effect IMMEDIATELY after validation, before any animations
-  soundManager.playDropSound(nextPiece.w);
+  // Note: Drop sound is now played immediately in the click/touch handler for iOS compatibility
   
   placing = true;
   lastPlacementTime = Date.now();
@@ -8517,6 +8642,24 @@ try {
   render();
   renderNext();
   console.log('✅ Game display rendered');
+  
+  // Check for game updates after everything is loaded and rendered
+  setTimeout(async () => {
+    try {
+      console.log('📰 Checking for game updates...');
+      const updates = await fetchUpdates();
+      const newUpdates = checkForNewUpdates(updates);
+      
+      if (newUpdates.length > 0) {
+        console.log('📰 Found new updates, showing modal...');
+        showUpdateModal(newUpdates);
+      } else {
+        console.log('📰 No new updates to show');
+      }
+    } catch (error) {
+      console.error('❌ Failed to check for updates:', error);
+    }
+  }, 1000); // Delay to ensure UI is fully rendered
   
   // Initialize help button glow for new players
   if (helpBtn) {

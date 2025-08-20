@@ -1,0 +1,5 @@
+# Stack Merge Game Updates
+# Format: timestamp|title|message
+# Timestamp should be in milliseconds (Date.now() format)
+
+1755663983072|iOS Performance Issues|We're investigating performance issues on iOS devices, relating to audio lag. Play on Desktop or Android for a smooth experience!
