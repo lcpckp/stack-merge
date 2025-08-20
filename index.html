@@ -3498,13 +3498,13 @@
   </div>
 
 <script>
-// Sound Manager for Stack Merge Game
+// Sound Manager for Stack Merge Game - Web Audio API Implementation
 class SoundManager {
   constructor() {
     this.isMuted = false;
     this.usePopMergeSounds = true; // true = cork sounds (default), false = musical sounds
     this.volume = 0.3; // Default volume (30%)
-    this.initialized = true; // Always initialized since we use simple audio files
+    this.initialized = false; // Will be set to true after Web Audio API initialization
     
     // Individual sound type volumes (0-5 scale, converted to 0.0-1.0 internally)
     this.soundVolumes = {
@@ -3515,50 +3515,142 @@ class SoundManager {
       other: 3      // Other sounds (stage up, etc.)
     };
     
-    // Universal audio unlock flag (works across all devices)
+    // Web Audio API components
+    this.audioContext = null;
+    this.audioBuffers = {};
     this.audioUnlocked = false;
+    
+    // Track initialization state
+    this.initializationPromise = null;
     
     // Debug localStorage to check for corrupted settings
     this.debugLocalStorage();
     
-    // Preload audio files for better performance
-    this.preloadAudioFiles();
-    
-    // Wait for sounds to be ready in the background
-    this.waitForSoundsReady().then(() => {
-      console.log('🎵 Sound system fully initialized and ready!');
-      console.log('🎵 Sound system status:', this.getSoundSystemStatus());
-    });
-    
-    // Log preloading progress every 2 seconds until complete
-    const progressInterval = setInterval(() => {
-      const progress = this.getPreloadProgress();
-      if (progress === 100) {
-        clearInterval(progressInterval);
-        console.log('🎵 All sounds fully loaded!');
-      } else {
-        console.log(`🎵 Preloading progress: ${progress}% (${this.getLoadedSoundCount()}/22 sounds ready)`);
-      }
-    }, 2000);
+    // Initialize Web Audio API system
+    this.initializeWebAudioSystem();
   }
   
 
   
 
   
-  // Universal audio unlock method (works on all devices including iOS)
-  unlockAudio() {
+  // Initialize Web Audio API system
+  async initializeWebAudioSystem() {
+    try {
+      console.log('🎵 Initializing Web Audio API system...');
+      
+      // Create audio context
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Define all sound files that need to be loaded
+      this.audioFiles = {
+        drop: 'sounds/click2.wav',
+        bomb: 'sounds/bomb.mp3',
+        stageUp: 'sounds/stage_up.mp3',
+        purchase: 'sounds/purchase.wav'
+      };
+      
+      // Cork sounds for merges
+      for (let i = 0; i <= 9; i++) {
+        this.audioFiles[`cork${i}`] = `sounds/cork${i}.wav`;
+      }
+      
+      // Coin sounds
+      for (let i = 1; i <= 7; i++) {
+        this.audioFiles[`coin${i}`] = `sounds/coin${i}.wav`;
+      }
+      
+      console.log('🎵 Web Audio API initialized with', Object.keys(this.audioFiles).length, 'sound files to load');
+      
+      // Start loading audio buffers in background
+      this.preloadAudioBuffers();
+      
+    } catch (error) {
+      console.error('❌ Failed to initialize Web Audio API:', error);
+      this.audioFiles = {};
+    }
+  }
+
+  // Preload all audio files as buffers
+  async preloadAudioBuffers() {
+    const loadPromises = [];
+    
+    for (const [soundKey, filePath] of Object.entries(this.audioFiles)) {
+      loadPromises.push(this.loadAudioBuffer(soundKey, filePath));
+    }
+    
+    try {
+      await Promise.all(loadPromises);
+      this.initialized = true;
+      console.log('🎵 All audio buffers loaded successfully!');
+    } catch (error) {
+      console.warn('⚠️ Some audio buffers failed to load:', error);
+      this.initialized = true; // Still mark as initialized to allow the game to continue
+    }
+  }
+
+  // Load individual audio buffer
+  async loadAudioBuffer(soundKey, filePath) {
+    try {
+      const response = await fetch(filePath);
+      if (!response.ok) throw new Error(`Failed to fetch ${filePath}`);
+      
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      
+      this.audioBuffers[soundKey] = audioBuffer;
+      console.log(`✅ Loaded audio buffer: ${soundKey}`);
+      
+    } catch (error) {
+      console.warn(`⚠️ Failed to load audio buffer ${soundKey}:`, error);
+    }
+  }
+
+  // Universal audio unlock method using Web Audio API (works on all devices including iOS)
+  async unlockAudio() {
     if (this.audioUnlocked) {
       return Promise.resolve();
     }
 
-    console.log('🎵 Unlocking audio silently...');
+    console.log('🎵 Unlocking Web Audio API...');
     
-    // Simple silent unlock - just mark as unlocked
-    // The first actual game sound will handle any browser audio context unlocking
-    this.audioUnlocked = true;
-    console.log('✅ Audio unlocked (silent mode)');
-    return Promise.resolve();
+    try {
+      // Initialize Web Audio if not already done
+      if (!this.audioContext) {
+        await this.initializeWebAudioSystem();
+      }
+      
+      // Resume audio context if suspended
+      if (this.audioContext && this.audioContext.state === 'suspended') {
+        let attempt = 1;
+        
+        while (this.audioContext.state === 'suspended' && attempt <= 1000) {
+          try {
+            const resumePromise = this.audioContext.resume();
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error('Timeout')), 1);
+            });
+            
+            await Promise.race([resumePromise, timeoutPromise]);
+            
+            if (this.audioContext.state === 'running') break;
+          } catch (error) {
+            // Silent continue
+          }
+          
+          attempt++;
+        }
+      }
+      
+      this.audioUnlocked = true;
+      console.log('✅ Web Audio API unlocked successfully');
+      return Promise.resolve();
+      
+    } catch (error) {
+      console.warn('⚠️ Failed to unlock Web Audio API:', error);
+      this.audioUnlocked = true; // Mark as unlocked anyway to prevent infinite retry
+      return Promise.resolve();
+    }
   }
 
   // Debug popup helper for iOS testing (disabled for normal gameplay)
@@ -3638,50 +3730,73 @@ class SoundManager {
   }
   
   // Simple, reliable audio system that works on all devices
-  preloadAudioFiles() {
+  // Play sound using Web Audio API
+  async playWebAudio(soundKey, volumeType = 'other') {
+    if (!this.audioContext || !this.audioBuffers[soundKey]) {
+      return false;
+    }
+    
     try {
-      console.log('🎵 Starting simple audio system...');
-      
-      // Create simple audio objects - don't over-complicate
-      this.audioFiles = {
-        drop: 'sounds/click2.wav',
-        bomb: 'sounds/bomb.mp3',
-        stageUp: 'sounds/stage_up.mp3',
-        purchase: 'sounds/purchase.wav'
-      };
-      
-      // Cork sounds for merges
-      for (let i = 0; i <= 9; i++) {
-        this.audioFiles[`cork${i}`] = `sounds/cork${i}.wav`;
+      // Resume audio context if suspended
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+        if (this.audioContext.state === 'suspended') return false;
       }
       
-      // Coin sounds
-      for (let i = 1; i <= 7; i++) {
-        this.audioFiles[`coin${i}`] = `sounds/coin${i}.wav`;
-      }
+      if (this.audioContext.state !== 'running') return false;
       
-      console.log('🎵 Simple audio system ready with', Object.keys(this.audioFiles).length, 'sound files');
+      // Create audio nodes
+      const source = this.audioContext.createBufferSource();
+      const gainNode = this.audioContext.createGain();
       
+      // Set up audio graph
+      source.buffer = this.audioBuffers[soundKey];
+      source.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      // Set volume based on type and settings
+      const volume = this.getActualVolume(volumeType);
+      gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+      
+      // Play the sound
+      source.start(0);
+      
+      return true;
     } catch (error) {
-      console.error('❌ Failed to initialize audio system:', error);
-      this.audioFiles = {};
+      console.warn(`⚠️ Failed to play sound ${soundKey}:`, error);
+      return false;
     }
   }
   
-  // Simple method to play any sound
-  playSound(soundKey, volumeType = 'other') {
+  // Enhanced method to play any sound with Web Audio API fallback
+  async playSound(soundKey, volumeType = 'other') {
     if (!this.canPlayAudio()) {
       return Promise.reject('Audio not available');
     }
     
-    if (!this.audioFiles[soundKey]) {
-      return Promise.reject(`Sound ${soundKey} not found`);
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      await this.unlockAudio();
     }
     
-    const audio = new Audio(this.audioFiles[soundKey]);
-    audio.volume = this.getActualVolume(volumeType);
+    // Try Web Audio API first
+    const webAudioSuccess = await this.playWebAudio(soundKey, volumeType);
+    if (webAudioSuccess) {
+      return Promise.resolve();
+    }
     
-    return this.safePlayAudio(audio);
+    // Fallback to traditional Audio element for compatibility
+    if (this.audioFiles && this.audioFiles[soundKey]) {
+      try {
+        const audio = new Audio(this.audioFiles[soundKey]);
+        audio.volume = this.getActualVolume(volumeType);
+        return this.safePlayAudio(audio);
+      } catch (error) {
+        return Promise.reject(`Fallback audio failed: ${error.message}`);
+      }
+    }
+    
+    return Promise.reject(`Sound ${soundKey} not found`);
   }
   
 
@@ -4071,42 +4186,42 @@ class SoundManager {
   
   // Check if all sounds are preloaded and ready for playback
   areSoundsPreloaded() {
-    if (!this.audioCache) return false;
+    if (!this.audioBuffers) return false;
     
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase', 'purchase2'
+      'bomb', 'stageUp', 'purchase'
     ];
     
     return requiredSounds.every(soundKey => 
-      this.audioCache[soundKey] && 
-      this.audioCache[soundKey].readyState >= 2 // HAVE_CURRENT_DATA
+      this.audioBuffers[soundKey] && this.audioBuffers[soundKey] instanceof AudioBuffer
     );
   }
   
   // Get preloading status for debugging
   getPreloadStatus() {
-    if (!this.audioCache) return { status: 'not_initialized', loaded: 0, total: 0 };
+    if (!this.audioBuffers) return { status: 'not_initialized', loaded: 0, total: 0 };
     
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase', 'purchase2'
+      'bomb', 'stageUp', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
-      this.audioCache[soundKey] && 
-      this.audioCache[soundKey].readyState >= 2
+      this.audioBuffers[soundKey] && this.audioBuffers[soundKey] instanceof AudioBuffer
     );
     
     return {
       status: loadedSounds.length === requiredSounds.length ? 'fully_loaded' : 'partially_loaded',
       loaded: loadedSounds.length,
       total: requiredSounds.length,
-      readyState: requiredSounds.reduce((acc, soundKey) => {
-        if (this.audioCache[soundKey]) {
-          acc[soundKey] = this.audioCache[soundKey].readyState;
+      bufferStatus: requiredSounds.reduce((acc, soundKey) => {
+        if (this.audioBuffers[soundKey]) {
+          acc[soundKey] = 'loaded';
+        } else {
+          acc[soundKey] = 'missing';
         }
         return acc;
       }, {})
@@ -4115,9 +4230,10 @@ class SoundManager {
   
   // Force reload all sounds (useful for troubleshooting)
   reloadAllSounds() {
-    console.log('🔄 Reloading all sounds...');
-    this.audioCache = {};
-    this.preloadAudioFiles();
+    console.log('🔄 Reloading all audio buffers...');
+    this.audioBuffers = {};
+    this.initialized = false;
+    this.initializeWebAudioSystem();
   }
   
   // Wait for all sounds to be ready (returns a promise)
@@ -4147,37 +4263,36 @@ class SoundManager {
   
   // Get preloading progress as a percentage
   getPreloadProgress() {
-    if (!this.audioCache) return 0;
+    if (!this.audioBuffers) return 0;
     
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase', 'purchase2'
+      'bomb', 'stageUp', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
-      this.audioCache[soundKey] && 
-      this.audioCache[soundKey].readyState >= 2
+      this.audioBuffers[soundKey] && this.audioBuffers[soundKey] instanceof AudioBuffer
     );
     
     return Math.round((loadedSounds.length / requiredSounds.length) * 100);
   }
   
-  // Check if a specific sound is ready for playback
+  // Check if a specific sound buffer is ready for playback
   isSoundReady(soundKey) {
-    return this.audioCache && 
-           this.audioCache[soundKey] && 
-           this.audioCache[soundKey].readyState >= 2;
+    return this.audioBuffers && 
+           this.audioBuffers[soundKey] && 
+           this.audioBuffers[soundKey] instanceof AudioBuffer;
   }
   
-  // Get the number of sounds currently loaded
+  // Get the number of sound buffers currently loaded
   getLoadedSoundCount() {
-    if (!this.audioCache) return 0;
+    if (!this.audioBuffers) return 0;
     
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase', 'purchase2'
+      'bomb', 'stageUp', 'purchase'
     ];
     
     return requiredSounds.filter(soundKey => this.isSoundReady(soundKey)).length;
@@ -4194,7 +4309,9 @@ class SoundManager {
       loadedCount: this.getLoadedSoundCount(),
       totalSounds: 22, // Total number of required sounds
       ready: this.areSoundsPreloaded(),
-      cacheStatus: this.audioCache ? 'active' : 'inactive'
+      webAudioContext: this.audioContext ? this.audioContext.state : 'not initialized',
+      audioUnlocked: this.audioUnlocked,
+      buffersLoaded: Object.keys(this.audioBuffers || {}).length
     };
   }
 }
@@ -4216,6 +4333,7 @@ const MAX_COOKIE_SIZE = 3500; // Conservative limit to avoid issues
 
 // Update notification system
 let lastSeenUpdateTimestamp = 0; // Track when user last saw updates
+let preventTimestampRestore = false; // Flag to prevent timestamp restoration after clearing
 
 // Help button state cookie
 const HELP_BUTTON_COOKIE_NAME = 'stackMerge_helpClicked';
@@ -4488,9 +4606,14 @@ function restoreGameState(gameState) {
       console.log('🔇 Restored master mute state:', gameState.isMuted);
     }
     
-    // Restore last seen update timestamp
-    lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
-    console.log('📰 Restored last seen update timestamp:', lastSeenUpdateTimestamp);
+    // Restore last seen update timestamp (unless prevented by clear operation)
+    if (!preventTimestampRestore) {
+      lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
+      console.log('📰 Restored last seen update timestamp:', lastSeenUpdateTimestamp);
+    } else {
+      console.log('📰 Skipped timestamp restoration due to clear operation');
+      preventTimestampRestore = false; // Reset the flag
+    }
     
     // Always update the merge sound button to reflect current state (including default)
     const mergeSoundBtn = document.getElementById('mergeSoundBtn');
@@ -4653,7 +4776,7 @@ function loadGameState() {
 async function fetchUpdates() {
   try {
     console.log('📰 Fetching updates from updates.txt...');
-    const response = await fetch('updates.txt');
+    const response = await fetch('updates.txt?' + Date.now()); // Add cache-busting
     if (!response.ok) {
       console.error('❌ Failed to fetch updates:', response.status);
       return [];
@@ -4735,8 +4858,8 @@ function showUpdateModal(updates) {
   // Add modal to page
   document.body.insertAdjacentHTML('beforeend', modalHtml);
   
-  // Update the last seen timestamp to current time
-  lastSeenUpdateTimestamp = Date.now();
+  // Update the last seen timestamp to the latest update's timestamp
+  lastSeenUpdateTimestamp = latestUpdate.timestamp;
   
   // Save the updated timestamp
   saveGameState();
@@ -4780,14 +4903,20 @@ function resetUpdateTimestamp() {
 function clearAllGameData() {
   console.log('🧹 CLEARING ALL GAME DATA...');
   
-  // Clear cookies
+  // Clear cookies - use multiple methods to ensure they're cleared
   try {
     // Clear main save cookie and its chunks
     const cookies = document.cookie.split(';');
     cookies.forEach(cookie => {
       const cookieName = cookie.split('=')[0].trim();
       if (cookieName.startsWith('stackMerge_')) {
+        // Try multiple cookie clearing methods
         document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname}`;
+        document.cookie = `${cookieName}=; max-age=0; path=/`;
+        document.cookie = `${cookieName}=; max-age=0; path=/; domain=${window.location.hostname}`;
+        document.cookie = `${cookieName}=; max-age=0; path=/; domain=.${window.location.hostname}`;
         console.log(`🍪 Cleared cookie: ${cookieName}`);
       }
     });
@@ -4818,6 +4947,29 @@ function clearAllGameData() {
   
   // Reset the update timestamp variable
   lastSeenUpdateTimestamp = 0;
+  
+  // Set flag to prevent timestamp restoration
+  preventTimestampRestore = true;
+  
+  // Also clear any saved game state that might restore the timestamp
+  try {
+    // Force clear any existing game state
+    const gameState = {
+      lastSeenUpdateTimestamp: 0,
+      timestamp: Date.now()
+    };
+    
+    // Save this "cleared" state to overwrite any existing data
+    if (useLocalStorage) {
+      localStorage.setItem(SAVE_COOKIE_NAME, JSON.stringify(gameState));
+    } else {
+      document.cookie = `${SAVE_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(gameState))}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    }
+    
+    console.log('✅ Forced cleared game state saved');
+  } catch (e) {
+    console.log('❌ Error saving cleared state:', e);
+  }
   
   console.log('✅ All game data cleared! Refresh the page to see the update modal.');
   console.log('💡 Or call testUpdateSystem() to trigger it immediately.');
