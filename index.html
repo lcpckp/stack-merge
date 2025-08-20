@@ -3759,6 +3759,50 @@ class SoundManager {
     }, 500);
   }
   
+  // Test if preloaded sounds are actually working
+  testPreloadedSounds() {
+    if (!this.audioCache) {
+      this.showDebugMessage('❌ No audio cache available');
+      return;
+    }
+    
+    this.showDebugMessage('🔍 Testing preloaded sounds...');
+    
+    // Test each sound type
+    const testSounds = [
+      { key: 'drop', name: 'Drop Sound' },
+      { key: 'cork0', name: 'Merge Sound 0' },
+      { key: 'coin1', name: 'Coin Sound 1' },
+      { key: 'bomb', name: 'Bomb Sound' }
+    ];
+    
+    testSounds.forEach((sound, index) => {
+      setTimeout(() => {
+        this.showDebugMessage(`🔍 Testing ${sound.name} (${sound.key})...`);
+        
+        if (this.audioCache[sound.key]) {
+          const audio = this.audioCache[sound.key];
+          this.showDebugMessage(`🔍 ${sound.name}: readyState=${audio.readyState}, networkState=${audio.networkState}`);
+          
+          // Try to play the preloaded sound
+          try {
+            const testAudio = audio.cloneNode();
+            testAudio.volume = 0.1; // Low volume for testing
+            testAudio.play().then(() => {
+              this.showDebugMessage(`✅ ${sound.name} played successfully from cache!`);
+            }).catch(error => {
+              this.showDebugMessage(`❌ ${sound.name} failed to play from cache: ${error.message}`);
+            });
+          } catch (error) {
+            this.showDebugMessage(`❌ ${sound.name} error creating clone: ${error.message}`);
+          }
+        } else {
+          this.showDebugMessage(`❌ ${sound.name} not found in cache`);
+        }
+      }, index * 1000); // Test each sound 1 second apart
+    });
+  }
+  
   // Show debug message in visual window
   showDebugMessage(message) {
     console.log(message); // Still log to console
@@ -3827,6 +3871,28 @@ class SoundManager {
         }
       };
       debugWindow.appendChild(forceBtn);
+      
+      // Add test preloaded sounds button
+      const testPreloadedBtn = document.createElement('button');
+      testPreloadedBtn.textContent = '🔍 Test Cache';
+      testPreloadedBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 160px;
+        background: #10b981;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      `;
+      testPreloadedBtn.onclick = () => {
+        if (this.testPreloadedSounds) {
+          this.testPreloadedSounds();
+        }
+      };
+      debugWindow.appendChild(testPreloadedBtn);
       
       // Add title
       const title = document.createElement('h3');
@@ -4011,35 +4077,51 @@ class SoundManager {
         purchase2: new Audio('sounds/purchase2.wav')
       };
       
-      // Set preload attribute to 'auto' for all audio files
-      Object.values(this.audioCache).forEach(audio => {
-        audio.preload = 'auto';
-        // Set initial volume to 0 to prevent any accidental playback during preloading
-        audio.volume = 0;
-      });
-      
-      // Force load all audio files by setting their currentTime
-      // This ensures they're fully loaded and ready for instant playback
-      let loadedCount = 0;
-      const totalSounds = Object.keys(this.audioCache).length;
-      
-      Object.values(this.audioCache).forEach(audio => {
-        audio.currentTime = 0;
+      // iOS-specific preloading approach
+      if (this.isIOS) {
+        console.log('🍎 iOS detected: Using iOS-specific audio preloading...');
         
-        // Monitor loading progress
-        audio.addEventListener('canplaythrough', () => {
-          loadedCount++;
-          if (loadedCount === totalSounds) {
-            console.log('🎵 All sounds fully loaded and ready for instant playback!');
-          } else {
-            console.log(`🎵 Sound loaded: ${loadedCount}/${totalSounds}`);
+        // For iOS, we need to be more careful about preloading
+        Object.values(this.audioCache).forEach(audio => {
+          audio.preload = 'metadata'; // Use metadata instead of auto for iOS
+          audio.volume = 0;
+          
+          // iOS Safari sometimes needs explicit load() calls
+          try {
+            audio.load();
+          } catch (e) {
+            console.log('🍎 iOS: Could not load audio file:', e);
           }
         });
         
-        audio.addEventListener('error', (e) => {
-          console.warn('⚠️ Sound failed to load:', e);
+        console.log('🍎 iOS: Audio preloading initiated with metadata preload');
+      } else {
+        // Non-iOS devices can use aggressive preloading
+        Object.values(this.audioCache).forEach(audio => {
+          audio.preload = 'auto';
+          audio.volume = 0;
+          audio.currentTime = 0; // Force load
         });
-      });
+        
+        // Monitor loading progress for non-iOS
+        let loadedCount = 0;
+        const totalSounds = Object.keys(this.audioCache).length;
+        
+        Object.values(this.audioCache).forEach(audio => {
+          audio.addEventListener('canplaythrough', () => {
+            loadedCount++;
+            if (loadedCount === totalSounds) {
+              console.log('🎵 All sounds fully loaded and ready for instant playback!');
+            } else {
+              console.log(`🎵 Sound loaded: ${loadedCount}/${totalSounds}`);
+            }
+          });
+          
+          audio.addEventListener('error', (e) => {
+            console.warn('⚠️ Sound failed to load:', e);
+          });
+        });
+      }
       
       console.log('🎵 Comprehensive audio preloading initiated - caching all sounds for instant playback');
       
