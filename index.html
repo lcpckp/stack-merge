@@ -3711,221 +3711,28 @@ class SoundManager {
     };
   }
   
-  // Force unlock iOS audio (for testing purposes)
+  // Force unlock iOS audio (temporarily disabled for production)
   forceUnlockIOSAudio() {
-    if (!this.isIOS) {
-      this.showDebugMessage('🖥️ Not an iOS device, no need to force unlock');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 Force unlocking iOS audio...');
-    
-    // Reset flags
-    this.audioContextPrimed = false;
-    this.userInteracted = true;
-    
-    // Try aggressive unlock
-    this.aggressivelyUnlockIOSAudio();
-    
-    // Also try immediate unlock
-    setTimeout(() => {
-      this.showDebugMessage('🍎 Attempting immediate audio unlock...');
-      this.primeAudioContext();
-    }, 500);
-    
-    // Check status after a delay
-    setTimeout(() => {
-      this.showDebugMessage('🍎 Force unlock complete. Final status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
-    }, 3000);
+    console.log('🍎 iOS audio force unlock temporarily disabled for production');
+    return;
   }
   
-  // Manually force audio context to be primed (for testing)
+  // Manually force audio context to be primed (temporarily disabled for production)
   forceAudioContextPrimed() {
-    if (!this.isIOS) {
-      this.showDebugMessage('🖥️ Not an iOS device, no need to force audio context');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 Manually forcing audio context to be primed...');
-    this.audioContextPrimed = true;
-    this.userInteracted = true;
-    
-    this.showDebugMessage('🍎 Audio context manually primed. Status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
-    
-    // Test if audio works now
-    setTimeout(() => {
-      this.showDebugMessage('🍎 Testing audio after manual priming...');
-      this.playDropSound(1);
-    }, 500);
+    console.log('🍎 iOS audio context forcing temporarily disabled for production');
+    return;
   }
   
-  // Test if preloaded sounds are actually working
+  // Test if preloaded sounds are actually working (temporarily disabled for production)
   testPreloadedSounds() {
-    if (!this.audioCache) {
-      this.showDebugMessage('❌ No audio cache available');
-      return;
-    }
-    
-    this.showDebugMessage('🔍 Testing preloaded sounds...');
-    
-    // Test each sound type
-    const testSounds = [
-      { key: 'drop', name: 'Drop Sound' },
-      { key: 'cork0', name: 'Merge Sound 0' },
-      { key: 'coin1', name: 'Coin Sound 1' },
-      { key: 'bomb', name: 'Bomb Sound' }
-    ];
-    
-    testSounds.forEach((sound, index) => {
-      setTimeout(() => {
-        this.showDebugMessage(`🔍 Testing ${sound.name} (${sound.key})...`);
-        
-        if (this.audioCache[sound.key]) {
-          const audio = this.audioCache[sound.key];
-          this.showDebugMessage(`🔍 ${sound.name}: readyState=${audio.readyState}, networkState=${audio.networkState}`);
-          
-          // Try to play the preloaded sound
-          try {
-            const testAudio = audio.cloneNode();
-            testAudio.volume = 0.1; // Low volume for testing
-            testAudio.play().then(() => {
-              this.showDebugMessage(`✅ ${sound.name} played successfully from cache!`);
-            }).catch(error => {
-              this.showDebugMessage(`❌ ${sound.name} failed to play from cache: ${error.message}`);
-            });
-          } catch (error) {
-            this.showDebugMessage(`❌ ${sound.name} error creating clone: ${error.message}`);
-          }
-        } else {
-          this.showDebugMessage(`❌ ${sound.name} not found in cache`);
-        }
-      }, index * 1000); // Test each sound 1 second apart
-    });
+    console.log('🍎 Preloaded sounds testing temporarily disabled for production');
+    return;
   }
   
-  // Show debug message in visual window
+  // Show debug message in visual window (temporarily disabled for production)
   showDebugMessage(message) {
-    console.log(message); // Still log to console
-    
-    // Create or update debug window
-    let debugWindow = document.getElementById('iosDebugWindow');
-    if (!debugWindow) {
-      debugWindow = document.createElement('div');
-      debugWindow.id = 'iosDebugWindow';
-      debugWindow.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 500px;
-        max-height: 80vh;
-        background: #1f2937;
-        border: 2px solid #8b5cf6;
-        border-radius: 12px;
-        padding: 20px;
-        color: white;
-        font-family: monospace;
-        font-size: 14px;
-        z-index: 10000;
-        overflow-y: auto;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      `;
-      
-      // Add close button
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✕ Close';
-      closeBtn.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #ef4444;
-        border: none;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 12px;
-      `;
-      closeBtn.onclick = () => debugWindow.remove();
-      debugWindow.appendChild(closeBtn);
-      
-      // Add force audio context button
-      const forceBtn = document.createElement('button');
-      forceBtn.textContent = '🔧 Force Audio';
-      forceBtn.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 80px;
-        background: #f59e0b;
-        border: none;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 12px;
-      `;
-      forceBtn.onclick = () => {
-        if (this.forceAudioContextPrimed) {
-          this.forceAudioContextPrimed();
-        }
-      };
-      debugWindow.appendChild(forceBtn);
-      
-      // Add test preloaded sounds button
-      const testPreloadedBtn = document.createElement('button');
-      testPreloadedBtn.textContent = '🔍 Test Cache';
-      testPreloadedBtn.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 160px;
-        background: #10b981;
-        border: none;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 12px;
-      `;
-      testPreloadedBtn.onclick = () => {
-        if (this.testPreloadedSounds) {
-          this.testPreloadedSounds();
-        }
-      };
-      debugWindow.appendChild(testPreloadedBtn);
-      
-      // Add title
-      const title = document.createElement('h3');
-      title.textContent = '🍎 iOS Audio Debug Window';
-      title.style.cssText = `
-        margin: 0 0 15px 0;
-        color: #8b5cf6;
-        font-size: 18px;
-        text-align: center;
-      `;
-      debugWindow.appendChild(title);
-      
-      // Add content area
-      const content = document.createElement('div');
-      content.id = 'iosDebugContent';
-      content.style.cssText = `
-        white-space: pre-wrap;
-        line-height: 1.4;
-        margin-top: 10px;
-      `;
-      content.innerHTML = '🍎 iOS Audio Debug Started...\n';
-      debugWindow.appendChild(content);
-      
-      document.body.appendChild(debugWindow);
-    }
-    
-    // Add message to content
-    const content = document.getElementById('iosDebugContent');
-    if (content) {
-      const timestamp = new Date().toLocaleTimeString();
-      content.innerHTML += `[${timestamp}] ${message}\n`;
-      content.scrollTop = content.scrollHeight; // Auto-scroll to bottom
-    }
+    console.log(message); // Still log to console for debugging
+    return; // No debug window for production
   }
   
   // Clear debug window
@@ -3936,60 +3743,10 @@ class SoundManager {
     }
   }
   
-  // Test iOS audio system
+  // Test iOS audio system (temporarily disabled for production)
   testIOSAudio() {
-    if (!this.isIOS) {
-      this.showDebugMessage('🖥️ Not an iOS device, no need to test iOS audio');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 Testing iOS audio system...');
-    this.showDebugMessage('🍎 Current status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
-    
-    if (!this.userInteracted) {
-      this.showDebugMessage('🍎 iOS audio test: User has not interacted yet - this is normal');
-      this.showDebugMessage('🍎 iOS audio test: Try clicking/touching any button or the game area');
-      return;
-    }
-    
-    if (!this.audioContextPrimed) {
-      this.showDebugMessage('🍎 iOS audio test: User has interacted but audio context not primed');
-      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with audio context priming');
-      
-      // Try to prime the audio context again
-      this.showDebugMessage('🍎 iOS audio test: Attempting to prime audio context again...');
-      this.primeAudioContext();
-      return;
-    }
-    
-    if (!this.canPlayAudio()) {
-      this.showDebugMessage('🍎 iOS audio test: Audio should be ready but canPlayAudio() returns false');
-      this.showDebugMessage('🍎 iOS audio test: This might indicate an issue with the audio system');
-      return;
-    }
-    
-    this.showDebugMessage('🍎 iOS audio test: All checks passed! Audio should work');
-    this.showDebugMessage('🍎 iOS audio test: Now testing actual sound playback...');
-    
-    // Actually try to play sounds to test if they work
-    try {
-      this.showDebugMessage('🍎 iOS audio test: Testing drop sound...');
-      this.playDropSound(1);
-      
-      setTimeout(() => {
-        this.showDebugMessage('🍎 iOS audio test: Testing merge sound...');
-        this.playMergeSound(2);
-      }, 500);
-      
-      setTimeout(() => {
-        this.showDebugMessage('🍎 iOS audio test: Testing coin sound...');
-        this.playCoinSound();
-      }, 1000);
-      
-      this.showDebugMessage('🍎 iOS audio test: Sound tests initiated. Check debug window for results.');
-    } catch (error) {
-      this.showDebugMessage('🍎 iOS audio test: Error during sound testing: ' + error.message);
-    }
+    console.log('🍎 iOS audio testing temporarily disabled for production');
+    return;
   }
   
   // Debug localStorage to check for corrupted settings
