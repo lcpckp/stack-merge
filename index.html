@@ -3348,16 +3348,10 @@ class SoundManager {
     
     // Log iOS detection status
     if (this.isIOS) {
-      this.showDebugMessage('🍎 iOS device detected - audio will require user interaction');
-      this.showDebugMessage('🍎 iOS audio status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
-      
-      // Try to aggressively unlock iOS audio
-      this.aggressivelyUnlockIOSAudio();
-      
-      // Add global touch/click listeners to try to unlock audio immediately
-      this.addGlobalAudioUnlockListeners();
+      console.log('🍎 iOS device detected - audio will require user interaction');
+      console.log('🍎 iOS audio status:', this.getIOSAudioStatus());
     } else {
-      this.showDebugMessage('🖥️ Non-iOS device detected - audio should work normally');
+      console.log('🖥️ Non-iOS device detected - audio should work normally');
     }
     
     // Debug localStorage to check for corrupted settings
@@ -3624,6 +3618,12 @@ class SoundManager {
           this.audioContextPrimed = true;
           this.userInteracted = true;
           this.showDebugMessage('🍎 iOS audio aggressively unlocked! Status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+          
+          // Force a test sound to verify it's actually working
+          setTimeout(() => {
+            this.showDebugMessage('🍎 Testing if audio actually works after unlock...');
+            this.playDropSound(1);
+          }, 500);
         }).catch(error => {
           this.showDebugMessage(`🍎 iOS audio unlock method ${index + 1} failed: ${error.message}`);
         });
@@ -3631,20 +3631,7 @@ class SoundManager {
     });
   }
   
-  // Add global touch/click listeners to try to unlock audio immediately
-  addGlobalAudioUnlockListeners() {
-    if (!this.isIOS) return;
-    
-    const tryUnlockAudio = () => {
-      if (!this.userInteracted) {
-        this.showDebugMessage('🍎 Global touch/click detected, trying to unlock audio...');
-        this.markUserInteraction();
-      }
-    };
-    
-    document.addEventListener('touchstart', tryUnlockAudio, { passive: true });
-    document.addEventListener('click', tryUnlockAudio);
-  }
+  // This method is no longer used - removed to prevent automatic audio unlock attempts
   
   // iOS Safari specific audio unlock method
   unlockIOSSafariAudio() {
@@ -3697,14 +3684,19 @@ class SoundManager {
   // Check if audio can be played on this device
   canPlayAudio() {
     if (this.isIOS && !this.userInteracted) {
-      console.log('🎵 iOS device requires user interaction before playing audio');
+      this.showDebugMessage('🎵 iOS device requires user interaction before playing audio');
       return false;
     }
     if (this.isIOS && this.userInteracted && !this.audioContextPrimed) {
-      console.log('🎵 iOS device: user has interacted but audio context not yet primed');
+      this.showDebugMessage('🎵 iOS device: user has interacted but audio context not yet primed');
       return false;
     }
-    return this.initialized && !this.isMuted && this.audioContextPrimed;
+    
+    const canPlay = this.initialized && !this.isMuted && this.audioContextPrimed;
+    if (this.isIOS) {
+      this.showDebugMessage(`🎵 iOS canPlayAudio check: initialized=${this.initialized}, muted=${this.isMuted}, primed=${this.audioContextPrimed} → ${canPlay}`);
+    }
+    return canPlay;
   }
   
   // Get iOS-specific audio status for debugging
@@ -3745,6 +3737,26 @@ class SoundManager {
     setTimeout(() => {
       this.showDebugMessage('🍎 Force unlock complete. Final status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
     }, 3000);
+  }
+  
+  // Manually force audio context to be primed (for testing)
+  forceAudioContextPrimed() {
+    if (!this.isIOS) {
+      this.showDebugMessage('🖥️ Not an iOS device, no need to force audio context');
+      return;
+    }
+    
+    this.showDebugMessage('🍎 Manually forcing audio context to be primed...');
+    this.audioContextPrimed = true;
+    this.userInteracted = true;
+    
+    this.showDebugMessage('🍎 Audio context manually primed. Status: ' + JSON.stringify(this.getIOSAudioStatus(), null, 2));
+    
+    // Test if audio works now
+    setTimeout(() => {
+      this.showDebugMessage('🍎 Testing audio after manual priming...');
+      this.playDropSound(1);
+    }, 500);
   }
   
   // Show debug message in visual window
@@ -3793,6 +3805,28 @@ class SoundManager {
       `;
       closeBtn.onclick = () => debugWindow.remove();
       debugWindow.appendChild(closeBtn);
+      
+      // Add force audio context button
+      const forceBtn = document.createElement('button');
+      forceBtn.textContent = '🔧 Force Audio';
+      forceBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 80px;
+        background: #f59e0b;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      `;
+      forceBtn.onclick = () => {
+        if (this.forceAudioContextPrimed) {
+          this.forceAudioContextPrimed();
+        }
+      };
+      debugWindow.appendChild(forceBtn);
       
       // Add title
       const title = document.createElement('h3');
@@ -4020,17 +4054,25 @@ class SoundManager {
   
   // Play the click2.wav sound effect for drops - using preloaded audio
   playDropSound(blockValue = 1) {
-    if (!this.canPlayAudio()) {
-      if (this.isIOS) {
-        console.log('🍎 iOS: Drop sound skipped - audio not ready. Status:', this.getIOSAudioStatus());
-      }
+    if (this.isIOS) {
+      this.showDebugMessage('🍎 iOS: Attempting to play drop sound...');
+      this.showDebugMessage('🍎 iOS: canPlayAudio() = ' + this.canPlayAudio());
+      this.showDebugMessage('🍎 iOS: areSoundsPreloaded() = ' + this.areSoundsPreloaded());
+    }
+    
+    // For iOS, try to play even if checks fail (more aggressive approach)
+    if (!this.canPlayAudio() && !this.isIOS) {
       return;
     }
     
     // Ensure sound system is ready
     if (!this.areSoundsPreloaded()) {
-      console.log('🎵 Sounds not ready yet, skipping drop sound');
-      return;
+      if (this.isIOS) {
+        this.showDebugMessage('🍎 iOS: Sounds not preloaded, but trying anyway...');
+      } else {
+        console.log('🎵 Sounds not ready yet, skipping drop sound');
+        return;
+      }
     }
     
     try {
@@ -4039,12 +4081,22 @@ class SoundManager {
         // Clone the preloaded audio to allow multiple simultaneous plays
         const dropAudio = this.audioCache.drop.cloneNode();
         dropAudio.volume = this.getActualVolume('drop');
-        dropAudio.play();
+        this.showDebugMessage('🍎 iOS: Playing drop sound with preloaded audio, volume: ' + dropAudio.volume);
+        dropAudio.play().then(() => {
+          this.showDebugMessage('🍎 iOS: Drop sound played successfully!');
+        }).catch(error => {
+          this.showDebugMessage('🍎 iOS: Drop sound play failed: ' + error.message);
+        });
       } else {
         // Fallback to creating new audio if preloading failed
+        this.showDebugMessage('🍎 iOS: Using fallback audio for drop sound');
         const dropAudio = new Audio('sounds/click2.wav');
         dropAudio.volume = this.getActualVolume('drop');
-        dropAudio.play();
+        dropAudio.play().then(() => {
+          this.showDebugMessage('🍎 iOS: Fallback drop sound played successfully!');
+        }).catch(error => {
+          this.showDebugMessage('🍎 iOS: Fallback drop sound failed: ' + error.message);
+        });
       }
     } catch (error) {
       // Silent fail - no console spam
