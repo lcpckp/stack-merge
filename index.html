@@ -26,6 +26,19 @@
     height: 100vh; /* Lock page height to exactly viewport height */
     overflow: hidden; /* Prevent any scrolling */
   }
+  
+  /* Development mode - enable scrolling for debug access */
+  body.development-mode {
+    overflow: auto; /* Allow scrolling in development */
+    min-height: 100vh; /* Ensure minimum height while allowing content to expand */
+  }
+  
+  /* Ensure debug button is accessible on mobile in development */
+  body.development-mode #debugBtn {
+    position: relative;
+    z-index: 1000;
+    margin-bottom: 20px; /* Add some bottom margin for mobile scrolling */
+  }
   .topbar { width:100%; max-width:1200px; display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 16px 8px; box-sizing:border-box; }
   h1 { margin:0; font-size:36px; font-weight:700; text-align:center; font-family: var(--font-family); }
   
@@ -426,6 +439,38 @@
       transform: translateY(-65px) scale(1);
     }
   }
+
+  /* Personal best animation */
+  .personal-best {
+    position: fixed;
+    color: #fbbf24;
+    font-weight: 700;
+    font-size: 18px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    z-index: 1000;
+    pointer-events: none;
+    animation: personalBest 3s ease-out forwards;
+  }
+  
+  @keyframes personalBest {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.7);
+    }
+    20% {
+      opacity: 1;
+      transform: translate(-50%, calc(-50% - 8px)) scale(1.1);
+    }
+    40% {
+      opacity: 1;
+      transform: translate(-50%, calc(-50% - 12px)) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% - 30px)) scale(1);
+    }
+  }
   
   /* Gold count pulse animation */
   .gold-value.pulse {
@@ -529,11 +574,30 @@
       box-sizing: border-box;
     }
     
-    /* Ensure modal title has proper spacing */
+    /* Ensure modal title has proper spacing and layout */
     .help-modal h2 {
-      margin-top: 0;
-      padding-top: 0;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
     }
+
+      /* High score display in help modal title */
+  
+  .help-modal .title-text {
+    font-size: 1em !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+  }
+  
+  .help-modal .high-score-display {
+    font-size: 0.8em !important;
+    color: #fbbf24 !important;
+    font-weight: 600 !important;
+    margin-left: auto !important;
+  }
     
     /* Ensure close button has proper spacing */
     .help-modal .actions {
@@ -600,13 +664,49 @@
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     /* Ensure modal fits within safe area */
     margin: 0;
-    position: relative;
+    position: absolute;
+    top: 20px; /* Default top position for desktop */
+  }
+
+  /* Override modal backdrop padding for help modal to allow proper positioning */
+  .help-modal-backdrop {
+    padding: 0;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* Desktop help modal backdrop should allow content positioning below close button */
+  @media (min-width: 769px) {
+    .help-modal-backdrop {
+      align-items: flex-start;
+    }
+  }
+
+  /* High score display in help modal title - Desktop */
+  .help-modal h2 {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  
+  .help-modal .title-text {
+    font-size: 1em !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+  }
+  
+  .help-modal .high-score-display {
+    font-size: 0.8em !important;
+    color: #fbbf24 !important;
+    font-weight: 600 !important;
+    margin-left: auto !important;
   }
   
   /* Modal Close Button - Desktop: floating in top-right of modal bounds */
   .help-modal-close-btn {
     position: fixed;
-    top: calc(50vh - min(calc(100vh - 80px)/2, 45vh) + 20px);
+    top: 20px;
     right: calc(50vw - min(450px, 47.5vw) + 20px);
     padding: 10px 20px;
     min-width: auto;
@@ -1594,7 +1694,7 @@
   .debug-pane .status.active { border-color: #10B981; background: rgba(16, 185, 129, 0.1); }
   .debug-pane .status.inactive { border-color: #6B7280; background: rgba(107, 114, 128, 0.1); }
   
-  /* Hide debug button by default - will be shown via JavaScript */
+  /* Hide debug button by default - will be shown only in development mode */
   #debugBtn {
     display: none;
   }
@@ -1640,6 +1740,31 @@
     font-family: var(--font-family);
     text-align: center;
     margin: 0;
+  }
+
+  .new-high-score-message {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fbbf24;
+    font-family: var(--font-family);
+    text-align: center;
+    margin: 8px 0;
+    animation: celebrateHighScore 1s ease-in-out;
+  }
+
+  @keyframes celebrateHighScore {
+    0% { 
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   .largest-merge-info {
@@ -2179,7 +2304,32 @@
     /* Hide scrollbar while maintaining scroll functionality */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Position will be set dynamically via JavaScript */
+    position: absolute;
   }
+
+  /* Mobile help modal backdrop positioning */
+  .help-modal-backdrop {
+    padding: 0;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* Mobile responsive for help modal high score display */
+  .help-modal .title-text {
+    font-size: 1em !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+  }
+  
+  .help-modal .high-score-display {
+    font-size: 0.7em !important;
+    margin-left: auto !important;
+  }
+
+
+
+
   
   /* Mobile responsive for help modal actions */
   .help-modal .actions {
@@ -2308,6 +2458,14 @@
   .help-modal {
     width: 98vw;
     padding: 16px;
+    position: absolute;
+  }
+
+  /* Extra small mobile help modal backdrop positioning */
+  .help-modal-backdrop {
+    padding: 0;
+    align-items: flex-start;
+    justify-content: center;
   }
   
   /* Extra small mobile floating close button - screen corner with safe area */
@@ -2969,6 +3127,7 @@
   <!-- Game Over Button Overlay -->
   <div id="gameOverButton" class="game-over-button-overlay">
     <div class="game-over-text">Game Over</div>
+    <div id="newHighScoreMessage" class="new-high-score-message hidden">🏆 New High Score!</div>
     <div class="largest-merge-info">
       <div class="largest-merge-label">Largest Merge:</div>
       <div id="largestMergeBlock" class="largest-merge-block"></div>
@@ -3122,10 +3281,13 @@
 
 
   <!-- Help modal (hidden by default) -->
-  <div id="helpModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div id="helpModal" class="modal-backdrop help-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="modal help-modal">
       <button id="helpClose" class="help-modal-close-btn" title="Close help guide">❌ Close</button>
-      <h2 id="helpTitle">How to Play</h2>
+      <h2 id="helpTitle">
+        <span class="title-text">How to Play</span>
+        <span class="high-score-display">High Score: 🏆 <span id="helpHighScore">0</span></span>
+      </h2>
       
       <div class="help-grid">
         <!-- Basic Controls Section -->
@@ -3479,10 +3641,15 @@
         <div class="control-row" style="margin-top: 12px;">
           <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
-        
-
-        
-
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Test Features</div>
+      <div class="controls">
+        <div class="control-row">
+          <button id="testPersonalBestBtn" class="button primary">Test Personal Best Message</button>
+        </div>
       </div>
     </div>
     
@@ -3498,6 +3665,66 @@
   </div>
 
 <script>
+// Environment Detection
+const isLocalhost = (() => {
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  const port = window.location.port;
+  
+  // Check for localhost variations
+  const localhostPatterns = [
+    'localhost',
+    '127.0.0.1',
+    '::1',
+    '0.0.0.0'
+  ];
+  
+  // Check for common development ports
+  const devPorts = ['3000', '8000', '8080', '5000', '5173', '4173', '3001'];
+  
+  // Check for file protocol (local file)
+  const isFileProtocol = protocol === 'file:';
+  
+  // Check if it's localhost or development environment
+  const isLocal = localhostPatterns.includes(hostname) || 
+                  devPorts.includes(port) || 
+                  isFileProtocol ||
+                  hostname.includes('.local') ||
+                  hostname.includes('.test');
+  
+  // Log environment info
+  console.log('🌍 Environment Detection:');
+  console.log('  Hostname:', hostname);
+  console.log('  Protocol:', protocol);
+  console.log('  Port:', port);
+  console.log('  Is Localhost/Dev:', isLocal);
+  
+  // Add environment indicator to page title in development
+  if (isLocal) {
+    document.title = `[DEV] ${document.title}`;
+    console.log('🔧 Development mode detected - added [DEV] prefix to title');
+    
+    // Enable scrolling in development mode for debug access
+    document.body.classList.add('development-mode');
+    console.log('📱 Development mode: Scrolling enabled for mobile debug access');
+  }
+  
+  // Log debug button availability
+  console.log(`🔧 Debug button will be ${isLocal ? 'enabled' : 'disabled'} based on environment`);
+  
+  // Additional development mode info
+  if (isLocal) {
+    console.log('📱 Mobile developers: Scrolling is now enabled to access debug features');
+  }
+  
+  return isLocal;
+})();
+
+// Utility functions for environment detection
+const isDevelopment = () => isLocalhost;
+const isProduction = () => !isLocalhost;
+const getEnvironment = () => isLocalhost ? 'development' : 'production';
+
 // Sound Manager for Stack Merge Game - Web Audio API Implementation
 class SoundManager {
   constructor() {
@@ -3547,7 +3774,8 @@ class SoundManager {
         drop: 'sounds/click2.wav',
         bomb: 'sounds/bomb.mp3',
         stageUp: 'sounds/stage_up.mp3',
-        purchase: 'sounds/purchase.wav'
+        purchase: 'sounds/purchase.wav',
+        personalBest: 'sounds/PB.mp3'
       };
       
       // Cork sounds for merges
@@ -4362,7 +4590,8 @@ function saveGameState() {
       trashButtonPresses: trashButtonPresses,
       bombSelected: bombSelected,
       previousBombCost: previousBombCost,
-      currentActiveDecayFactor: currentActiveDecayFactor
+      currentActiveDecayFactor: currentActiveDecayFactor,
+      hasShownPersonalBest: hasShownPersonalBest
     });
     console.log('🔊 Sound settings being saved:', {
       usePopMergeSounds: soundManager.getMergeSoundType(),
@@ -4393,6 +4622,9 @@ function saveGameState() {
       isMuted: soundManager.getMuteState(),
       currentActiveDecayFactor: currentActiveDecayFactor,
       lastSeenUpdateTimestamp: lastSeenUpdateTimestamp || 0,
+      highScore: window.highScore || 0,
+      totalGames: window.totalGames || 0,
+      hasShownPersonalBest: hasShownPersonalBest || false,
       timestamp: Date.now()
     };
     
@@ -4568,6 +4800,18 @@ function restoreGameState(gameState) {
     score = gameState.score || 0;
     gold = gameState.gold || 0;
     blocksDropped = gameState.blocksDropped || 0;
+    
+    // Restore high score from saved state
+    window.highScore = gameState.highScore || 0;
+    
+    // Restore total games counter from saved state
+    window.totalGames = gameState.totalGames || 0;
+    
+    // Restore personal best flag from saved state
+    hasShownPersonalBest = gameState.hasShownPersonalBest || false;
+    
+    // Update the help modal high score display if it exists
+    updateHelpModalHighScore();
     currentTargetBlockSize = gameState.currentTargetBlockSize || STARTING_BLOCK_SIZE;
     currentStage = gameState.currentStage || 1;
     weights = gameState.weights || [1, 2];
@@ -4637,6 +4881,9 @@ function restoreGameState(gameState) {
     console.log('- Poles changed from', oldPoles.length, 'to', poles.length);
     console.log('- Score changed from', oldScore, 'to', score);
     console.log('- Gold changed from', oldGold, 'to', gold);
+    console.log('- High score:', window.highScore);
+    console.log('- Total games played:', window.totalGames);
+    console.log('- Has shown personal best:', hasShownPersonalBest);
     console.log('- Current stage:', currentStage);
     console.log('- Weights:', weights);
     console.log('- Next queue length:', nextQueue.length);
@@ -4903,6 +5150,11 @@ function resetUpdateTimestamp() {
 function clearAllGameData() {
   console.log('🧹 CLEARING ALL GAME DATA...');
   
+  // Reset the game to a fresh state before clearing data
+  // This ensures we don't accidentally save any in-progress game state
+  console.log('🔄 Resetting game to fresh state...');
+  resetGame(true);
+  
   // Clear cookies - use multiple methods to ensure they're cleared
   try {
     // Clear main save cookie and its chunks
@@ -4950,6 +5202,18 @@ function clearAllGameData() {
   
   // Set flag to prevent timestamp restoration
   preventTimestampRestore = true;
+  
+  // Reset the high score
+  window.highScore = 0;
+  
+  // Reset the total games counter
+  window.totalGames = 0;
+  
+  // Update the high score display in the help modal
+  const helpHighScore = document.getElementById('helpHighScore');
+  if (helpHighScore) {
+    helpHighScore.textContent = '0';
+  }
   
   // Also clear any saved game state that might restore the timestamp
   try {
@@ -5244,6 +5508,35 @@ function updateScoreDisplay() {
     debugScore.textContent = score;
   }
   
+  // Check for new personal best during gameplay
+  const previousHighScore = window.highScore || 0;
+  console.log('🔍 Score check - Current score:', score, 'Current high score:', window.highScore, 'Previous high score:', previousHighScore);
+  
+  if (score > previousHighScore && score > 0) {
+    // Always update high score when current score exceeds it
+    window.highScore = score;
+    console.log('✅ High score updated to:', window.highScore);
+    
+    // Update the help modal high score display
+    updateHelpModalHighScore();
+    
+    // Only show personal best message once per game AND if this isn't the user's first game
+    if (!hasShownPersonalBest && window.totalGames > 0) {
+      hasShownPersonalBest = true;
+      
+      // Show the personal best animation
+      showPersonalBest();
+      
+      console.log('🏆 New Personal Best during gameplay! Score:', score, 'Previous best:', previousHighScore);
+    } else if (!hasShownPersonalBest && window.totalGames === 0) {
+      // First game ever - don't show personal best message
+      hasShownPersonalBest = true; // Still mark as shown to prevent showing later in this game
+      console.log('🎮 First game ever - no personal best message shown. Score:', score, 'Total games:', window.totalGames);
+    } else {
+      console.log('🏆 High score updated during gameplay! Score:', score, 'Previous best:', previousHighScore, 'Total games:', window.totalGames);
+    }
+  }
+  
   // Auto-save when score changes
   if (score > 0) {
     saveGameState();
@@ -5352,6 +5645,12 @@ function getRandomPiece(){
 let poles = [[],[],[],[]];
 let score = 0;
 let gold = 0; // Track accumulated gold
+
+// Initialize high score tracking
+window.highScore = window.highScore || 0;
+// Initialize total games counter
+window.totalGames = window.totalGames || 0;
+let hasShownPersonalBest = false; // Track if we've shown personal best this game
 let blocksDropped = 0; // Track total blocks dropped for bomb delay
 let placing = false; // block multiple rapid placements while animating
 let lastPlacementTime = 0; // track when placement started for timeout safety
@@ -5625,6 +5924,50 @@ function showGoldEarned(amount) {
       goldEl.parentNode.removeChild(goldEl);
     }
   }, 1200);
+}
+
+function showPersonalBest() {
+  // Create the personal best display element
+  const personalBestEl = document.createElement('div');
+  personalBestEl.className = 'personal-best';
+  personalBestEl.textContent = 'New Record!';
+  
+  // Position it centered above the score display
+  const scoreDisplay = document.querySelector('.score-value');
+  if (scoreDisplay) {
+    const rect = scoreDisplay.getBoundingClientRect();
+    personalBestEl.style.left = (rect.left + rect.width / 2) + 'px';
+    personalBestEl.style.top = (rect.top - 40) + 'px'; // Position 40px above the score display
+    personalBestEl.style.textAlign = 'center';
+  } else {
+    // Fallback positioning if score display not found
+    personalBestEl.style.left = '50%';
+    personalBestEl.style.top = '30%';
+  }
+  
+  document.body.appendChild(personalBestEl);
+  
+  // Play the personal best sound effect
+  if (soundManager && soundManager.canPlayAudio()) {
+    soundManager.playSound('personalBest', 'other').catch(error => {
+      console.log('Personal best sound failed:', error);
+    });
+  }
+  
+  // Add pulse animation to the score display
+  if (scoreDisplay) {
+    scoreDisplay.classList.add('pulse');
+    setTimeout(() => {
+      scoreDisplay.classList.remove('pulse');
+    }, 300);
+  }
+  
+  // Remove after animation completes (increased from 1.5s to 3s)
+  setTimeout(() => {
+    if (personalBestEl.parentNode) {
+      personalBestEl.parentNode.removeChild(personalBestEl);
+    }
+  }, 3000);
 }
 
 function handleBombConversion() {
@@ -6061,13 +6404,165 @@ document.addEventListener('keydown', (e) => {
 
 
 
+// Function to update the help modal high score display
+function updateHelpModalHighScore() {
+  const helpHighScore = document.getElementById('helpHighScore');
+  console.log('🔄 updateHelpModalHighScore called - window.highScore:', window.highScore);
+  if (helpHighScore) {
+    helpHighScore.textContent = window.highScore || 0;
+    console.log('✅ Help modal high score updated to:', helpHighScore.textContent);
+  } else {
+    console.log('⚠️ helpHighScore element not found');
+  }
+}
+
 // Help modal wiring
 function openHelp(){ 
   helpModal.classList.remove('hidden'); 
+  
+  // Update the high score display in the help modal
+  updateHelpModalHighScore();
+  
+  // Dynamically position the help modal content below the close button on mobile
+  const helpModalContent = document.querySelector('.help-modal');
+  const closeButton = document.getElementById('helpClose');
+  
+  if (helpModalContent && closeButton && window.innerWidth <= 768) {
+    // Use a small delay to ensure the modal is fully rendered before calculating position
+    setTimeout(() => {
+      positionHelpModalMobile();
+    }, 50);
+  } else if (helpModalContent) {
+    // Position for desktop with delay to ensure rendering
+    setTimeout(() => {
+      positionHelpModalDesktop();
+    }, 50);
+  }
+  
   // Save that the help button has been clicked and remove the glow
   setHelpButtonClicked();
   helpBtn.classList.remove('help-glow');
 }
+
+// Function to calculate safe viewport dimensions for mobile
+function calculateSafeViewport() {
+  // Get the actual viewport dimensions
+  const visualViewport = window.visualViewport || window;
+  
+  // Get safe area insets (iOS specific)
+  const safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sat') || '0');
+  const safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab') || '0');
+  
+  // Calculate the actual safe viewport
+  const safeTop = Math.max(safeAreaTop, 0);
+  const safeBottom = Math.max(safeAreaBottom, 0);
+  
+  // Use visualViewport.height for more accurate mobile viewport
+  const viewportHeight = visualViewport.height || window.innerHeight;
+  const safeHeight = viewportHeight - safeTop - safeBottom;
+  
+  return {
+    top: safeTop,
+    bottom: safeBottom,
+    height: safeHeight,
+    viewportHeight: viewportHeight,
+    width: visualViewport.width || window.innerWidth
+  };
+}
+
+// Function to position help modal on mobile with proper safe viewport handling
+function positionHelpModalMobile() {
+  const helpModalContent = document.querySelector('.help-modal');
+  const closeButton = document.getElementById('helpClose');
+  
+  if (!helpModalContent || !closeButton) return;
+  
+  const safeViewport = calculateSafeViewport();
+  
+  // Position close button at the top of safe area with some padding
+  const closeButtonTop = safeViewport.top + 20;
+  closeButton.style.top = `${closeButtonTop}px`;
+  
+  // Calculate close button dimensions
+  const closeButtonRect = closeButton.getBoundingClientRect();
+  const closeButtonHeight = closeButtonRect.height;
+  
+  // Position help modal below close button with spacing
+  const modalTop = closeButtonTop + closeButtonHeight + 20;
+  helpModalContent.style.top = `${modalTop}px`;
+  
+  // Calculate maximum height for the modal to fit within safe viewport
+  const availableHeight = safeViewport.height - (modalTop - safeViewport.top) - 40;
+  helpModalContent.style.maxHeight = `${availableHeight}px`;
+  
+  // Reset padding to normal
+  helpModalContent.style.paddingTop = '20px';
+  
+  console.log('📱 Mobile help modal positioned:', {
+    safeTop: safeViewport.top,
+    safeBottom: safeViewport.bottom,
+    safeHeight: safeViewport.height,
+    closeButtonTop,
+    modalTop,
+    availableHeight
+  });
+}
+
+// Function to position help modal on desktop
+function positionHelpModalDesktop() {
+  const helpModalContent = document.querySelector('.help-modal');
+  const closeButton = document.getElementById('helpClose');
+  
+  if (!helpModalContent || !closeButton) return;
+  
+  // On desktop, we need to position the modal content below the close button
+  // The close button is positioned with fixed positioning, so we calculate its position
+  const closeButtonRect = closeButton.getBoundingClientRect();
+  const closeButtonBottom = closeButtonRect.bottom;
+  
+  // Position the modal content below the close button with spacing
+  const modalTop = closeButtonBottom + 20;
+  helpModalContent.style.top = `${modalTop}px`;
+  
+  // Calculate maximum height to ensure content fits within viewport
+  const availableHeight = window.innerHeight - modalTop - 80; // 80px bottom margin for desktop spacing
+  helpModalContent.style.maxHeight = `${availableHeight}px`;
+  
+  // Reset other positioning properties
+  helpModalContent.style.paddingTop = '20px';
+  
+  console.log('🖥️ Desktop help modal positioned below close button:', {
+    closeButtonBottom,
+    modalTop,
+    availableHeight
+  });
+}
+
+// Function to reposition help modal content when needed
+function repositionHelpModal() {
+  const helpModalContent = document.querySelector('.help-modal');
+  if (helpModalContent && !helpModalContent.classList.contains('hidden')) {
+    if (window.innerWidth <= 768) {
+      positionHelpModalMobile();
+    } else {
+      positionHelpModalDesktop();
+    }
+  }
+}
+
+// Add event listeners for viewport changes and device rotation
+window.addEventListener('resize', repositionHelpModal);
+
+// Listen for visual viewport changes (important for mobile browsers)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', repositionHelpModal);
+  window.visualViewport.addEventListener('scroll', repositionHelpModal);
+}
+
+// Listen for orientation changes
+window.addEventListener('orientationchange', () => {
+  setTimeout(repositionHelpModal, 100); // Delay to allow orientation change to complete
+});
 function closeHelp(){ helpModal.classList.add('hidden'); }
 if (helpBtn) {
   helpBtn.addEventListener('click', () => {
@@ -6493,21 +6988,20 @@ if (debugBtn) {
   console.log('⚠️ Debug button not found');
 }
 
-// Simple title selection detection to reveal debug button
+// Initialize debug button visibility based on environment
 document.addEventListener('DOMContentLoaded', () => {
-  const titleElement = document.querySelector('h1');
   const debugBtn = document.getElementById('debugBtn');
   
-  if (titleElement && debugBtn) {
-    titleElement.addEventListener('mouseup', () => {
-      const selection = window.getSelection();
-      if (selection.toString().toLowerCase().includes('merge')) {
-        debugBtn.style.display = 'block';
-        console.log('Debug button revealed!');
-      }
-    });
+  if (debugBtn) {
+    if (isDevelopment()) {
+      debugBtn.style.display = 'block';
+      console.log('🔧 Debug button enabled in development mode');
+    } else {
+      debugBtn.style.display = 'none';
+      console.log('🚫 Debug button disabled in production mode');
+    }
   } else {
-    console.log('⚠️ Title element or debug button not found for selection detection');
+    console.log('⚠️ Debug button not found');
   }
   
   // Initialize sound control modal after DOM is loaded
@@ -6799,6 +7293,14 @@ function syncDebugControls() {
     debugSpeedSlider.addEventListener('input', handleSpeedSlider);
   }
   
+  // Set up test personal best button event listener
+  const testPersonalBestBtn = document.getElementById('testPersonalBestBtn');
+  if (testPersonalBestBtn) {
+    // Remove existing listeners to avoid duplicates
+    testPersonalBestBtn.removeEventListener('click', handleTestPersonalBest);
+    testPersonalBestBtn.addEventListener('click', handleTestPersonalBest);
+  }
+  
   // Set up debug button event listeners
   if (grantGoldBtn) {
     // Remove existing listeners to avoid duplicates
@@ -6921,6 +7423,18 @@ function handleCheckCoinStatus() {
   } else {
     console.warn('⚠️ Coin sound loading issues detected');
   }
+}
+
+function handleTestPersonalBest() {
+  console.log('🧪 Testing personal best message...');
+  showPersonalBest();
+  
+  // Automatically close the debug pane after showing the test message
+  // This provides a better UX by not keeping the debug pane open after testing
+  setTimeout(() => {
+    closeDebugPane();
+    console.log('🔧 Debug pane automatically closed after testing personal best message');
+  }, 150); // Small delay to ensure the message is visible before closing
 }
 
 function handleBlockItemClick(blockItem) {
@@ -7896,7 +8410,41 @@ function showGameOver(){
   // Reset bomb selection state when game over is reached
   bombSelected = false;
   
+  // Check if this is a new high score
+  const previousHighScore = window.highScore || 0;
+  const isNewHighScore = score > previousHighScore;
+  if (isNewHighScore) {
+    window.highScore = score;
+    
+    // Update the help modal high score display
+    updateHelpModalHighScore();
+  }
+  
+  // Show "New High Score!" message if we achieved a new personal best this game
+  console.log('🔍 Game over check - hasShownPersonalBest:', hasShownPersonalBest, 'totalGames:', window.totalGames);
+  
+  if (hasShownPersonalBest && window.totalGames > 0) {
+    const newHighScoreMessage = document.getElementById('newHighScoreMessage');
+    if (newHighScoreMessage) {
+      newHighScoreMessage.classList.remove('hidden');
+    }
+    console.log('🏆 NEW HIGH SCORE! Current score:', score, 'Previous best:', previousHighScore, 'Total games:', window.totalGames);
+  } else if (hasShownPersonalBest && window.totalGames === 0) {
+    console.log('🎮 First game ever - no high score message shown. Score:', score, 'Total games:', window.totalGames);
+  } else {
+    // Hide the message if no new personal best was achieved
+    const newHighScoreMessage = document.getElementById('newHighScoreMessage');
+    if (newHighScoreMessage) {
+      newHighScoreMessage.classList.add('hidden');
+    }
+    console.log('ℹ️ No new personal best achieved this game - hiding high score message');
+  }
+  
   // Note: Pole interactions are no longer disabled to allow players to examine the final state
+  
+  // Increment total games counter when game ends
+  window.totalGames++;
+  console.log('🎮 Game ended. Total games played:', window.totalGames);
   
   // Save final game state when game over is reached
   console.log('🔄 Triggering final save at game over...');
@@ -7928,6 +8476,7 @@ function resetGame(isFreshGame = true){
   poles = [[],[],[],[]];
   score = 0;
   gold = 0; // Reset gold counter
+  hasShownPersonalBest = false; // Reset personal best flag for new game
   blocksDropped = 0; // Reset blocks dropped counter
   currentTargetBlockSize = STARTING_BLOCK_SIZE; // Reset target block size
   currentStackCapacity = MAX_HEIGHT; // Reset stack capacity
@@ -8772,6 +9321,11 @@ window.addEventListener('keydown', (e) => {
 console.log('🎮 Starting game initialization...');
 
 try {
+  // Initialize safe viewport calculation for mobile devices
+  console.log('📱 Initializing safe viewport calculation...');
+  const initialSafeViewport = calculateSafeViewport();
+  console.log('✅ Safe viewport calculated:', initialSafeViewport);
+  
   // Set up initial probability distribution for the starting block sizes (1 and 2)
   console.log('📊 Setting up initial probability distribution...');
   updateProbabilityDistribution();
