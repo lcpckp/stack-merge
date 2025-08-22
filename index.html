@@ -6308,7 +6308,6 @@ window.addEventListener('resize', repositionHelpModal);
 // Listen for visual viewport changes (important for mobile browsers)
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', repositionHelpModal);
-  window.visualViewport.addEventListener('scroll', repositionHelpModal);
 }
 
 // Listen for orientation changes
@@ -6758,6 +6757,24 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize sound control modal after DOM is loaded
   initializeSoundControlModal();
+  
+  // Force scroll to top immediately when DOM is ready
+  console.log('🔄 DOM ready - resetting scroll position to top...');
+  
+  // Try to clear any stored scroll position
+  try {
+    if (window.history && window.history.scrollRestoration) {
+      window.history.scrollRestoration = 'manual';
+      console.log('🔧 Disabled browser scroll restoration');
+    }
+  } catch (e) {
+    console.log('⚠️ Could not disable scroll restoration:', e);
+  }
+  
+  window.scrollTo(0, 0);
+  if (window.visualViewport) {
+    window.visualViewport.scrollTop = 0;
+  }
 });
 
 // Test function to verify volume changes are working
@@ -9133,6 +9150,50 @@ try {
   } else {
     console.log('⚠️ Help button not found for glow initialization');
   }
+  
+  // Force scroll to top to prevent phantom scroll issues
+  console.log('🔄 Resetting scroll position to top...');
+  window.scrollTo(0, 0);
+  if (window.visualViewport) {
+    window.visualViewport.scrollTop = 0;
+  }
+  
+  // Add window load event listener to ensure scroll stays at top
+  window.addEventListener('load', () => {
+    console.log('🔄 Window loaded - ensuring scroll position is at top...');
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      if (window.visualViewport) {
+        window.visualViewport.scrollTop = 0;
+      }
+    }, 100); // Small delay to ensure everything is fully loaded
+  });
+  
+  // Add persistent scroll reset to catch browser restoration
+  let scrollResetAttempts = 0;
+  const maxScrollResetAttempts = 10;
+  
+  const persistentScrollReset = () => {
+    if (scrollResetAttempts >= maxScrollResetAttempts) return;
+    
+    const currentScrollY = window.scrollY || 0;
+    const currentVisualScrollTop = window.visualViewport ? window.visualViewport.scrollTop : 0;
+    
+    if (currentScrollY > 0 || currentVisualScrollTop > 0) {
+      console.log(`🔄 Scroll reset attempt ${scrollResetAttempts + 1}: Y=${currentScrollY}, visualViewport.scrollTop=${currentVisualScrollTop}`);
+      window.scrollTo(0, 0);
+      if (window.visualViewport) {
+        window.visualViewport.scrollTop = 0;
+      }
+      scrollResetAttempts++;
+      
+      // Try again after a short delay
+      setTimeout(persistentScrollReset, 200);
+    }
+  };
+  
+  // Start persistent scroll reset after a delay
+  setTimeout(persistentScrollReset, 500);
   
 
   
