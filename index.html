@@ -1817,6 +1817,40 @@
     transition: all 0.2s ease;
   }
 
+  .gold-earned-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .gold-earned-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: var(--font-family);
+    text-align: center;
+    margin: 0;
+  }
+
+  .gold-earned-amount {
+    background: #FCD34D; 
+    color: #000; 
+    padding: 10px 20px; 
+    border-radius: 9px; 
+    font-weight: 600; 
+    font-size: 20px; 
+    min-width: 70px; 
+    text-align: center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
+    position: relative;
+    font-family: var(--font-family);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .new-game-btn {
     background: #10B981;
     color: white;
@@ -3152,6 +3186,13 @@
               <div class="largest-merge-label">Largest Block:</div>
       <div id="largestMergeBlock" class="largest-merge-block"></div>
     </div>
+    <div class="gold-earned-info">
+      <div class="gold-earned-label">Total Gold Earned:</div>
+      <div id="goldEarnedDisplay" class="gold-earned-amount">
+        <div class="gold-emoji">💰</div>
+        <div class="gold-text">0</div>
+      </div>
+    </div>
   </div>
 
   <!-- New Game Confirmation Modal -->
@@ -3669,6 +3710,9 @@
       <div class="controls">
         <div class="control-row">
           <button id="testPersonalBestBtn" class="button primary">Test Personal Best Message</button>
+        </div>
+        <div class="control-row">
+          <button id="testGameOverBtn" class="button primary">Test Game Over Screen</button>
         </div>
       </div>
     </div>
@@ -4592,6 +4636,8 @@ function saveGameState() {
       poles: poles,
       score: score,
       gold: gold,
+      goldEarnedThisGame: goldEarnedThisGame,
+      lifetimeGoldEarned: lifetimeGoldEarned,
       blocksDropped: blocksDropped,
       currentTargetBlockSize: currentTargetBlockSize,
       currentStage: currentStage,
@@ -4607,6 +4653,7 @@ function saveGameState() {
       currentActiveDecayFactor: currentActiveDecayFactor,
       hasShownPersonalBest: hasShownPersonalBest
     });
+    console.log('💰 Gold tracking - Current:', gold, 'This Game:', goldEarnedThisGame, 'Lifetime:', lifetimeGoldEarned);
     console.log('🔊 Sound settings being saved:', {
       usePopMergeSounds: soundManager.getMergeSoundType(),
       soundVolumes: soundManager.getAllSoundVolumes(),
@@ -4619,6 +4666,8 @@ function saveGameState() {
       poles: poles,
       score: score || 0,
       gold: gold || 0,
+      goldEarnedThisGame: goldEarnedThisGame || 0,
+      lifetimeGoldEarned: lifetimeGoldEarned || 0,
       blocksDropped: blocksDropped || 0,
       currentTargetBlockSize: currentTargetBlockSize || STARTING_BLOCK_SIZE,
       currentStage: currentStage || 1,
@@ -4696,6 +4745,8 @@ function restoreGameState(gameState) {
     poles = gameState.poles;
     score = gameState.score || 0;
     gold = gameState.gold || 0;
+    goldEarnedThisGame = gameState.goldEarnedThisGame || 0;
+    lifetimeGoldEarned = gameState.lifetimeGoldEarned || 0;
     blocksDropped = gameState.blocksDropped || 0;
     
     // Restore high score from saved state
@@ -4706,6 +4757,10 @@ function restoreGameState(gameState) {
     
     // Restore personal best flag from saved state
     hasShownPersonalBest = gameState.hasShownPersonalBest || false;
+    
+    // Restore gold tracking variables (with fallbacks for old saves)
+    goldEarnedThisGame = gameState.goldEarnedThisGame || 0;
+    lifetimeGoldEarned = gameState.lifetimeGoldEarned || 0;
     
     // Update the help modal high score display if it exists
     updateHelpModalHighScore();
@@ -4778,6 +4833,8 @@ function restoreGameState(gameState) {
     console.log('- Poles changed from', oldPoles.length, 'to', poles.length);
     console.log('- Score changed from', oldScore, 'to', score);
     console.log('- Gold changed from', oldGold, 'to', gold);
+    console.log('- Gold earned this game:', goldEarnedThisGame);
+    console.log('- Lifetime gold earned:', lifetimeGoldEarned);
     console.log('- High score:', window.highScore);
     console.log('- Total games played:', window.totalGames);
     console.log('- Has shown personal best:', hasShownPersonalBest);
@@ -5034,6 +5091,9 @@ function clearAllGameData() {
   
   // Reset the total games counter
   window.totalGames = 0;
+  
+  // Reset lifetime gold earned
+  lifetimeGoldEarned = 0;
   
   // Update the high score display in the help modal
   const helpHighScore = document.getElementById('helpHighScore');
@@ -5417,6 +5477,8 @@ function getRandomPiece(){
 let poles = [[],[],[],[]];
 let score = 0;
 let gold = 0; // Track accumulated gold
+let goldEarnedThisGame = 0; // Track gold earned in current game
+let lifetimeGoldEarned = 0; // Track total gold earned across all games
 
 // Initialize high score tracking
 window.highScore = window.highScore || 0;
@@ -7115,6 +7177,14 @@ function syncDebugControls() {
     testPersonalBestBtn.addEventListener('click', handleTestPersonalBest);
   }
   
+  // Set up test game over button event listener
+  const testGameOverBtn = document.getElementById('testGameOverBtn');
+  if (testGameOverBtn) {
+    // Remove existing listeners to avoid duplicates
+    testGameOverBtn.removeEventListener('click', handleTestGameOver);
+    testGameOverBtn.addEventListener('click', handleTestGameOver);
+  }
+  
   // Set up debug button event listeners
   if (grantGoldBtn) {
     // Remove existing listeners to avoid duplicates
@@ -7199,6 +7269,8 @@ function handleSpeedSlider(e) {
 
 function handleGrantGold() {
   gold += 1000;
+  goldEarnedThisGame += 1000; // Track gold earned in current game
+  lifetimeGoldEarned += 1000; // Track lifetime gold earned
   // Update gold display
   updateGoldDisplay();
   // Update bomb conversion button state
@@ -7213,7 +7285,7 @@ function handleGrantGold() {
   console.log('🔄 Triggering save after granting gold...');
   saveGameState();
   
-  console.log(`Granted 1000 gold. New balance: ${gold}`);
+  console.log(`Granted 1000 gold. New balance: ${gold}, This Game: ${goldEarnedThisGame}, Lifetime: ${lifetimeGoldEarned}`);
 }
 
 function handleGrantScore() {
@@ -7249,6 +7321,26 @@ function handleTestPersonalBest() {
     closeDebugPane();
     console.log('🔧 Debug pane automatically closed after testing personal best message');
   }, 150); // Small delay to ensure the message is visible before closing
+}
+
+function handleTestGameOver() {
+  console.log('🧪 Testing game over screen...');
+  
+  // Set some sample data to make the game over screen look realistic
+  if (weights && weights.length > 0) {
+    const highestBlock = Math.max(...weights);
+    console.log(`Setting largest block to: ${highestBlock}`);
+  }
+  
+  // Show the game over screen
+  showGameOver();
+  
+  // Automatically close the debug pane after showing the game over screen
+  // This provides a better UX by not keeping the debug pane open during testing
+  setTimeout(() => {
+    closeDebugPane();
+    console.log('🔧 Debug pane automatically closed after testing game over screen');
+  }, 150); // Small delay to ensure the game over screen is visible before closing
 }
 
 function handleBlockItemClick(blockItem) {
@@ -8105,8 +8197,10 @@ async function animateMergeCascade(index){
     const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
     const goldEarned = baseGoldEarned * stageMultiplier;
     gold += goldEarned;
+    goldEarnedThisGame += goldEarned; // Track gold earned in current game
+    lifetimeGoldEarned += goldEarned; // Track lifetime gold earned
     updateGoldDisplay();
-    console.log(`Merge ${mergeCount}: Earned ${formatNumber(goldEarned)} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)})`);
+    console.log(`Merge ${mergeCount}: Earned ${formatNumber(goldEarned)} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)}, This Game: ${formatNumber(goldEarnedThisGame)}, Lifetime: ${formatNumber(lifetimeGoldEarned)})`);
     
     // Show gold earned animation
     showGoldEarned(goldEarned);
@@ -8222,6 +8316,15 @@ function showGameOver(){
     largestMergeBlock.textContent = highestBlock >= 100000 ? formatNumber(highestBlock) : String(highestBlock);
   }
   
+  // Display gold earned in this game
+  const goldEarnedDisplay = document.getElementById('goldEarnedDisplay');
+  if (goldEarnedDisplay) {
+    goldEarnedDisplay.innerHTML = `
+      <div class="gold-emoji">💰</div>
+      <div class="gold-text">${formatNumber(goldEarnedThisGame)}</div>
+    `;
+  }
+  
   // Add glowing effect to the ➕ button to guide user to start new game
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
@@ -8288,6 +8391,15 @@ function resetGame(isFreshGame = true){
     largestMergeBlock.removeAttribute('data-value');
   }
   
+  // Clear the gold earned display
+  const goldEarnedDisplay = document.getElementById('goldEarnedDisplay');
+  if (goldEarnedDisplay) {
+    goldEarnedDisplay.innerHTML = `
+      <div class="gold-emoji">💰</div>
+      <div class="gold-text">0</div>
+    `;
+  }
+  
       // Remove glowing effect from the ➕ button
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
@@ -8297,6 +8409,7 @@ function resetGame(isFreshGame = true){
   poles = [[],[],[],[]];
   score = 0;
   gold = 0; // Reset gold counter
+  goldEarnedThisGame = 0; // Reset gold earned this game counter
   hasShownPersonalBest = false; // Reset personal best flag for new game
   blocksDropped = 0; // Reset blocks dropped counter
   currentTargetBlockSize = STARTING_BLOCK_SIZE; // Reset target block size
