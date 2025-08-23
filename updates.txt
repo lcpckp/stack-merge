@@ -7,3 +7,5 @@
 1755720024782|iOS Audio Issues Resolved|I've finally identified and corrected the issues we were seeing on iOS devices having trouble playing audio. Enjoy a smooth experience on any platform!
 
 1755806110034|Personal High Scores|Added a personal high score tracking feature. Check your high score in the Help menu (? button)
+
+1755973636743|Player Statistics|Added new functionality to track lifetime statistics. Click the ? button and then click My Stats.

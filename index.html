@@ -592,11 +592,120 @@
     font-weight: 700 !important;
   }
   
-  .help-modal .high-score-display {
+  /* Stats button styling - Manual reset approach */
+  .help-modal .stats-btn,
+  .help-modal button.stats-btn,
+  .help-modal #showStatsBtn {
+    /* Manual reset of button defaults instead of all: unset */
     font-size: 0.8em !important;
-    color: #fbbf24 !important;
-    font-weight: 600 !important;
+    color: var(--text) !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
     margin-left: auto !important;
+    padding: 6px 12px !important;
+    
+    /* Background and border */
+    background: #334155 !important;
+    background-color: #334155 !important;
+    background-image: none !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    
+    /* Layout and display */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    
+    /* Interaction */
+    cursor: pointer !important;
+    user-select: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+    
+    /* Remove browser button styling */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    
+    /* Effects */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.2s ease !important;
+    font-family: var(--font-family) !important;
+    
+    /* Force dimensions */
+    min-height: auto !important;
+    min-width: auto !important;
+    height: auto !important;
+    width: auto !important;
+  }
+
+  /* Desktop-specific styling to override mobile styles */
+  @media (min-width: 769px) {
+    .help-modal .stats-btn,
+    .help-modal button.stats-btn,
+    .help-modal #showStatsBtn {
+      font-size: 0.8em !important;
+      padding: 6px 12px !important;
+      background: #334155 !important;
+      background-color: #334155 !important;
+      border: 1px solid #475569 !important;
+      border-color: #475569 !important;
+      color: var(--text) !important;
+      font-weight: 500 !important;
+      font-family: var(--font-family) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+      border-radius: 8px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-left: auto !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+    }
+  }
+  
+  .help-modal .stats-btn:hover,
+  .help-modal button.stats-btn:hover,
+  .help-modal #showStatsBtn:hover {
+    background: #475569 !important;
+    background-color: #475569 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  .help-modal .stats-btn:active,
+  .help-modal button.stats-btn:active,
+  .help-modal #showStatsBtn:active {
+    transform: translateY(0) !important;
+    background: #334155 !important;
+    background-color: #334155 !important;
+  }
+
+  /* Desktop-specific hover and active states */
+  @media (min-width: 769px) {
+    .help-modal .stats-btn:hover,
+    .help-modal button.stats-btn:hover,
+    .help-modal #showStatsBtn:hover {
+      background: #475569 !important;
+      background-color: #475569 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .help-modal .stats-btn:active,
+    .help-modal button.stats-btn:active,
+    .help-modal #showStatsBtn:active {
+      transform: translateY(0) !important;
+      background: #334155 !important;
+      background-color: #334155 !important;
+    }
   }
     
     /* Ensure close button has proper spacing */
@@ -696,12 +805,7 @@
     font-weight: 700 !important;
   }
   
-  .help-modal .high-score-display {
-    font-size: 0.8em !important;
-    color: #fbbf24 !important;
-    font-weight: 600 !important;
-    margin-left: auto !important;
-  }
+
   
   /* Modal Close Button - Desktop: floating in top-right of modal bounds */
   .help-modal-close-btn {
@@ -963,6 +1067,114 @@
     margin: 0; 
     font-size: 16px; 
     color: #f8fafc; 
+  }
+
+  /* Statistics Modal Styles */
+  .stats-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    width: auto;
+    max-width: 90vw;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .stats-modal-backdrop {
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stats-modal h2 {
+    text-align: center;
+    margin: 0 0 16px 0;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+    font-family: var(--font-family);
+  }
+
+  .stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .stat-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 6px 0;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+    opacity: 0.9;
+    flex-shrink: 0;
+  }
+
+  .stat-label {
+    font-size: 16px;
+    color: #94a3b8;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+
+
+
+  /* Mobile responsive for stats modal */
+  @media (max-width: 768px) {
+    .stats-modal {
+      width: auto;
+      max-width: calc(100vw - 40px);
+      padding: 16px;
+    }
+
+    .stats-content {
+      gap: 4px;
+      margin: 12px 0;
+    }
+
+    .stat-line {
+      padding: 4px 0;
+      flex-wrap: nowrap;
+      min-width: 0;
+      gap: 16px;
+    }
+
+    .stat-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
   }
 
   .game-container {
@@ -2376,9 +2588,16 @@
     font-weight: 700 !important;
   }
   
-  .help-modal .high-score-display {
-    font-size: 0.7em !important;
+  .help-modal .stats-btn {
+    font-size: 16px !important;
     margin-left: auto !important;
+    padding: 10px 16px !important;
+    background: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: var(--text) !important;
+    font-weight: 500 !important;
+    font-family: var(--font-family) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
   }
 
 
@@ -3347,7 +3566,7 @@
       <button id="helpClose" class="help-modal-close-btn" title="Close help guide">❌ Close</button>
       <h2 id="helpTitle">
         <span class="title-text">How to Play</span>
-        <span class="high-score-display">High Score: 🏆 <span id="helpHighScore">0</span></span>
+        <button id="showStatsBtn" class="stats-btn" title="Show Player Statistics" style="background: #334155 !important; border: 1px solid #475569 !important; color: var(--text) !important; padding: 10px 20px !important; border-radius: 8px !important; font-family: var(--font-family) !important; font-weight: 500 !important; cursor: pointer !important; margin-left: auto !important; appearance: none !important; -webkit-appearance: none !important; font-size: 16px !important;">📊 My Stats</button>
       </h2>
       
       <div class="help-grid">
@@ -3598,6 +3817,30 @@
     </div>
   </div>
 
+  <!-- Player Statistics Modal (hidden by default) -->
+  <div id="statsModal" class="modal-backdrop stats-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="modal stats-modal">
+      <h2 id="statsTitle">Player Statistics</h2>
+      
+      <div class="stats-content">
+        <div class="stat-line">
+          <span class="stat-label">🏆 All Time High Score:</span>
+          <span class="stat-value" id="statsHighScore">0</span>
+        </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">💰 Lifetime Gold Earned:</span>
+          <span class="stat-value" id="statsLifetimeGold">0</span>
+        </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">📦 Total Blocks Dropped:</span>
+          <span class="stat-value" id="statsTotalBlocksDropped">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Debug pane (hidden by default) -->
   <div id="debugPane" class="debug-pane">
     <button class="close-btn" id="debugClose" title="Close debug pane">×</button>
@@ -3687,6 +3930,7 @@
           <tr><td>Target:</td><td id="debugTarget">1024</td></tr>
           <tr><td>Max Block:</td><td id="debugMaxBlock">512</td></tr>
           <tr><td>Blocks Dropped:</td><td id="debugBlocksDropped">0</td></tr>
+          <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">0</td></tr>
           <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
           <tr><td>Stage:</td><td id="debugStage">1</td></tr>
         </table>
@@ -4639,6 +4883,7 @@ function saveGameState() {
       goldEarnedThisGame: goldEarnedThisGame,
       lifetimeGoldEarned: lifetimeGoldEarned,
       blocksDropped: blocksDropped,
+      totalBlocksDropped: totalBlocksDropped,
       currentTargetBlockSize: currentTargetBlockSize,
       currentStage: currentStage,
       weights: weights,
@@ -4669,6 +4914,7 @@ function saveGameState() {
       goldEarnedThisGame: goldEarnedThisGame || 0,
       lifetimeGoldEarned: lifetimeGoldEarned || 0,
       blocksDropped: blocksDropped || 0,
+      totalBlocksDropped: totalBlocksDropped || 0,
       currentTargetBlockSize: currentTargetBlockSize || STARTING_BLOCK_SIZE,
       currentStage: currentStage || 1,
       weights: weights || [1, 2],
@@ -4748,6 +4994,7 @@ function restoreGameState(gameState) {
     goldEarnedThisGame = gameState.goldEarnedThisGame || 0;
     lifetimeGoldEarned = gameState.lifetimeGoldEarned || 0;
     blocksDropped = gameState.blocksDropped || 0;
+    totalBlocksDropped = gameState.totalBlocksDropped || 0;
     
     // Restore high score from saved state
     window.highScore = gameState.highScore || 0;
@@ -4758,12 +5005,15 @@ function restoreGameState(gameState) {
     // Restore personal best flag from saved state
     hasShownPersonalBest = gameState.hasShownPersonalBest || false;
     
-    // Restore gold tracking variables (with fallbacks for old saves)
+        // Restore gold tracking variables (with fallbacks for old saves)
     goldEarnedThisGame = gameState.goldEarnedThisGame || 0;
     lifetimeGoldEarned = gameState.lifetimeGoldEarned || 0;
     
-    // Update the help modal high score display if it exists
-    updateHelpModalHighScore();
+    // Update statistics modal if it's open
+    if (statsModal && !statsModal.classList.contains('hidden')) {
+      updateStatsModal();
+    }
+    
     currentTargetBlockSize = gameState.currentTargetBlockSize || STARTING_BLOCK_SIZE;
     currentStage = gameState.currentStage || 1;
     weights = gameState.weights || [1, 2];
@@ -5095,11 +5345,7 @@ function clearAllGameData() {
   // Reset lifetime gold earned
   lifetimeGoldEarned = 0;
   
-  // Update the high score display in the help modal
-  const helpHighScore = document.getElementById('helpHighScore');
-  if (helpHighScore) {
-    helpHighScore.textContent = '0';
-  }
+
   
       // Also clear any saved game state that might restore the timestamp
     try {
@@ -5349,8 +5595,10 @@ function updateScoreDisplay() {
     window.highScore = score;
     console.log('✅ High score updated to:', window.highScore);
     
-    // Update the help modal high score display
-    updateHelpModalHighScore();
+    // Update statistics modal if it's open
+    if (statsModal && !statsModal.classList.contains('hidden')) {
+      updateStatsModal();
+    }
     
     // Only show personal best message once per game AND if this isn't the user's first game
     if (!hasShownPersonalBest && window.totalGames > 0) {
@@ -5479,6 +5727,7 @@ let score = 0;
 let gold = 0; // Track accumulated gold
 let goldEarnedThisGame = 0; // Track gold earned in current game
 let lifetimeGoldEarned = 0; // Track total gold earned across all games
+let totalBlocksDropped = 0; // Track total blocks dropped across all games
 
 // Initialize high score tracking
 window.highScore = window.highScore || 0;
@@ -6180,6 +6429,7 @@ let debugCapacity = null;
 let debugTarget = null;
 let debugMaxBlock = null;
 let debugBlocksDropped = null;
+let debugTotalBlocksDropped = null;
 let debugBombStatus = null;
 let debugStage = null;
 let debugAiToggle = null;
@@ -6231,7 +6481,8 @@ debugStacks = document.getElementById('debugStacks');
 debugCapacity = document.getElementById('debugCapacity');
 debugTarget = document.getElementById('debugTarget');
 debugMaxBlock = document.getElementById('debugMaxBlock');
-debugBlocksDropped = document.getElementById('debugBlocksDropped');
+      debugBlocksDropped = document.getElementById('debugBlocksDropped');
+      debugTotalBlocksDropped = document.getElementById('debugTotalBlocksDropped');
 debugBombStatus = document.getElementById('debugBombStatus');
 debugStage = document.getElementById('debugStage');
 const grantGoldBtn = document.getElementById('grantGoldBtn');
@@ -6263,24 +6514,11 @@ document.addEventListener('keydown', (e) => {
 
 
 
-// Function to update the help modal high score display
-function updateHelpModalHighScore() {
-  const helpHighScore = document.getElementById('helpHighScore');
-  console.log('🔄 updateHelpModalHighScore called - window.highScore:', window.highScore);
-  if (helpHighScore) {
-    helpHighScore.textContent = window.highScore || 0;
-    console.log('✅ Help modal high score updated to:', helpHighScore.textContent);
-  } else {
-    console.log('⚠️ helpHighScore element not found');
-  }
-}
+
 
 // Help modal wiring
 function openHelp(){ 
   helpModal.classList.remove('hidden'); 
-  
-  // Update the high score display in the help modal
-  updateHelpModalHighScore();
   
   // Dynamically position the help modal content below the close button on mobile
   const helpModalContent = document.querySelector('.help-modal');
@@ -6459,6 +6697,55 @@ if (helpModal) {
   helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
 } else {
   console.log('⚠️ Help modal not found');
+}
+
+// Statistics modal DOM refs and functionality
+const showStatsBtn = document.getElementById('showStatsBtn');
+const statsModal = document.getElementById('statsModal');
+
+// Function to update statistics modal
+function updateStatsModal() {
+  const statsHighScore = document.getElementById('statsHighScore');
+  const statsLifetimeGold = document.getElementById('statsLifetimeGold');
+  const statsTotalBlocksDropped = document.getElementById('statsTotalBlocksDropped');
+  
+  if (statsHighScore) {
+    statsHighScore.textContent = window.highScore || 0;
+  }
+  
+  if (statsLifetimeGold) {
+    statsLifetimeGold.textContent = formatNumber(lifetimeGoldEarned || 0);
+  }
+  
+  if (statsTotalBlocksDropped) {
+    statsTotalBlocksDropped.textContent = formatNumber(totalBlocksDropped || 0);
+  }
+  
+  console.log('📊 Statistics modal updated - High Score:', window.highScore, 'Lifetime Gold:', lifetimeGoldEarned, 'Total Blocks Dropped:', totalBlocksDropped);
+}
+
+// Function to open statistics modal
+function openStats() {
+  statsModal.classList.remove('hidden');
+  updateStatsModal();
+}
+
+// Function to close statistics modal
+function closeStats() {
+  statsModal.classList.add('hidden');
+}
+
+// Statistics modal event listeners
+if (showStatsBtn) {
+  showStatsBtn.addEventListener('click', openStats);
+} else {
+  console.log('⚠️ Show stats button not found');
+}
+
+if (statsModal) {
+  statsModal.addEventListener('click', (e) => { if (e.target === statsModal) closeStats(); });
+} else {
+  console.log('⚠️ Stats modal not found');
 }
 
 // Sound button event listener
@@ -7046,7 +7333,8 @@ function updateDebugPane() {
   if (debugCapacity) debugCapacity.textContent = currentStackCapacity;
   if (debugTarget) debugTarget.textContent = currentTargetBlockSize * 2;
   if (debugMaxBlock) debugMaxBlock.textContent = Math.max(...weights);
-  if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
+        if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
+      if (debugTotalBlocksDropped) debugTotalBlocksDropped.textContent = totalBlocksDropped;
   if (debugBombStatus) debugBombStatus.textContent = blocksDropped >= BOMB_DELAY_BLOCKS ? 'Enabled' : 'Disabled';
   if (debugStage) debugStage.textContent = currentStage;
   
@@ -7273,6 +7561,11 @@ function handleGrantGold() {
   lifetimeGoldEarned += 1000; // Track lifetime gold earned
   // Update gold display
   updateGoldDisplay();
+  
+  // Update statistics modal if it's open
+  if (statsModal && !statsModal.classList.contains('hidden')) {
+    updateStatsModal();
+  }
   // Update bomb conversion button state
   updateBombButtonIfGoldChanged();
   // Update trash button state
@@ -7903,6 +8196,7 @@ function placeOnPole(idx){
       // Increment blocks dropped counter (only for regular pieces, not custom debug pieces)
       if (!wasCustomBlock) {
         blocksDropped++;
+        totalBlocksDropped++;
       }
       
       // Only advance the queue if we used a regular piece, not a custom one
@@ -8200,6 +8494,12 @@ async function animateMergeCascade(index){
     goldEarnedThisGame += goldEarned; // Track gold earned in current game
     lifetimeGoldEarned += goldEarned; // Track lifetime gold earned
     updateGoldDisplay();
+    
+    // Update statistics modal if it's open
+    if (statsModal && !statsModal.classList.contains('hidden')) {
+      updateStatsModal();
+    }
+    
     console.log(`Merge ${mergeCount}: Earned ${formatNumber(goldEarned)} gold (${baseGoldEarned} × ${stageMultiplier}x multiplier) (Total: ${formatNumber(gold)}, This Game: ${formatNumber(goldEarnedThisGame)}, Lifetime: ${formatNumber(lifetimeGoldEarned)})`);
     
     // Show gold earned animation
@@ -8340,8 +8640,10 @@ function showGameOver(){
   if (isNewHighScore) {
     window.highScore = score;
     
-    // Update the help modal high score display
-    updateHelpModalHighScore();
+    // Update statistics modal if it's open
+    if (statsModal && !statsModal.classList.contains('hidden')) {
+      updateStatsModal();
+    }
   }
   
   // Show "New High Score!" message if we achieved a new personal best this game
