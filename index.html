@@ -1559,7 +1559,6 @@
   }
   
   .block-item {
-    aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1599,6 +1598,16 @@
   .block-item[data-value="4096"] { background: #7c2d6d; color: #fff; }
   .block-item[data-value="8192"] { background: #64748b; color: #fff; }
   .block-item[data-value="16384"] { background: #fff; color: #000; }
+  .block-item[data-value="32768"] { background: #fff; color: #000; }
+  .block-item[data-value="65536"] { background: #fff; color: #000; }
+  .block-item[data-value="131072"] { background: #fff; color: #000; }
+  .block-item[data-value="262144"] { background: #fff; color: #000; }
+  
+  /* General rule for any higher tier blocks (262144+) to use white styling */
+  .block-item[data-value]:not([data-value="1"]):not([data-value="2"]):not([data-value="4"]):not([data-value="8"]):not([data-value="16"]):not([data-value="32"]):not([data-value="64"]):not([data-value="128"]):not([data-value="256"]):not([data-value="512"]):not([data-value="1024"]):not([data-value="2048"]):not([data-value="4096"]):not([data-value="8192"]):not([data-value="16384"]):not([data-value="32768"]):not([data-value="65536"]):not([data-value="131072"]):not([data-value="262144"]) {
+    background: #fff !important;
+    color: #000 !important;
+  }
   
   /* Largest merge block styling - same colors as block-item */
   .largest-merge-block[data-value="1"] { background: #cfef08; color: #000; }
@@ -1616,6 +1625,16 @@
   .largest-merge-block[data-value="4096"] { background: #7c2d6d; color: #fff; }
   .largest-merge-block[data-value="8192"] { background: #64748b; color: #fff; }
   .largest-merge-block[data-value="16384"] { background: #fff; color: #000; }
+  .largest-merge-block[data-value="32768"] { background: #fff; color: #000; }
+  .largest-merge-block[data-value="65536"] { background: #fff; color: #000; }
+  .largest-merge-block[data-value="131072"] { background: #fff; color: #000; }
+  .largest-merge-block[data-value="262144"] { background: #fff; color: #000; }
+  
+  /* General rule for any higher tier blocks (262144+) to use white styling */
+  .largest-merge-block[data-value]:not([data-value="1"]):not([data-value="2"]):not([data-value="4"]):not([data-value="8"]):not([data-value="16"]):not([data-value="32"]):not([data-value="64"]):not([data-value="128"]):not([data-value="256"]):not([data-value="512"]):not([data-value="1024"]):not([data-value="2048"]):not([data-value="4096"]):not([data-value="8192"]):not([data-value="16384"]):not([data-value="32768"]):not([data-value="65536"]):not([data-value="131072"]):not([data-value="262144"]) {
+    background: #fff !important;
+    color: #000 !important;
+  }
   
   /* Dynamic gold glow effect for white blocks (16384+) in the game */
   .disc.white-block-glow {
@@ -1785,16 +1804,17 @@
   }
 
   .largest-merge-block {
-    width: 80px;
-    height: 33px;
-    border-radius: 6px;
+    width: 108px;
+    height: 42px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 12px;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    font-size: 24px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     font-family: var(--font-family);
+    transition: all 0.2s ease;
   }
 
   .new-game-btn {
@@ -3129,7 +3149,7 @@
     <div class="game-over-text">Game Over</div>
     <div id="newHighScoreMessage" class="new-high-score-message hidden">🏆 New High Score!</div>
     <div class="largest-merge-info">
-      <div class="largest-merge-label">Largest Merge:</div>
+              <div class="largest-merge-label">Largest Block:</div>
       <div id="largestMergeBlock" class="largest-merge-block"></div>
     </div>
   </div>
@@ -5647,11 +5667,38 @@ function showGoldEarned(amount) {
   
   goldEl.textContent = `+${formatNumber(amount)}`;
   
-  // Position it closer to the top right corner of the gold display
+  // Position it at a specific point with text centered on that point
   const goldDisplay = document.querySelector('.gold-value');
   if (goldDisplay) {
     const rect = goldDisplay.getBoundingClientRect();
-    goldEl.style.left = (rect.right + 2) + 'px';
+    
+    // First, add the element to the DOM temporarily to measure its width
+    document.body.appendChild(goldEl);
+    const textWidth = goldEl.offsetWidth;
+    
+    // Calculate the desired position (2px right of gold display right edge)
+    let desiredLeft = rect.right + 2;
+    
+    // Check if the text would be cut off by the right edge of the screen
+    const screenRight = window.innerWidth;
+    // Since text starts at left edge, the right edge is at desiredLeft + textWidth
+    const textRightEdge = desiredLeft + textWidth;
+    
+    // If text would be cut off, adjust position to the left
+    if (textRightEdge > screenRight - 10) { // Leave 10px margin from screen edge
+      desiredLeft = screenRight - 10 - textWidth;
+    }
+    
+    // Ensure we don't go too far left (keep it within reasonable bounds)
+    const minLeft = Math.max(0, rect.left - 20); // Don't go more than 20px left of the gold display, and never go off-screen left
+    if (desiredLeft < minLeft) {
+      desiredLeft = minLeft;
+    }
+    
+
+    
+    // Position the element so its left edge starts at desiredLeft
+    goldEl.style.left = desiredLeft + 'px';
     goldEl.style.top = (rect.top + 5) + 'px';
   } else {
     // Fallback positioning if gold display not found
@@ -5659,8 +5706,6 @@ function showGoldEarned(amount) {
     goldEl.style.top = '50%';
     goldEl.style.transform = 'translate(-50%, -50%)';
   }
-  
-  document.body.appendChild(goldEl);
   
   // Add pulse animation to the gold count
   if (goldDisplay) {
@@ -6956,10 +7001,10 @@ function openDebugPane(){
 }
 function closeDebugPane(){ 
   debugPane.classList.remove('show'); 
-  // Reset custom block mode when debug pane is closed
-  customBlockMode = false;
+  // Keep custom block mode active when debug pane is closed
+  // customBlockMode will only be reset when "No Block" is selected
   
-  console.log('Debug pane closed, custom block mode disabled');
+  console.log('Debug pane closed, custom block mode remains active');
 }
 debugClose.addEventListener('click', closeDebugPane);
 debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
@@ -7227,6 +7272,13 @@ function handleBlockItemClick(blockItem) {
     customBlockMode = true;
     
     console.log(`Selected block: ${value}`);
+    
+    // Automatically close the debug pane when a custom block is selected
+    // This allows immediate dropping of the selected block
+    setTimeout(() => {
+      closeDebugPane();
+      console.log('🔧 Debug pane automatically closed after selecting custom block');
+    }, 150); // Small delay to ensure the selection is visible before closing
   }
   
   // Re-render to update pole enabling/disabling based on the new custom block
@@ -7387,7 +7439,7 @@ function render(){
     
     // Determine which piece to check against for pole enabling/disabling
     let pieceToCheck;
-    if (customBlockMode && customBlockSize && debugPane && debugPane.classList.contains('show')) {
+    if (customBlockMode && customBlockSize) {
       pieceToCheck = { w: customBlockSize, bomb: customBlockBomb };
     } else {
       pieceToCheck = nextQueue[0];
@@ -7611,13 +7663,13 @@ function placeOnPole(idx){
   }
   const pole = poles[idx];
   
-  // Check if custom block mode is active AND debug pane is open
+  // Check if custom block mode is active
   let nextPiece;
   let wasCustomBlock = false;
-  if (customBlockMode && customBlockSize && debugPane && debugPane.classList.contains('show')) {
+  if (customBlockMode && customBlockSize) {
     nextPiece = { w: customBlockSize, bomb: customBlockBomb };
     wasCustomBlock = true;
-    // Custom block mode only works when debug pane is visible and a block is selected
+    // Custom block mode works when a block is selected, regardless of debug pane visibility
   } else {
     nextPiece = nextQueue[0];
   }
