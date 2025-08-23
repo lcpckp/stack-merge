@@ -135,31 +135,7 @@
     transform: scale(1.05);
   }
   
-  /* Merge sound button states */
-  .title-btn#mergeSoundBtn {
-    transition: all 0.2s ease;
-  }
-  
-  .title-btn#mergeSoundBtn:hover {
-    transform: scale(1.05);
-  }
-  
-  /* Pop sound button special styling */
-  .title-btn#mergeSoundBtn[title*="pop"] {
-    background: linear-gradient(135deg, var(--panel) 0%, #374151 100%);
-  }
-  
-  /* Disabled musical sound button styling */
-  .title-btn#mergeSoundBtn[title*="musical"] {
-    opacity: 0.5;
-    filter: grayscale(0.8);
-    background: linear-gradient(135deg, var(--panel) 0%, #4a5568 100%);
-  }
-  
-  .title-btn#mergeSoundBtn[title*="musical"]:hover {
-    opacity: 0.7;
-    filter: grayscale(0.6);
-  }
+
   
   @keyframes breatheGlow {
     0%, 100% { 
@@ -241,14 +217,9 @@
       transform: none;
     }
     
-    .title-btn#mergeSoundBtn:hover {
-      transform: none;
-    }
+
     
-    .title-btn#mergeSoundBtn[title*="musical"]:hover {
-      opacity: 0.5;
-      filter: grayscale(0.8);
-    }
+
   }
   
 
@@ -783,12 +754,16 @@
     align-items: flex-start;
     justify-content: center;
   }
+  
+
 
   /* Desktop help modal backdrop should allow content positioning below close button */
   @media (min-width: 769px) {
     .help-modal-backdrop {
       align-items: flex-start;
     }
+    
+
   }
 
   /* High score display in help modal title - Desktop */
@@ -830,6 +805,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
     font-family: var(--font-family);
+  }
+  
+  /* Sound Control and Settings Modal Close Button - positioned for narrower modals */
+  .sound-control-modal .help-modal-close-btn,
+  .settings-modal .help-modal-close-btn {
+    right: calc(50vw - 250px + 20px); /* Position relative to 500px modal width (250px is half) */
   }
   
   .help-modal-close-btn:hover {
@@ -2580,6 +2561,8 @@
     align-items: flex-start;
     justify-content: center;
   }
+  
+
 
   /* Mobile responsive for help modal high score display */
   .help-modal .title-text {
@@ -2622,6 +2605,16 @@
   
   /* Mobile responsive for floating close button - screen corner with safe area */
   .help-modal-close-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 24px);
+    right: calc(env(safe-area-inset-right, 0px) + 20px);
+    padding: 10px 16px;
+    font-size: 16px;
+  }
+  
+  /* Mobile responsive for sound control and settings modal close buttons */
+  .sound-control-modal .help-modal-close-btn,
+  .settings-modal .help-modal-close-btn {
     position: fixed;
     top: calc(env(safe-area-inset-top, 0px) + 24px);
     right: calc(env(safe-area-inset-right, 0px) + 20px);
@@ -2741,8 +2734,20 @@
     justify-content: center;
   }
   
+
+  
   /* Extra small mobile floating close button - screen corner with safe area */
   .help-modal-close-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    right: calc(env(safe-area-inset-right, 0px) + 16px);
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  /* Extra small mobile sound control and settings modal close buttons */
+  .sound-control-modal .help-modal-close-btn,
+  .settings-modal .help-modal-close-btn {
     position: fixed;
     top: calc(env(safe-area-inset-top, 0px) + 16px);
     right: calc(env(safe-area-inset-right, 0px) + 16px);
@@ -3113,27 +3118,55 @@
   font-size: 16px;
 }
 
-/* Sound Control Modal Styles */
-.sound-control-modal { 
-  background: var(--panel); 
-  color: var(--text); 
-  width: min(500px, 90vw); 
-  border-radius: 16px; 
-  padding: 28px; 
-  box-shadow: 0 15px 45px rgba(0,0,0,0.4); 
-  font-family: var(--font-family);
-  z-index: 1001;
-  max-height: 80vh;
-  overflow-y: auto;
-}
+  /* Sound Control Modal Styles */
+  .sound-control-modal { 
+    background: var(--panel); 
+    color: var(--text); 
+    width: min(500px, 85vw); /* Narrower width to create margins like help guide */
+    border-radius: 16px; 
+    padding: 28px; 
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4); 
+    font-family: var(--font-family);
+    z-index: 1001;
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 120px);
+    overflow-y: auto;
+    /* Hide scrollbar while maintaining scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Ensure modal fits within safe area and starts below close button */
+    margin: 0;
+    position: absolute;
+    top: 80px; /* Start below the close button with proper spacing - accounts for button height + border + text */
+  }
 
-.sound-control-modal h2 { 
-  margin: 0 0 24px; 
-  font-size: 24px; 
-  text-align: center; 
-  color: #0ea5e9;
-  font-family: var(--font-family);
-}
+  .sound-control-modal h2 { 
+    margin: 0 0 24px; 
+    font-size: 24px; 
+    text-align: center; 
+    color: #0ea5e9;
+    font-family: var(--font-family);
+  }
+  
+  /* Settings Modal Styles - same positioning as sound control modal */
+  .settings-modal { 
+    background: var(--panel); 
+    color: var(--text); 
+    width: min(500px, 85vw); /* Narrower width to create margins like help guide */
+    border-radius: 16px; 
+    padding: 28px; 
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4); 
+    font-family: var(--font-family);
+    z-index: 1001;
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 120px);
+    overflow-y: auto;
+    /* Hide scrollbar while maintaining scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Ensure modal fits within safe area and starts below close button */
+    margin: 0;
+    position: absolute;
+    top: 80px; /* Start below the close button with proper spacing - accounts for button height + border + text */
+  }
 
 .sound-control-container {
   background: var(--bg);
@@ -3224,43 +3257,39 @@
   border-color: #dc2626;
 }
 
-.sound-control-close {
-  background: #334155;
-  color: var(--text);
-  border: 1px solid #475569;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 16px;
-  transition: all 0.2s ease;
-  font-family: var(--font-family);
-  width: 100%;
-  margin-top: 24px;
-}
 
-.sound-control-close:hover {
-  background: #475569;
-}
 
-.sound-control-close:active {
-  background: #334155;
-}
-
-/* Mobile responsive design for sound control modal */
+/* Mobile responsive design for sound control and settings modals */
 @media (max-width: 768px) {
-  .sound-control-modal {
-    width: 95vw;
+  .sound-control-modal,
+  .settings-modal {
+    width: 90vw; /* Narrower width to create margins like help guide */
     padding: 24px;
     margin: 20px;
+    /* Mobile positioning - start below close button */
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 70px); /* Account for close button height + small padding */
   }
   
-  .sound-control-modal h2 {
+  .sound-control-modal h2,
+  .settings-modal h2 {
     font-size: 22px;
     margin-bottom: 20px;
   }
   
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) on mobile */
+  .sound-control-modal::-webkit-scrollbar,
+  .settings-modal::-webkit-scrollbar {
+    display: none;
+  }
+  
   .sound-control-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  /* Settings modal container styling */
+  .settings-modal .sound-control-container {
     padding: 16px;
     margin-bottom: 16px;
   }
@@ -3272,7 +3301,21 @@
     margin-bottom: 20px;
   }
   
+  /* Settings modal row styling */
+  .settings-modal .sound-control-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
   .sound-control-label {
+    min-width: auto;
+    justify-content: center;
+  }
+  
+  /* Settings modal label styling */
+  .settings-modal .sound-control-label {
     min-width: auto;
     justify-content: center;
   }
@@ -3301,6 +3344,30 @@
     flex-shrink: 0;
   }
   
+  /* Settings modal slider and controls styling */
+  .settings-modal .sound-control-slider {
+    width: 100%;
+  }
+  
+  .settings-modal .sound-control-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .settings-modal .sound-control-controls .sound-control-slider {
+    flex: 1;
+  }
+  
+  .settings-modal .sound-control-controls .volume-value {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  
   /* For rows with just a button (like master mute), center the button */
   .sound-control-row:has(.sound-control-mute) {
     align-items: center;
@@ -3310,16 +3377,32 @@
     align-self: center;
     min-width: 100px;
   }
+  
+  /* Settings modal mute button styling */
+  .settings-modal .sound-control-row:has(.sound-control-mute) {
+    align-items: center;
+  }
+  
+  .settings-modal .sound-control-mute {
+    align-self: center;
+    min-width: 100px;
+  }
 }
 
 /* Extra small mobile devices */
 @media (max-width: 480px) {
-  .sound-control-modal {
+  .sound-control-modal,
+  .settings-modal {
+    width: 92vw; /* Narrower width to create margins like help guide */
     padding: 20px;
     margin: 16px;
+    /* Extra small mobile positioning - start below close button */
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 65px); /* Account for close button height + small padding */
   }
   
-  .sound-control-modal h2 {
+  .sound-control-modal h2,
+  .settings-modal h2 {
     font-size: 20px;
     margin-bottom: 18px;
   }
@@ -3329,7 +3412,19 @@
     margin-bottom: 14px;
   }
   
+  /* Settings modal container styling for extra small mobile */
+  .settings-modal .sound-control-container {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  
   .sound-control-row {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  
+  /* Settings modal row styling for extra small mobile */
+  .settings-modal .sound-control-row {
     gap: 10px;
     margin-bottom: 18px;
   }
@@ -3338,7 +3433,17 @@
     font-size: 15px;
   }
   
+  /* Settings modal label styling for extra small mobile */
+  .settings-modal .sound-control-label {
+    font-size: 15px;
+  }
+  
   .sound-control-emoji {
+    font-size: 18px;
+  }
+  
+  /* Settings modal emoji styling for extra small mobile */
+  .settings-modal .sound-control-emoji {
     font-size: 18px;
   }
 }
@@ -3371,7 +3476,7 @@
       </div>
       <div class="right-section">
         <button id="soundBtn" class="title-btn" title="Sound Controls">🔊</button>
-        <button id="mergeSoundBtn" class="title-btn" title="Switch to musical merge sounds">🎵</button>
+        <button id="settingsBtn" class="title-btn" title="Settings">⚙️</button>
       </div>
     </div>
   </div>
@@ -3426,7 +3531,7 @@
   </div>
 
   <!-- Sound Control Modal -->
-  <div id="soundControlModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="soundControlTitle">
+  <div id="soundControlModal" class="modal-backdrop help-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="soundControlTitle">
     <div class="modal sound-control-modal">
       <h2 id="soundControlTitle">Sound Controls</h2>
       
@@ -3495,17 +3600,22 @@
         </div>
       </div>
       
-      <button id="soundControlClose" class="sound-control-close">Close</button>
-      
-      <div style="margin-top: 16px; text-align: center;">
-        <button id="resetAudioBtn" class="sound-control-mute" style="background: #f59e0b; border-color: #d97706; min-width: 120px;">
-          Reset Audio Settings
-        </button>
-        <button id="testAudioBtn" class="sound-control-mute" style="background: #10b981; border-color: #059669; min-width: 120px; margin-top: 8px;">
-          Test Audio (Debug)
-        </button>
+      <button id="soundControlClose" class="help-modal-close-btn" title="Close sound controls">❌ Close</button>
+    </div>
+  </div>
 
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-backdrop help-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal sound-control-modal settings-modal">
+      <h2 id="settingsTitle">Settings</h2>
+      
+      <div class="sound-control-container">
+        <p style="text-align: center; color: #94a3b8; font-style: italic;">
+          Settings panel coming soon...
+        </p>
       </div>
+      
+      <button id="settingsClose" class="help-modal-close-btn" title="Close settings">❌ Close</button>
     </div>
   </div>
 
@@ -3812,7 +3922,7 @@
 
 
       <div class="actions" style="justify-content: flex-start;">
-        <button id="resetDataBtn" class="ai-btn" style="background-color: #dc2626; color: white;" title="Clear all game data and cookies">Clear Local Data</button>
+        <button id="resetDataBtn" class="ai-btn" style="background-color: #dc2626; color: white;" title="Clear all game data and cookies">Clear All Data</button>
       </div>
     </div>
   </div>
@@ -4037,7 +4147,7 @@ const getEnvironment = () => isLocalhost ? 'development' : 'production';
 class SoundManager {
   constructor() {
     this.isMuted = false;
-    this.usePopMergeSounds = true; // true = cork sounds (default), false = musical sounds
+    // Always use cork sounds for merges
     this.volume = 0.3; // Default volume (30%)
     this.initialized = false; // Will be set to true after Web Audio API initialization
     
@@ -4424,19 +4534,9 @@ class SoundManager {
   
 
   
-  // Toggle between musical and cork merge sounds
-  toggleMergeSoundType() {
-    this.usePopMergeSounds = !this.usePopMergeSounds;
-    console.log(`🔄 Switched to ${this.usePopMergeSounds ? 'cork' : 'musical'} merge sounds`);
-    this.saveSoundSettings();
-    return this.usePopMergeSounds;
-  }
-  
-
-  
-  // Get current merge sound type preference
+  // Get current merge sound type preference (always cork sounds now)
   getMergeSoundType() {
-    return this.usePopMergeSounds;
+    return true; // Always return true for cork sounds
   }
   
   // Set individual sound type volume (0-5 scale)
@@ -4531,7 +4631,6 @@ class SoundManager {
       const settings = {
         isMuted: this.isMuted,
         volume: this.volume,
-        usePopMergeSounds: this.usePopMergeSounds,
         soundVolumes: this.soundVolumes,
         timestamp: Date.now()
       };
@@ -4552,7 +4651,7 @@ class SoundManager {
         // Load settings with validation
         if (typeof settings.isMuted === 'boolean') this.isMuted = settings.isMuted;
         if (typeof settings.volume === 'number') this.volume = Math.max(0, Math.min(1, settings.volume));
-        if (typeof settings.usePopMergeSounds === 'boolean') this.usePopMergeSounds = settings.usePopMergeSounds;
+
         
         // Load individual sound volumes
         if (settings.soundVolumes && typeof settings.soundVolumes === 'object') {
@@ -4584,7 +4683,7 @@ class SoundManager {
     // Reset to default values
     this.isMuted = false;
     this.volume = 0.3;
-    this.usePopMergeSounds = true;
+
     this.soundVolumes = {
       drop: 3,
       merge: 3,
@@ -4900,7 +4999,6 @@ function saveGameState() {
     });
     console.log('💰 Gold tracking - Current:', gold, 'This Game:', goldEarnedThisGame, 'Lifetime:', lifetimeGoldEarned);
     console.log('🔊 Sound settings being saved:', {
-      usePopMergeSounds: soundManager.getMergeSoundType(),
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState()
     });
@@ -4926,7 +5024,7 @@ function saveGameState() {
       trashButtonPresses: trashButtonPresses || 0,
       bombSelected: bombSelected || false,
       previousBombCost: previousBombCost || bombConversionCost,
-      usePopMergeSounds: soundManager.getMergeSoundType(),
+
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
       currentActiveDecayFactor: currentActiveDecayFactor,
@@ -5035,11 +5133,7 @@ function restoreGameState(gameState) {
     bombSelected = gameState.bombSelected || false;
     previousBombCost = gameState.previousBombCost || bombConversionCost;
     
-    // Restore merge sound type preference from saved state
-    if (gameState.usePopMergeSounds !== undefined) {
-      // Set the merge sound type preference in the sound manager
-      soundManager.usePopMergeSounds = gameState.usePopMergeSounds;
-    }
+
     
     // Restore sound volumes from saved state
     if (gameState.soundVolumes && typeof gameState.soundVolumes === 'object') {
@@ -5061,13 +5155,7 @@ function restoreGameState(gameState) {
       preventTimestampRestore = false; // Reset the flag
     }
     
-    // Always update the merge sound button to reflect current state (including default)
-    const mergeSoundBtn = document.getElementById('mergeSoundBtn');
-    if (mergeSoundBtn) {
-      const usePopSounds = soundManager.getMergeSoundType();
-      mergeSoundBtn.textContent = '🎵'; // Always show music note
-      mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
-    }
+
     
     // Update sound button to reflect restored mute state
     const soundBtn = document.getElementById('soundBtn');
@@ -5097,7 +5185,6 @@ function restoreGameState(gameState) {
     console.log('- Bomb selected:', bombSelected);
     console.log('- Previous bomb cost:', previousBombCost);
     console.log('🔊 Sound settings restored:', {
-      usePopMergeSounds: soundManager.getMergeSoundType(),
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState()
     });
@@ -5344,6 +5431,60 @@ function clearAllGameData() {
   
   // Reset lifetime gold earned
   lifetimeGoldEarned = 0;
+  
+  // Reset total blocks dropped count
+  totalBlocksDropped = 0;
+  
+  // Reset other important game state variables
+  hasShownPersonalBest = false;
+  bombConversionCost = 25; // Reset to default cost
+  trashButtonCost = 25; // Reset to default cost
+  bombConversionPresses = 0;
+  trashButtonPresses = 0;
+  bombSelected = false;
+  previousBombCost = 25;
+  currentActiveDecayFactor = 0.6; // Reset to default decay factor
+  
+  // Reset sound settings to defaults
+  if (soundManager) {
+    soundManager.resetToDefaults();
+  }
+  
+  // Reset game state variables to defaults
+  score = 0;
+  gold = 0;
+  goldEarnedThisGame = 0;
+  blocksDropped = 0;
+  placing = false;
+  lastPlacementTime = 0;
+  currentTargetBlockSize = STARTING_BLOCK_SIZE;
+  currentStackCapacity = MAX_HEIGHT;
+  currentStage = 1;
+  lastGoldAmount = 0;
+  
+  // Reset weights and probabilities to defaults
+  weights = [1, 2];
+  probabilities = [0.5, 0.5];
+  
+  // Reset next queue
+  nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+  
+  // Reset poles to empty
+  poles = [[],[],[],[]];
+  
+  // Reset debug-related variables to defaults
+  currentSpeed = 2; // Reset to Medium speed
+  customBlockMode = false;
+  customBlockSize = null;
+  customBlockBomb = false;
+  
+  // Reset debug UI elements to defaults
+  if (bombToggle) bombToggle.checked = false;
+  
+  // Update debug pane to reflect cleared state
+  if (typeof updateDebugPane === 'function') {
+    updateDebugPane();
+  }
   
 
   
@@ -6679,7 +6820,7 @@ if (helpClose) {
 const resetDataBtn = document.getElementById('resetDataBtn');
 if (resetDataBtn) {
   resetDataBtn.addEventListener('click', () => {
-    if (confirm('This will clear ALL game data (save progress, settings, etc.) Are you sure?')) {
+    if (confirm('Are you sure you want to clear all data? This will delete all player statistics and settings.')) {
       clearAllGameData();
       closeHelp(); // Close the help modal
       
@@ -6758,27 +6899,17 @@ if (soundBtn) {
   console.log('⚠️ Sound button not found');
 }
 
-// Merge sound button event listener
-const mergeSoundBtn = document.getElementById('mergeSoundBtn');
-if (mergeSoundBtn) {
-  mergeSoundBtn.addEventListener('click', () => {
-
-    const usePopSounds = soundManager.toggleMergeSoundType();
-    mergeSoundBtn.textContent = '🎵'; // Always show music note
-    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
+// Settings button event listener
+const settingsBtn = document.getElementById('settingsBtn');
+if (settingsBtn) {
+  settingsBtn.addEventListener('click', () => {
+    openSettingsModal();
   });
 } else {
-  console.log('⚠️ Merge sound button not found');
+  console.log('⚠️ Settings button not found');
 }
 
-// Set initial merge sound button state
-if (mergeSoundBtn) {
-  const usePopSounds = soundManager.getMergeSoundType();
-  mergeSoundBtn.textContent = '🎵'; // Always show music note
-  mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
-} else {
-  console.log('⚠️ Merge sound button not found for state initialization');
-}
+
 
 // Set initial sound button state
 if (soundBtn) {
@@ -6908,6 +7039,47 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Settings Modal Functions
+function openSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    console.log('⚙️ Opening settings modal...');
+    modal.classList.remove('hidden');
+  }
+}
+
+function closeSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+function initializeSettingsModal() {
+  // Settings close button
+  const closeBtn = document.getElementById('settingsClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeSettingsModal);
+  }
+  
+  // Close modal when clicking outside
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeSettingsModal();
+      }
+    });
+  }
+  
+  // Close modal with Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      closeSettingsModal();
+    }
+  });
+}
+
 // Sound Control Modal Functions
 function openSoundControlModal() {
   const modal = document.getElementById('soundControlModal');
@@ -7015,43 +7187,7 @@ function initializeSoundControlModal() {
   
 
   
-  // Reset audio settings button
-  const resetAudioBtn = document.getElementById('resetAudioBtn');
-  if (resetAudioBtn) {
-    resetAudioBtn.addEventListener('click', () => {
 
-      console.log('🔄 Reset audio settings button clicked');
-      if (soundManager && typeof soundManager.resetAudioSettings === 'function') {
-        soundManager.resetAudioSettings();
-        // Update the UI to reflect the reset
-        updateVolumeSliders();
-        // Update master mute button
-        const masterMuteBtn = document.getElementById('masterMuteBtn');
-        if (masterMuteBtn) {
-          masterMuteBtn.textContent = 'Mute';
-          masterMuteBtn.classList.remove('muted');
-        }
-        console.log('✅ Audio settings reset and UI updated');
-      } else {
-        console.error('❌ Sound manager not available or reset method missing');
-      }
-    });
-  }
-
-  // Test audio button for debugging
-  const testAudioBtn = document.getElementById('testAudioBtn');
-  if (testAudioBtn) {
-    testAudioBtn.addEventListener('click', () => {
-      if (soundManager) {
-        // Quick audio test - just play a drop sound
-        setTimeout(() => {
-          soundManager.playDropSound(1);
-        }, 100);
-      } else {
-        alert('❌ Sound manager not available');
-      }
-    });
-  }
   
   // Close modal when clicking outside
   const modal = document.getElementById('soundControlModal');
@@ -7151,6 +7287,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize sound control modal after DOM is loaded
   initializeSoundControlModal();
+  
+  // Initialize settings modal after DOM is loaded
+  initializeSettingsModal();
   
   // Force scroll to top immediately when DOM is ready
   console.log('🔄 DOM ready - resetting scroll position to top...');
@@ -7699,13 +7838,7 @@ function updateDebugMuteStatus() {
   const isMuted = soundManager.getMuteState();
   debugMuteStatus.textContent = isMuted ? 'Yes' : 'No';
   
-  // Also update merge sound button state in debug panel
-  const mergeSoundBtn = document.getElementById('mergeSoundBtn');
-  if (mergeSoundBtn) {
-    const usePopSounds = soundManager.getMergeSoundType();
-    mergeSoundBtn.textContent = '🎵'; // Always show music note
-    mergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
-  }
+
 }
 
 function updateDebugDecayLabel(decayFactor) {
@@ -9263,13 +9396,7 @@ function aiStep(){
   placeOnPole(pick);
 }
 
-// Ensure merge sound button is properly initialized with current state
-const initMergeSoundBtn = document.getElementById('mergeBtn');
-if (initMergeSoundBtn) {
-  const usePopSounds = soundManager.getMergeSoundType();
-  initMergeSoundBtn.textContent = '🎵'; // Always show music note
-  initMergeSoundBtn.title = usePopSounds ? 'Switch to musical merge sounds' : 'Switch to cork merge sounds';
-}
+
 
 
 
