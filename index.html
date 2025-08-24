@@ -14,6 +14,8 @@
     --panel:#1e293b; 
     --text:#f8fafc; 
     --font-family: 'Quantico', monospace;
+    
+    /* Theme colors are now handled dynamically via JavaScript */
   }
   body { 
     margin:0; 
@@ -126,6 +128,13 @@
     border-color: #ef4444;
   }
   
+  /* Glowing ⚙️ button when new theme is unlocked */
+  .title-btn.settings-glow {
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6), 0 0 16px rgba(34, 197, 94, 0.4), 0 0 24px rgba(34, 197, 94, 0.3), 0 3px 0 rgba(0,0,0,0.25);
+    animation: breatheGlowGreen 1.5s ease-in-out infinite;
+    border-color: #22c55e;
+  }
+  
   /* Sound button states */
   .title-btn#soundBtn {
     transition: all 0.2s ease;
@@ -152,6 +161,15 @@
     }
     50% { 
       box-shadow: 0 0 12px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.6), 0 0 28px rgba(239, 68, 68, 0.4), 0 3px 0 rgba(0,0,0,0.25);
+    }
+  }
+  
+  @keyframes breatheGlowGreen {
+    0%, 100% { 
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6), 0 0 16px rgba(34, 197, 94, 0.4), 0 0 24px rgba(34, 197, 94, 0.3), 0 3px 0 rgba(0,0,0,0.25);
+    }
+    50% { 
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8), 0 0 20px rgba(34, 197, 94, 0.6), 0 0 28px rgba(34, 197, 94, 0.4), 0 3px 0 rgba(0,0,0,0.25);
     }
   }
   
@@ -933,54 +951,9 @@
     font-family: var(--font-family);
   }
   
-  .merge-block.block-1 { 
-    background: #cfef08; 
-    color: #000; 
-  }
-  
-  .merge-block.block-2 { 
-    background: #10B981; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-4 { 
-    background: #2563EB; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-8 { 
-    background: #7C3AED; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-16 { 
-    background: #581C87; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-32 { 
-    background: #D946EF; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-64 { 
-    background: #EC4899; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-128 { 
-    background: #e86758; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-256 { 
-    background: #F59E0B; 
-    color: #fff; 
-  }
-  
-  .merge-block.block-512 { 
-    background: #ea580c; 
-    color: #fff; 
+  /* Block colors are now handled dynamically via JavaScript */
+  .merge-block {
+    /* Base styling for merge blocks */
   }
   
   .merge-block.bomb-block {
@@ -1776,25 +1749,32 @@
     box-shadow: 0 4px 0 rgba(0,0,0,0.4);
   }
   
-  .block-item[data-value="1"] { background: #cfef08; color: #000; }
-  .block-item[data-value="2"] { background: #10B981; color: #fff; }
-  .block-item[data-value="4"] { background: #2563EB; color: #fff; }
-  .block-item[data-value="8"] { background: #7C3AED; color: #fff; }
-  .block-item[data-value="16"] { background: #581C87; color: #fff; }
-  .block-item[data-value="32"] { background: #D946EF; color: #fff; }
-  .block-item[data-value="64"] { background: #EC4899; color: #fff; }
-  .block-item[data-value="128"] { background: #e86758; color: #fff; }
-  .block-item[data-value="256"] { background: #F59E0B; color: #fff; }
-  .block-item[data-value="512"] { background: #ea580c; color: #fff; }
-  .block-item[data-value="1024"] { background: #dc2626; color: #fff; }
-  .block-item[data-value="2048"] { background: #9d174d; color: #fff; }
-  .block-item[data-value="4096"] { background: #7c2d6d; color: #fff; }
-  .block-item[data-value="8192"] { background: #64748b; color: #fff; }
-  .block-item[data-value="16384"] { background: #fff; color: #000; }
-  .block-item[data-value="32768"] { background: #fff; color: #000; }
-  .block-item[data-value="65536"] { background: #fff; color: #000; }
-  .block-item[data-value="131072"] { background: #fff; color: #000; }
-  .block-item[data-value="262144"] { background: #fff; color: #000; }
+  /* Debug block colors are now handled dynamically via JavaScript */
+  
+  /* Basic styling for debug blocks (colors applied via JavaScript) */
+  .debug-pane .block-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+  
+  .debug-pane .block-item:hover {
+    border-color: #64748b;
+    transform: scale(1.05);
+  }
+  
+  .debug-pane .block-item.selected {
+    border-color: #0ea5e9;
+    transform: scale(1.1);
+  }
   
   /* General rule for any higher tier blocks (262144+) to use white styling */
   .block-item[data-value]:not([data-value="1"]):not([data-value="2"]):not([data-value="4"]):not([data-value="8"]):not([data-value="16"]):not([data-value="32"]):not([data-value="64"]):not([data-value="128"]):not([data-value="256"]):not([data-value="512"]):not([data-value="1024"]):not([data-value="2048"]):not([data-value="4096"]):not([data-value="8192"]):not([data-value="16384"]):not([data-value="32768"]):not([data-value="65536"]):not([data-value="131072"]):not([data-value="262144"]) {
@@ -1802,32 +1782,11 @@
     color: #000 !important;
   }
   
-  /* Largest merge block styling - same colors as block-item */
-  .largest-merge-block[data-value="1"] { background: #cfef08; color: #000; }
-  .largest-merge-block[data-value="2"] { background: #10B981; color: #fff; }
-  .largest-merge-block[data-value="4"] { background: #2563EB; color: #fff; }
-  .largest-merge-block[data-value="8"] { background: #7C3AED; color: #fff; }
-  .largest-merge-block[data-value="16"] { background: #581C87; color: #fff; }
-  .largest-merge-block[data-value="32"] { background: #D946EF; color: #fff; }
-  .largest-merge-block[data-value="64"] { background: #EC4899; color: #fff; }
-  .largest-merge-block[data-value="128"] { background: #e86758; color: #fff; }
-  .largest-merge-block[data-value="256"] { background: #F59E0B; color: #fff; }
-  .largest-merge-block[data-value="512"] { background: #ea580c; color: #fff; }
-  .largest-merge-block[data-value="1024"] { background: #dc2626; color: #fff; }
-  .largest-merge-block[data-value="2048"] { background: #9d174d; color: #fff; }
-  .largest-merge-block[data-value="4096"] { background: #7c2d6d; color: #fff; }
-  .largest-merge-block[data-value="8192"] { background: #64748b; color: #fff; }
-  .largest-merge-block[data-value="16384"] { background: #fff; color: #000; }
-  .largest-merge-block[data-value="32768"] { background: #fff; color: #000; }
-  .largest-merge-block[data-value="65536"] { background: #fff; color: #000; }
-  .largest-merge-block[data-value="131072"] { background: #fff; color: #000; }
-  .largest-merge-block[data-value="262144"] { background: #fff; color: #000; }
+  /* Largest merge block styling - now handled dynamically via JavaScript */
   
-  /* General rule for any higher tier blocks (262144+) to use white styling */
-  .largest-merge-block[data-value]:not([data-value="1"]):not([data-value="2"]):not([data-value="4"]):not([data-value="8"]):not([data-value="16"]):not([data-value="32"]):not([data-value="64"]):not([data-value="128"]):not([data-value="256"]):not([data-value="512"]):not([data-value="1024"]):not([data-value="2048"]):not([data-value="4096"]):not([data-value="8192"]):not([data-value="16384"]):not([data-value="32768"]):not([data-value="65536"]):not([data-value="131072"]):not([data-value="262144"]) {
-    background: #fff !important;
-    color: #000 !important;
-  }
+  /* Largest merge block styling - now handled dynamically via JavaScript with proper theming */
+
+  /* Theme switching classes - now handled dynamically via JavaScript */
   
   /* Dynamic gold glow effect for white blocks (16384+) in the game */
   .disc.white-block-glow {
@@ -3257,6 +3216,47 @@
   border-color: #dc2626;
 }
 
+.theme-selector {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid #475569;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.theme-selector:hover {
+  border-color: #64748b;
+}
+
+  .theme-selector:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  }
+  
+  /* Mobile responsive theme selector */
+  @media (max-width: 768px) {
+    .theme-selector {
+      min-width: 100px;
+      font-size: 16px; /* Prevent zoom on iOS */
+      padding: 10px 14px;
+    }
+  }
+  
+  /* Debug pane theme selector styling */
+  .debug-pane .theme-selector {
+    min-width: 120px;
+    background: var(--bg);
+    border-color: #64748b;
+  }
+
+
+
 
 
 /* Mobile responsive design for sound control and settings modals */
@@ -3295,45 +3295,54 @@
   }
   
   .sound-control-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 20px;
   }
   
   /* Settings modal row styling */
   .settings-modal .sound-control-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 20px;
   }
   
   .sound-control-label {
     min-width: auto;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
   }
   
   /* Settings modal label styling */
   .settings-modal .sound-control-label {
     min-width: auto;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
   }
   
   .sound-control-slider {
-    width: 100%;
+    width: 200px !important;
+    flex: none !important;
+    flex-shrink: 0;
   }
   
   /* Create a horizontal container for slider + value on mobile */
   .sound-control-controls {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
-    width: 100%;
+    flex-shrink: 0;
   }
   
   .sound-control-controls .sound-control-slider {
-    flex: 1;
+    width: 200px !important;
+    flex: none !important;
+    flex-shrink: 0;
   }
   
   .sound-control-controls .volume-value {
@@ -3346,18 +3355,23 @@
   
   /* Settings modal slider and controls styling */
   .settings-modal .sound-control-slider {
-    width: 100%;
+    width: 200px !important;
+    flex: none !important;
+    flex-shrink: 0;
   }
   
   .settings-modal .sound-control-controls {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
-    width: 100%;
+    flex-shrink: 0;
   }
   
   .settings-modal .sound-control-controls .sound-control-slider {
-    flex: 1;
+    width: 200px !important;
+    flex: none !important;
+    flex-shrink: 0;
   }
   
   .settings-modal .sound-control-controls .volume-value {
@@ -3386,6 +3400,36 @@
   .settings-modal .sound-control-mute {
     align-self: center;
     min-width: 100px;
+  }
+  
+  /* Theme selector styling for mobile */
+  .theme-selector {
+    width: 200px !important;
+    min-width: 200px !important;
+    flex-shrink: 0;
+  }
+  
+  /* Settings modal theme selector controls - right justify the dropdown */
+  .settings-modal .sound-control-controls:has(.theme-selector) {
+    justify-content: flex-end;
+  }
+}
+
+/* Medium-small mobile devices */
+@media (max-width: 600px) and (min-width: 481px) {
+  /* Adjust slider width for medium-small screens */
+  .sound-control-slider,
+  .sound-control-controls .sound-control-slider,
+  .settings-modal .sound-control-slider,
+  .settings-modal .sound-control-controls .sound-control-slider {
+    width: 180px !important;
+    flex: none !important;
+  }
+  
+  /* Theme selector width for medium-small screens */
+  .theme-selector {
+    width: 180px !important;
+    min-width: 180px !important;
   }
 }
 
@@ -3445,6 +3489,21 @@
   /* Settings modal emoji styling for extra small mobile */
   .settings-modal .sound-control-emoji {
     font-size: 18px;
+  }
+  
+  /* Adjust slider width for very small screens */
+  .sound-control-slider,
+  .sound-control-controls .sound-control-slider,
+  .settings-modal .sound-control-slider,
+  .settings-modal .sound-control-controls .sound-control-slider {
+    width: 150px !important;
+    flex: none !important;
+  }
+  
+  /* Theme selector width for very small screens */
+  .theme-selector {
+    width: 150px !important;
+    min-width: 150px !important;
   }
 }
 </style>
@@ -3610,9 +3669,23 @@
       <h2 id="settingsTitle">Settings</h2>
       
       <div class="sound-control-container">
-        <p style="text-align: center; color: #94a3b8; font-style: italic;">
-          Settings panel coming soon...
-        </p>
+        <!-- Theme Settings -->
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">🎨</span>
+            <span>Theme</span>
+          </div>
+          <div class="sound-control-controls">
+                    <select id="themeSelector" class="theme-selector">
+          <option value="jellyfish">Jellyfish</option>
+          <option value="alternate">Earth</option>
+        </select>
+          </div>
+        </div>
+        
+
+        
+
       </div>
       
       <button id="settingsClose" class="help-modal-close-btn" title="Close settings">❌ Close</button>
@@ -3711,14 +3784,14 @@
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="merge-before">
                   <div class="merge-blocks">
-                    <div class="merge-block block-1">1</div>
-                    <div class="merge-block block-1">1</div>
+                    <div class="merge-block" data-value="1">1</div>
+                    <div class="merge-block" data-value="1">1</div>
                   </div>
                 </div>
                 <div class="merge-arrow">→</div>
                 <div class="merge-after">
                   <div class="merge-blocks">
-                    <div class="merge-block block-2">2</div>
+                    <div class="merge-block" data-value="2">2</div>
                   </div>
                 </div>
               </div>
@@ -3726,14 +3799,14 @@
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="merge-before">
                   <div class="merge-blocks">
-                    <div class="merge-block block-2">2</div>
-                    <div class="merge-block block-2">2</div>
+                    <div class="merge-block" data-value="2">2</div>
+                    <div class="merge-block" data-value="2">2</div>
                   </div>
                 </div>
                 <div class="merge-arrow">→</div>
                 <div class="merge-after">
                   <div class="merge-blocks">
-                    <div class="merge-block block-4">4</div>
+                    <div class="merge-block" data-value="4">4</div>
                   </div>
                 </div>
               </div>
@@ -3753,7 +3826,7 @@
             <div class="merge-example">
               <div class="merge-before">
                 <div class="merge-blocks">
-                  <div class="merge-block block-2">2</div>
+                  <div class="merge-block" data-value="2">2</div>
                   <div class="merge-block bomb-block">
                     <div class="bomb-content">
                       <div class="bomb-emoji">💣</div>
@@ -3846,7 +3919,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div class="next-stage-block" data-value="1024" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #dc2626; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">1024</div>
+                      <div class="next-stage-block" data-value="1024" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">1024</div>
                     </div>
                   </div>
                   
@@ -3864,7 +3937,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div class="next-stage-block" data-value="2048" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #9d174d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">2048</div>
+                      <div class="next-stage-block" data-value="2048" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">2048</div>
                     </div>
                   </div>
                   
@@ -3882,7 +3955,7 @@
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
                   <div style="margin: 0; justify-self: end;">
                     <div style="display: flex; align-items: center; justify-content: center;">
-                      <div class="next-stage-block" data-value="4096" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: #7c2d6d; color: white; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
+                      <div class="next-stage-block" data-value="4096" style="width: 100px; height: 42px; font-size: 22px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 600; box-shadow: 0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family);">4096</div>
                     </div>
                   </div>
                   
@@ -3947,6 +4020,16 @@
           <span class="stat-label">📦 Total Blocks Dropped:</span>
           <span class="stat-value" id="statsTotalBlocksDropped">0</span>
         </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">💣 Total Bombs Exploded:</span>
+          <span class="stat-value" id="statsTotalBombsExploded">0</span>
+        </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">🗑️ Total Blocks Trashed:</span>
+          <span class="stat-value" id="statsTotalBlocksTrashed">0</span>
+        </div>
       </div>
     </div>
   </div>
@@ -3972,11 +4055,24 @@
       <div class="controls">
         <div class="control-row">
           <label for="debugDecaySlider">Decay Factor:</label>
-          <input type="range" id="debugDecaySlider" min="0.1" max="0.9" value="0.6" step="0.05">
-          <div class="value-display" id="debugDecayLabel">0.60</div>
+          <input type="range" id="debugDecaySlider" min="0.1" max="0.9" value="0.7" step="0.05">
+          <div class="value-display" id="debugDecayLabel">0.70</div>
         </div>
         <div class="control-row">
           <button id="debugUpdateProbBtn" class="button">Update Probabilities</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Theme Settings</div>
+      <div class="controls">
+        <div class="control-row">
+          <label for="debugThemeSelector">Theme:</label>
+                      <select id="debugThemeSelector" class="theme-selector">
+              <option value="jellyfish">Jellyfish</option>
+              <option value="alternate">Earth</option>
+            </select>
         </div>
       </div>
     </div>
@@ -4040,8 +4136,10 @@
           <tr><td>Target:</td><td id="debugTarget">1024</td></tr>
           <tr><td>Max Block:</td><td id="debugMaxBlock">512</td></tr>
           <tr><td>Blocks Dropped:</td><td id="debugBlocksDropped">0</td></tr>
-          <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">0</td></tr>
-          <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
+                      <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">0</td></tr>
+            <tr><td>Total Bombs Exploded:</td><td id="debugTotalBombsExploded">0</td></tr>
+            <tr><td>Total Blocks Trashed:</td><td id="debugTotalBlocksTrashed">0</td></tr>
+            <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
           <tr><td>Stage:</td><td id="debugStage">1</td></tr>
         </table>
       </div>
@@ -4067,6 +4165,8 @@
         </div>
         <div class="control-row">
           <button id="testGameOverBtn" class="button primary">Test Game Over Screen</button>
+        <button id="testUnlockThemeBtn" class="button primary">Test Theme Unlock</button>
+        <button id="testLockThemeBtn" class="button primary">Test Theme Lock</button>
         </div>
       </div>
     </div>
@@ -4110,29 +4210,14 @@ const isLocalhost = (() => {
                   hostname.includes('.local') ||
                   hostname.includes('.test');
   
-  // Log environment info
-  console.log('🌍 Environment Detection:');
-  console.log('  Hostname:', hostname);
-  console.log('  Protocol:', protocol);
-  console.log('  Port:', port);
-  console.log('  Is Localhost/Dev:', isLocal);
+  // Environment detection complete
   
   // Add environment indicator to page title in development
   if (isLocal) {
     document.title = `[DEV] ${document.title}`;
-    console.log('🔧 Development mode detected - added [DEV] prefix to title');
     
     // Enable scrolling in development mode for debug access
     document.body.classList.add('development-mode');
-    console.log('📱 Development mode: Scrolling enabled for mobile debug access');
-  }
-  
-  // Log debug button availability
-  console.log(`🔧 Debug button will be ${isLocal ? 'enabled' : 'disabled'} based on environment`);
-  
-  // Additional development mode info
-  if (isLocal) {
-    console.log('📱 Mobile developers: Scrolling is now enabled to access debug features');
   }
   
   return isLocal;
@@ -4182,7 +4267,6 @@ class SoundManager {
   // Initialize Web Audio API system
   async initializeWebAudioSystem() {
     try {
-      console.log('🎵 Initializing Web Audio API system...');
       
       // Create audio context
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -4192,8 +4276,12 @@ class SoundManager {
         drop: 'sounds/click2.wav',
         bomb: 'sounds/bomb.mp3',
         stageUp: 'sounds/stage_up.mp3',
+        stageProgression: 'sounds/stageprogression.mp3',
+        newGame: 'sounds/newgame.mp3',
+        gameOver: 'sounds/gameover.mp3',
         purchase: 'sounds/purchase.wav',
-        personalBest: 'sounds/PB.mp3'
+        personalBest: 'sounds/newrecord.mp3',
+        themeUnlock: 'sounds/themeunlock.mp3'
       };
       
       // Cork sounds for merges
@@ -4206,13 +4294,12 @@ class SoundManager {
         this.audioFiles[`coin${i}`] = `sounds/coin${i}.wav`;
       }
       
-      console.log('🎵 Web Audio API initialized with', Object.keys(this.audioFiles).length, 'sound files to load');
+
       
       // Start loading audio buffers in background
       this.preloadAudioBuffers();
       
     } catch (error) {
-      console.error('❌ Failed to initialize Web Audio API:', error);
       this.audioFiles = {};
     }
   }
@@ -4228,9 +4315,7 @@ class SoundManager {
     try {
       await Promise.all(loadPromises);
       this.initialized = true;
-      console.log('🎵 All audio buffers loaded successfully!');
     } catch (error) {
-      console.warn('⚠️ Some audio buffers failed to load:', error);
       this.initialized = true; // Still mark as initialized to allow the game to continue
     }
   }
@@ -4245,10 +4330,9 @@ class SoundManager {
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       
       this.audioBuffers[soundKey] = audioBuffer;
-      console.log(`✅ Loaded audio buffer: ${soundKey}`);
       
     } catch (error) {
-      console.warn(`⚠️ Failed to load audio buffer ${soundKey}:`, error);
+      // Silent error handling
     }
   }
 
@@ -4258,7 +4342,7 @@ class SoundManager {
       return Promise.resolve();
     }
 
-    console.log('🎵 Unlocking Web Audio API...');
+
     
     try {
       // Initialize Web Audio if not already done
@@ -4289,11 +4373,9 @@ class SoundManager {
       }
       
       this.audioUnlocked = true;
-      console.log('✅ Web Audio API unlocked successfully');
       return Promise.resolve();
       
     } catch (error) {
-      console.warn('⚠️ Failed to unlock Web Audio API:', error);
       this.audioUnlocked = true; // Mark as unlocked anyway to prevent infinite retry
       return Promise.resolve();
     }
@@ -4301,21 +4383,16 @@ class SoundManager {
 
   // Debug popup helper for iOS testing (disabled for normal gameplay)
   showDebugPopup(message) {
-    // Only console log now - no more popups
-    console.log(message);
+    // Silent debug helper
   }
 
   // Helper method to safely play audio with proper promise handling
   safePlayAudio(audio) {
-    // Simplified - just console log for debugging
-    console.log(`🎵 Playing: ${audio.src ? audio.src.split('/').pop() : 'no src'} (vol: ${audio.volume})`);
-    
     const playPromise = audio.play();
     if (playPromise) {
       return playPromise.then(() => {
-        console.log('✅ Audio played successfully');
+        // Audio played successfully
       }).catch((error) => {
-        console.log(`❌ Audio failed: ${error.message}`);
         throw error;
       });
     }
@@ -4333,45 +4410,39 @@ class SoundManager {
     try {
       // Check if localStorage is available
       if (typeof localStorage !== 'undefined') {
-        console.log('📱 localStorage is available');
         
         // Check for corrupted sound settings
         const soundSettings = localStorage.getItem('stackMerge_soundSettings');
         if (soundSettings) {
           try {
             const parsed = JSON.parse(soundSettings);
-            console.log('🔍 Found sound settings in localStorage:', parsed);
             
             // Check for suspicious values
             if (parsed.isMuted === true) {
-              console.warn('⚠️ WARNING: Sound is muted in localStorage!');
+              // Sound is muted
             }
             if (parsed.volume === 0) {
-              console.warn('⚠️ WARNING: Master volume is 0 in localStorage!');
+              // Master volume is 0
             }
             if (parsed.soundVolumes) {
               Object.entries(parsed.soundVolumes).forEach(([type, vol]) => {
                 if (vol === 0) {
-                  console.warn(`⚠️ WARNING: ${type} volume is 0 in localStorage!`);
+                  // Volume is 0
                 }
               });
             }
           } catch (parseError) {
-            console.error('❌ CORRUPTED localStorage data found!', parseError);
-            console.log('Raw data:', soundSettings);
-            
             // Clear corrupted data
             localStorage.removeItem('stackMerge_soundSettings');
-            console.log('🧹 Cleared corrupted sound settings');
           }
         } else {
-          console.log('📱 No sound settings found in localStorage');
+          // No sound settings found
         }
       } else {
-        console.log('📱 localStorage is not available');
+        // localStorage not available
       }
     } catch (error) {
-      console.log('📱 Error checking localStorage:', error);
+      // Silent error handling
     }
   }
   
@@ -4409,7 +4480,6 @@ class SoundManager {
       
       return true;
     } catch (error) {
-      console.warn(`⚠️ Failed to play sound ${soundKey}:`, error);
       return false;
     }
   }
@@ -4461,7 +4531,7 @@ class SoundManager {
     
     // Use the simple playSound method
     this.playSound('drop', 'drop').catch(error => {
-      console.log('Drop sound failed:', error);
+      // Silent error handling
     });
   }
   
@@ -4491,14 +4561,11 @@ class SoundManager {
         corkSoundKey = 'cork9'; // Any remaining merges use cork9
       }
       
-      console.log(`🔗 Playing cascade merge sound: ${corkSoundKey} (merge #${mergeCount})`);
-      
       // Use simple playSound method
       this.playSound(corkSoundKey, 'merge').catch(error => {
-        console.log('Merge sound failed:', error);
+        // Silent error handling
       });
     } catch (error) {
-      console.warn('⚠️ Error in playMergeSound:', error);
       // Silent fail - no console spam
     }
   }
@@ -4541,18 +4608,10 @@ class SoundManager {
   
   // Set individual sound type volume (0-5 scale)
   setSoundVolume(soundType, volume) {
-    console.log(`🎚️ setSoundVolume called with: ${soundType} = ${volume}`);
-    
     if (this.soundVolumes.hasOwnProperty(soundType)) {
       const oldVolume = this.soundVolumes[soundType];
       this.soundVolumes[soundType] = Math.max(0, Math.min(5, Math.round(volume)));
-      console.log(`🔊 Set ${soundType} volume from ${oldVolume} to ${this.soundVolumes[soundType]}`);
       this.saveSoundSettings();
-      
-      // Log current state of all volumes
-      console.log('📊 Current sound volumes:', this.soundVolumes);
-    } else {
-      console.warn(`⚠️ Unknown sound type: ${soundType}`);
     }
   }
   
@@ -4573,24 +4632,17 @@ class SoundManager {
   
   // Set all sound volumes at once
   setAllSoundVolumes(volumes) {
-    console.log('🎚️ setAllSoundVolumes called with:', volumes);
-    
     Object.keys(volumes).forEach(soundType => {
       if (this.soundVolumes.hasOwnProperty(soundType)) {
         const oldVolume = this.soundVolumes[soundType];
         const newVolume = Math.max(0, Math.min(5, Math.round(volumes[soundType])));
         this.soundVolumes[soundType] = newVolume;
-        console.log(`🔊 ${soundType}: ${oldVolume} → ${newVolume} (input: ${volumes[soundType]})`);
       }
     });
-    
-    console.log('🔊 Final sound volumes after update:', this.soundVolumes);
   }
   
   // Convert volume scale (0-5) to actual volume (0.0-2.0 for drop/merge, 0.0-1.0 for others)
   getActualVolume(soundType) {
-    console.log(`🔍 getActualVolume called for: ${soundType}`);
-    
     // If the sound type has a specific volume, use it
     if (this.soundVolumes.hasOwnProperty(soundType)) {
       const volume = this.soundVolumes[soundType];
@@ -4607,11 +4659,6 @@ class SoundManager {
         actualVolume = volume === 0 ? 0 : volume / 5;
       }
       
-      if (soundType === 'merge') {
-        console.log(`✅ ${soundType} has enhanced volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%) [curved mapping for more presence]`);
-      } else {
-        console.log(`✅ ${soundType} has standard volume: ${volume} → ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
-      }
       return actualVolume;
     }
     
@@ -4621,7 +4668,6 @@ class SoundManager {
     
     fallbackActual = fallbackVolume === 0 ? 0 : fallbackVolume / 5;
     
-    console.log(`🔄 ${soundType} using fallback volume: ${fallbackVolume} → ${fallbackActual} (${Math.round(fallbackActual * 100)}%)`);
     return fallbackActual;
   }
   
@@ -4635,9 +4681,8 @@ class SoundManager {
         timestamp: Date.now()
       };
       localStorage.setItem('stackMerge_soundSettings', JSON.stringify(settings));
-      console.log('💾 Sound settings saved to localStorage');
     } catch (error) {
-      console.error('❌ Failed to save sound settings:', error);
+      // Silent error handling
     }
   }
   
@@ -4665,11 +4710,9 @@ class SoundManager {
           });
         }
         
-        console.log('📂 Sound settings loaded from localStorage:', settings);
         return true;
       }
     } catch (error) {
-      console.error('❌ Failed to load sound settings:', error);
       // If loading fails, reset to defaults and clear corrupted data
       this.resetAudioSettings();
     }
@@ -4678,8 +4721,6 @@ class SoundManager {
   
   // Reset audio settings to defaults (useful for fixing corrupted settings)
   resetAudioSettings() {
-    console.log('🔄 Resetting audio settings to defaults');
-    
     // Reset to default values
     this.isMuted = false;
     this.volume = 0.3;
@@ -4695,14 +4736,12 @@ class SoundManager {
     // Clear corrupted localStorage data
     try {
       localStorage.removeItem('stackMerge_soundSettings');
-      console.log('🧹 Cleared corrupted localStorage data');
     } catch (error) {
-      console.log('📱 Could not clear localStorage:', error);
+      // Silent error handling
     }
     
     // Save fresh default settings
     this.saveSoundSettings();
-    console.log('✅ Audio settings reset to defaults');
   }
   
 
@@ -4726,10 +4765,10 @@ class SoundManager {
       
       // Use the simple playSound method
       this.playSound(coinKey, 'coin').catch(error => {
-        console.log('Coin sound failed:', error);
+        // Silent error handling
       });
     } catch (error) {
-      console.log('Error in playCoinSound:', error);
+      // Silent error handling
     }
   }
   
@@ -4738,10 +4777,28 @@ class SoundManager {
 
   
 
-  
 
 
-  // Load and play the stage up sound effect
+
+  // Load and play the new game sound effect
+  playNewGameSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playNewGameSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('newGame', 'other').catch(error => {
+      // Silent error handling
+    });
+  }
+
+  // Load and play the stage progression sound effect
   playStageProgressionSound() {
     if (!this.canPlayAudio()) {
       return;
@@ -4754,8 +4811,26 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('stageUp', 'other').catch(error => {
-      console.log('Stage up sound failed:', error);
+    this.playSound('stageProgression', 'other').catch(error => {
+      // Silent error handling
+    });
+  }
+
+  // Load and play the game over sound effect
+  playGameOverSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playGameOverSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('gameOver', 'other').catch(error => {
+      // Silent error handling
     });
   }
 
@@ -4773,7 +4848,7 @@ class SoundManager {
     
     // Use the simple playSound method
     this.playSound('bomb', 'bomb').catch(error => {
-      console.log('Bomb sound failed:', error);
+      // Silent error handling
     });
   }
 
@@ -4797,7 +4872,7 @@ class SoundManager {
     
     // Use the simple playSound method
     this.playSound('purchase', 'other').catch(error => {
-      console.log('Purchase sound failed:', error);
+      // Silent error handling
     });
   }
 
@@ -4826,7 +4901,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase'
+      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     return requiredSounds.every(soundKey => 
@@ -4841,7 +4916,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase'
+      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
@@ -4865,7 +4940,6 @@ class SoundManager {
   
   // Force reload all sounds (useful for troubleshooting)
   reloadAllSounds() {
-    console.log('🔄 Reloading all audio buffers...');
     this.audioBuffers = {};
     this.initialized = false;
     this.initializeWebAudioSystem();
@@ -4890,7 +4964,6 @@ class SoundManager {
       // Timeout after 10 seconds
       setTimeout(() => {
         clearInterval(checkInterval);
-        console.warn('⚠️ Timeout waiting for sounds to load, proceeding anyway');
         resolve();
       }, 10000);
     });
@@ -4903,7 +4976,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase'
+      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
@@ -4927,7 +5000,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'purchase'
+      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     return requiredSounds.filter(soundKey => this.isSoundReady(soundKey)).length;
@@ -4942,7 +5015,7 @@ class SoundManager {
       soundVolumes: this.soundVolumes,
       preloadProgress: this.getPreloadProgress(),
       loadedCount: this.getLoadedSoundCount(),
-      totalSounds: 22, // Total number of required sounds
+      totalSounds: 23, // Total number of required sounds
       ready: this.areSoundsPreloaded(),
       webAudioContext: this.audioContext ? this.audioContext.state : 'not initialized',
       audioUnlocked: this.audioUnlocked,
@@ -4951,8 +5024,257 @@ class SoundManager {
   }
 }
 
+// Theme Manager for Stack Merge Game
+class ThemeManager {
+  constructor() {
+    this.currentTheme = 'jellyfish'; // Default theme
+    this.availableThemes = ['jellyfish', 'alternate'];
+    
+    // Theme unlock requirements
+    this.themeUnlockRequirements = {
+      'jellyfish': { unlocked: true, requirement: 'Default theme' },
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+    };
+    
+    // Load saved theme and unlock status from localStorage (but don't apply it yet)
+    this.loadTheme();
+    
+          // Check if we need to force reset unlocks (from clear all data operation)
+    try {
+      const forceReset = localStorage.getItem('stackMerge_forceResetUnlocks');
+      if (forceReset === 'true') {
+        localStorage.removeItem('stackMerge_forceResetUnlocks');
+        // Don't load unlock status, keep defaults
+      } else {
+        // Only load unlock status if not prevented by clear operation
+        if (!window.preventThemeUnlockLoad) {
+          this.loadUnlockStatus();
+        } else {
+          window.preventThemeUnlockLoad = false; // Reset the flag
+        }
+      }
+    } catch (e) {
+      // Fall back to normal loading
+      if (!window.preventThemeUnlockLoad) {
+        this.loadUnlockStatus();
+      }
+    }
+    
+    // Don't apply theme in constructor - will be applied after game initialization
+  }
+  
+  // Get current theme
+  getCurrentTheme() {
+    return this.currentTheme;
+  }
+  
+  // Get available themes
+  getAvailableThemes() {
+    return this.availableThemes;
+  }
+  
+  // Apply a specific theme
+  applyTheme(themeName) {
+    if (!this.availableThemes.includes(themeName)) {
+      themeName = 'jellyfish';
+    }
+    
+    // Check if theme is unlocked
+    if (!this.isThemeUnlocked(themeName)) {
+      return false;
+    }
+    
+    // Remove all theme classes from body
+    document.body.classList.remove('theme-alternate');
+    
+    // Add the selected theme class
+    if (themeName === 'alternate') {
+      document.body.classList.add('theme-alternate');
+    }
+    
+    this.currentTheme = themeName;
+    
+    // Save theme preference
+    this.saveTheme();
+    
+    // Re-rendering game to apply new theme colors...
+    if (typeof render === 'function') {
+      render();
+    }
+    
+      // Re-rendering next queue to apply new theme colors...
+  if (typeof renderNext === 'function') {
+    renderNext();
+  }
+  
+  // Update debug custom dropper block colors
+  updateDebugBlockColors();
+  
+  return true;
+  }
+  
+  // Save theme to localStorage
+  saveTheme() {
+    try {
+      localStorage.setItem('stackMerge_theme', this.currentTheme);
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+  
+  // Load theme from localStorage
+  loadTheme() {
+    try {
+      const savedTheme = localStorage.getItem('stackMerge_theme');
+      if (savedTheme && this.availableThemes.includes(savedTheme)) {
+        this.currentTheme = savedTheme;
+      } else {
+        this.currentTheme = 'jellyfish';
+      }
+    } catch (error) {
+      this.currentTheme = 'jellyfish';
+    }
+  }
+  
+  // Initialize theme after game is ready
+  initializeTheme() {
+    this.applyTheme(this.currentTheme);
+  }
+  
+  // Reset theme to default
+  resetTheme() {
+    this.applyTheme('jellyfish');
+  }
+  
+  // Check if a theme is unlocked
+  isThemeUnlocked(themeName) {
+    return this.themeUnlockRequirements[themeName]?.unlocked || false;
+  }
+  
+  // Get unlock requirement for a theme
+  getThemeRequirement(themeName) {
+    return this.themeUnlockRequirements[themeName]?.requirement || 'Unknown requirement';
+  }
+  
+  // Unlock a theme
+  unlockTheme(themeName) {
+    if (this.themeUnlockRequirements[themeName]) {
+      this.themeUnlockRequirements[themeName].unlocked = true;
+      this.saveUnlockStatus();
+      return true;
+    }
+    return false;
+  }
+  
+  // Get all unlocked themes
+  getUnlockedThemes() {
+    return this.availableThemes.filter(theme => this.isThemeUnlocked(theme));
+  }
+  
+  // Save unlock status to localStorage
+  saveUnlockStatus() {
+    try {
+      const unlockData = {};
+      for (const [theme, data] of Object.entries(this.themeUnlockRequirements)) {
+        unlockData[theme] = { unlocked: data.unlocked, requirement: data.requirement };
+      }
+      localStorage.setItem('stackMerge_themeUnlocks', JSON.stringify(unlockData));
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+  
+  // Load unlock status from localStorage
+  loadUnlockStatus() {
+    try {
+      const unlockData = localStorage.getItem('stackMerge_themeUnlocks');
+      if (unlockData) {
+        const savedUnlocks = JSON.parse(unlockData);
+        // Merge saved unlocks with current requirements
+        for (const [theme, data] of Object.entries(savedUnlocks)) {
+          if (this.themeUnlockRequirements[theme]) {
+            this.themeUnlockRequirements[theme].unlocked = data.unlocked;
+          }
+        }
+      }
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+}
+
+
+
+// Function to update theme selectors with unlock status
+function updateThemeSelectors() {
+  const themeSelectors = ['themeSelector', 'debugThemeSelector'];
+  
+  themeSelectors.forEach(selectorId => {
+    const selector = document.getElementById(selectorId);
+    if (selector) {
+      // Clear existing options
+      selector.innerHTML = '';
+      
+      // Add themes with unlock status
+      themeManager.availableThemes.forEach(theme => {
+        const option = document.createElement('option');
+        option.value = theme;
+        
+        if (themeManager.isThemeUnlocked(theme)) {
+          option.textContent = theme === 'jellyfish' ? 'Jellyfish' : 'Earth';
+          option.disabled = false;
+        } else {
+          option.textContent = `${theme === 'jellyfish' ? 'Jellyfish' : 'Earth'} (🔒 ${themeManager.getThemeRequirement(theme)})`;
+          option.disabled = true;
+        }
+        
+        selector.appendChild(option);
+      });
+      
+      // Set current theme
+      selector.value = themeManager.getCurrentTheme();
+    }
+  });
+}
+
+// Function to update debug custom dropper block colors based on current theme
+function updateDebugBlockColors() {
+  const currentTheme = themeManager ? themeManager.getCurrentTheme() : 'jellyfish';
+  
+  // Update all block-item elements in the debug pane
+  const debugBlocks = document.querySelectorAll('.debug-pane .block-item[data-value]');
+  debugBlocks.forEach(block => {
+    const value = block.getAttribute('data-value');
+    
+    // Skip the "no-block" option
+    if (value === 'none') return;
+    
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      // Apply theme colors using the same functions as the game
+      block.style.background = colorFor(numValue);
+      block.style.color = getTextColorFor(numValue);
+    }
+  });
+  
+  // Also update the largest merge block in the game over screen if it exists
+  const largestMergeBlock = document.getElementById('largestMergeBlock');
+  if (largestMergeBlock && largestMergeBlock.hasAttribute('data-value')) {
+    const value = largestMergeBlock.getAttribute('data-value');
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      // Apply theme colors using the same functions as the game
+      largestMergeBlock.style.background = colorFor(numValue);
+      largestMergeBlock.style.color = getTextColorFor(numValue);
+    }
+  }
+}
+
 // Initialize sound manager
 const soundManager = new SoundManager();
+
+// Initialize theme manager
+const themeManager = new ThemeManager();
 
 // Load saved sound settings
 soundManager.loadSoundSettings();
@@ -4974,36 +5296,6 @@ const HELP_BUTTON_KEY = 'stackMerge_helpClicked';
 // Save game state to localStorage
 function saveGameState() {
   try {
-    console.log('=== SAVING GAME STATE ===');
-    console.log('Current game state:', {
-      poles: poles,
-      score: score,
-      gold: gold,
-      goldEarnedThisGame: goldEarnedThisGame,
-      lifetimeGoldEarned: lifetimeGoldEarned,
-      blocksDropped: blocksDropped,
-      totalBlocksDropped: totalBlocksDropped,
-      currentTargetBlockSize: currentTargetBlockSize,
-      currentStage: currentStage,
-      weights: weights,
-      probabilities: probabilities,
-      nextQueue: nextQueue,
-      bombConversionCost: bombConversionCost,
-      trashButtonCost: trashButtonCost,
-      bombConversionPresses: bombConversionPresses,
-      trashButtonPresses: trashButtonPresses,
-      bombSelected: bombSelected,
-      previousBombCost: previousBombCost,
-      currentActiveDecayFactor: currentActiveDecayFactor,
-      hasShownPersonalBest: hasShownPersonalBest
-    });
-    console.log('💰 Gold tracking - Current:', gold, 'This Game:', goldEarnedThisGame, 'Lifetime:', lifetimeGoldEarned);
-    console.log('🔊 Sound settings being saved:', {
-      soundVolumes: soundManager.getAllSoundVolumes(),
-      isMuted: soundManager.getMuteState()
-    });
-    console.log('💾 Saving button costs - Bomb:', bombConversionCost, 'Trash:', trashButtonCost);
-    console.log('💾 Saving bomb state - Selected:', bombSelected, 'Previous Cost:', previousBombCost);
     
     const gameState = {
       poles: poles,
@@ -5013,6 +5305,8 @@ function saveGameState() {
       lifetimeGoldEarned: lifetimeGoldEarned || 0,
       blocksDropped: blocksDropped || 0,
       totalBlocksDropped: totalBlocksDropped || 0,
+      totalBombsExploded: totalBombsExploded || 0,
+      totalBlocksTrashed: totalBlocksTrashed || 0,
       currentTargetBlockSize: currentTargetBlockSize || STARTING_BLOCK_SIZE,
       currentStage: currentStage || 1,
       weights: weights || [1, 2],
@@ -5027,6 +5321,8 @@ function saveGameState() {
 
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
+      currentTheme: themeManager.getCurrentTheme(),
+      themeUnlocks: themeManager.themeUnlockRequirements,
       currentActiveDecayFactor: currentActiveDecayFactor,
       lastSeenUpdateTimestamp: lastSeenUpdateTimestamp || 0,
       highScore: window.highScore || 0,
@@ -5036,50 +5332,30 @@ function saveGameState() {
     };
     
     const saveData = JSON.stringify(gameState);
-    console.log('Save data size:', saveData.length, 'characters');
-    console.log('Save data preview:', saveData.substring(0, 200) + '...');
     
     // Save to localStorage
     localStorage.setItem(SAVE_KEY, saveData);
-    console.log('✅ Game state saved to localStorage');
-    
-    console.log('=== SAVE COMPLETE ===');
   } catch (error) {
-    console.error('❌ Failed to save game state:', error);
-    console.error('Error details:', error.message);
-    console.error('Error stack:', error.stack);
+    // Silent error handling
   }
 }
 
 // Restore game state from loaded data
 function restoreGameState(gameState) {
   try {
-    console.log('Validating loaded game state...');
     
     // Validate the loaded data
     if (!gameState.poles || !Array.isArray(gameState.poles) || gameState.poles.length !== 4) {
-      console.error('❌ Invalid save data: poles structure corrupted');
-      console.log('Poles:', gameState.poles);
-      console.log('Poles type:', typeof gameState.poles);
-      console.log('Poles is array:', Array.isArray(gameState.poles));
-      console.log('Poles length:', gameState.poles ? gameState.poles.length : 'undefined');
       return false;
     }
     
     // Check if save is too old (more than 30 days)
     const saveAge = Date.now() - gameState.timestamp;
     const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-    console.log('Save age:', saveAge, 'ms');
-    console.log('Max age:', maxAge, 'ms');
-    console.log('Save timestamp:', new Date(gameState.timestamp).toISOString());
-    
     if (saveAge > maxAge) {
-      console.log('❌ Save data is too old, starting fresh game');
       clearGameSave();
       return false;
     }
-    
-    console.log('✅ Save data validation passed, restoring game state...');
     
     // Restore game state
     const oldPoles = [...poles];
@@ -5093,6 +5369,8 @@ function restoreGameState(gameState) {
     lifetimeGoldEarned = gameState.lifetimeGoldEarned || 0;
     blocksDropped = gameState.blocksDropped || 0;
     totalBlocksDropped = gameState.totalBlocksDropped || 0;
+    totalBombsExploded = gameState.totalBombsExploded || 0;
+    totalBlocksTrashed = gameState.totalBlocksTrashed || 0;
     
     // Restore high score from saved state
     window.highScore = gameState.highScore || 0;
@@ -5143,15 +5421,33 @@ function restoreGameState(gameState) {
     // Restore master mute state from saved state
     if (gameState.isMuted !== undefined) {
       soundManager.isMuted = gameState.isMuted;
-      console.log('🔇 Restored master mute state:', gameState.isMuted);
+    }
+    
+    // Restore theme from saved state
+    if (gameState.currentTheme && themeManager.getAvailableThemes().includes(gameState.currentTheme)) {
+      themeManager.applyTheme(gameState.currentTheme);
+    }
+    
+    // Restore theme unlock status from saved state (unless prevented by force reset)
+    if (gameState.themeUnlocks && typeof gameState.themeUnlocks === 'object' && !window.preventThemeUnlockLoad) {
+      for (const [theme, data] of Object.entries(gameState.themeUnlocks)) {
+        if (themeManager.themeUnlockRequirements[theme]) {
+          themeManager.themeUnlockRequirements[theme].unlocked = data.unlocked;
+        }
+      }
+    } else if (window.preventThemeUnlockLoad) {
+      // Skipped theme unlock restoration due to force reset
+    }
+    
+    // Update theme selectors after restoring unlock status
+    if (typeof updateThemeSelectors === 'function') {
+      updateThemeSelectors();
     }
     
     // Restore last seen update timestamp (unless prevented by clear operation)
     if (!preventTimestampRestore) {
       lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
-      console.log('📰 Restored last seen update timestamp:', lastSeenUpdateTimestamp);
     } else {
-      console.log('📰 Skipped timestamp restoration due to clear operation');
       preventTimestampRestore = false; // Reset the flag
     }
     
@@ -5164,30 +5460,6 @@ function restoreGameState(gameState) {
       soundBtn.textContent = isMuted ? '🔇' : '🔊';
       soundBtn.title = 'Sound Controls';
     }
-    
-    console.log('🔄 Restored button costs - Bomb:', oldBombCost, '→', bombConversionCost, 'Trash:', oldTrashCost, '→', trashButtonCost);
-    
-    console.log('Game state restored:');
-    console.log('- Poles changed from', oldPoles.length, 'to', poles.length);
-    console.log('- Score changed from', oldScore, 'to', score);
-    console.log('- Gold changed from', oldGold, 'to', gold);
-    console.log('- Gold earned this game:', goldEarnedThisGame);
-    console.log('- Lifetime gold earned:', lifetimeGoldEarned);
-    console.log('- High score:', window.highScore);
-    console.log('- Total games played:', window.totalGames);
-    console.log('- Has shown personal best:', hasShownPersonalBest);
-    console.log('- Current stage:', currentStage);
-    console.log('- Weights:', weights);
-    console.log('- Next queue length:', nextQueue.length);
-    console.log('- Bomb conversion cost:', bombConversionCost);
-    console.log('- Current active decay factor:', currentActiveDecayFactor);
-    console.log('- Trash button cost:', trashButtonCost);
-    console.log('- Bomb selected:', bombSelected);
-    console.log('- Previous bomb cost:', previousBombCost);
-    console.log('🔊 Sound settings restored:', {
-      soundVolumes: soundManager.getAllSoundVolumes(),
-      isMuted: soundManager.getMuteState()
-    });
     
     // Update cost displays after restoring game state
     if (bombCostEl) {
@@ -5206,10 +5478,8 @@ function restoreGameState(gameState) {
     // Update button states to reflect restored bomb selection state
     updateBombConversionButtonState();
     
-    console.log('=== LOAD COMPLETE ===');
     return true;
   } catch (error) {
-    console.error('❌ Failed to restore game state:', error);
     return false;
   }
 }
@@ -5219,22 +5489,25 @@ function restoreGameState(gameState) {
 // Load game state from localStorage
 function loadGameState() {
   try {
-    console.log('=== LOADING GAME STATE ===');
-    console.log('📱 Loading from localStorage...');
+    // Check if we need to force reset unlocks (from clear all data operation)
+    try {
+      const forceReset = localStorage.getItem('stackMerge_forceResetUnlocks');
+      if (forceReset === 'true') {
+        localStorage.removeItem('stackMerge_forceResetUnlocks');
+        return false; // Don't load any game state, start fresh
+      }
+          } catch (e) {
+        // Silent error handling
+      }
     
     const saveData = localStorage.getItem(SAVE_KEY);
     if (saveData) {
-      console.log('✅ Found save data in localStorage');
       const gameState = JSON.parse(saveData);
       return restoreGameState(gameState);
     } else {
-      console.log('📱 No save data found in localStorage');
       return false;
     }
   } catch (error) {
-    console.error('❌ Failed to load game state:', error);
-    console.error('Error details:', error.message);
-    console.error('Error stack:', error.stack);
     return false;
   }
 }
@@ -5242,10 +5515,8 @@ function loadGameState() {
 // Update notification system functions
 async function fetchUpdates() {
   try {
-    console.log('📰 Fetching updates from updates.txt...');
     const response = await fetch('updates.txt?' + Date.now()); // Add cache-busting
     if (!response.ok) {
-      console.error('❌ Failed to fetch updates:', response.status);
       return [];
     }
     
@@ -5272,27 +5543,20 @@ async function fetchUpdates() {
     
     // Sort updates by timestamp (newest first)
     updates.sort((a, b) => b.timestamp - a.timestamp);
-    console.log('📰 Parsed updates:', updates);
     return updates;
   } catch (error) {
-    console.error('❌ Error fetching updates:', error);
     return [];
   }
 }
 
 function checkForNewUpdates(updates) {
-  console.log('📰 Checking for new updates since:', lastSeenUpdateTimestamp);
-  console.log('📰 Available updates:', updates.length);
-  
   // If this is a first-time user (lastSeenUpdateTimestamp is 0), only show the most recent update
   if (lastSeenUpdateTimestamp === 0 && updates.length > 0) {
-    console.log('📰 First-time user - showing only the most recent update');
     return [updates[0]]; // Only return the most recent update
   }
   
   // Find updates newer than the last seen timestamp
   const newUpdates = updates.filter(update => update.timestamp > lastSeenUpdateTimestamp);
-  console.log('📰 New updates found:', newUpdates.length);
   
   return newUpdates;
 }
@@ -5302,8 +5566,6 @@ function showUpdateModal(updates) {
   
   // Get the newest update to show
   const latestUpdate = updates[0];
-  
-  console.log('📰 Showing update modal for:', latestUpdate.title);
   
   // Create modal HTML
   const modalHtml = `
@@ -5341,39 +5603,30 @@ function closeUpdateModal() {
 
 // Test function for debugging the update system
 async function testUpdateSystem() {
-  console.log('🧪 Testing update notification system...');
-  console.log('Current lastSeenUpdateTimestamp:', lastSeenUpdateTimestamp);
-  
   const updates = await fetchUpdates();
-  console.log('Fetched updates:', updates);
   
   const newUpdates = checkForNewUpdates(updates);
-  console.log('New updates:', newUpdates);
   
   if (newUpdates.length > 0) {
-    console.log('Showing update modal...');
     showUpdateModal(newUpdates);
-  } else {
-    console.log('No new updates to show');
   }
 }
 
 // Function to reset update timestamp for testing
 function resetUpdateTimestamp() {
-  console.log('🔄 Resetting update timestamp for testing...');
   lastSeenUpdateTimestamp = 0;
   saveGameState();
-  console.log('✅ Update timestamp reset. Call testUpdateSystem() to see the modal.');
 }
 
 // Function to completely clear all game data (cookies AND localStorage)
 function clearAllGameData() {
-  console.log('🧹 CLEARING ALL GAME DATA...');
-  
   // Reset the game to a fresh state before clearing data
   // This ensures we don't accidentally save any in-progress game state
-  console.log('🔄 Resetting game to fresh state...');
-  resetGame(true);
+  try {
+    resetGame(true);
+  } catch (error) {
+    // Silent error handling
+  }
   
   // Clear cookies - use multiple methods to ensure they're cleared
   try {
@@ -5389,11 +5642,10 @@ function clearAllGameData() {
         document.cookie = `${cookieName}=; max-age=0; path=/`;
         document.cookie = `${cookieName}=; max-age=0; path=/; domain=${window.location.hostname}`;
         document.cookie = `${cookieName}=; max-age=0; path=/; domain=.${window.location.hostname}`;
-        console.log(`🍪 Cleared cookie: ${cookieName}`);
       }
     });
   } catch (e) {
-    console.log('❌ Error clearing cookies:', e);
+    // Silent error handling
   }
   
   // Clear localStorage
@@ -5408,10 +5660,12 @@ function clearAllGameData() {
     
     keysToRemove.forEach(key => {
       localStorage.removeItem(key);
-      console.log(`💾 Cleared localStorage: ${key}`);
     });
+    
+    // Also specifically clear theme unlock data to ensure it's reset
+    localStorage.removeItem('stackMerge_themeUnlocks');
   } catch (e) {
-    console.log('❌ Error clearing localStorage:', e);
+    // Silent error handling
   }
   
   // Reset the useLocalStorage flag
@@ -5435,6 +5689,12 @@ function clearAllGameData() {
   // Reset total blocks dropped count
   totalBlocksDropped = 0;
   
+  // Reset total bombs exploded count
+  totalBombsExploded = 0;
+  
+  // Reset total blocks trashed count
+  totalBlocksTrashed = 0;
+  
   // Reset other important game state variables
   hasShownPersonalBest = false;
   bombConversionCost = 25; // Reset to default cost
@@ -5443,11 +5703,66 @@ function clearAllGameData() {
   trashButtonPresses = 0;
   bombSelected = false;
   previousBombCost = 25;
-  currentActiveDecayFactor = 0.6; // Reset to default decay factor
+  currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR; // Reset to default decay factor
   
   // Reset sound settings to defaults
   if (soundManager) {
-    soundManager.resetToDefaults();
+    try {
+      soundManager.resetAudioSettings();
+    } catch (e) {
+      // Silent error handling
+    }
+  }
+  
+  // Set flag to prevent theme unlock loading after clear
+  window.preventThemeUnlockLoad = true;
+  
+  // Set a persistent flag in localStorage to ensure unlock status is reset on next load
+  try {
+    localStorage.setItem('stackMerge_forceResetUnlocks', 'true');
+  } catch (e) {
+    // Silent error handling
+  }
+  
+  // Reset theme unlock status to defaults
+  if (themeManager) {
+    themeManager.themeUnlockRequirements = {
+      'jellyfish': { unlocked: true, requirement: 'Default theme' },
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+    };
+    // Don't save unlock status during clear - let the force reset flag handle it
+    // themeManager.saveUnlockStatus();
+    themeManager.applyTheme('jellyfish'); // Reset to default theme
+  }
+  
+  // Force clear any remaining unlock data from localStorage
+  try {
+    localStorage.removeItem('stackMerge_themeUnlocks');
+    localStorage.removeItem('stackMerge_theme');
+  } catch (e) {
+    // Silent error handling
+  }
+  
+  // Completely reset the ThemeManager to ensure fresh state
+  if (themeManager) {
+    // Force reset the unlock requirements
+    themeManager.themeUnlockRequirements = {
+      'jellyfish': { unlocked: true, requirement: 'Default theme' },
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+    };
+    
+    // Don't save unlock status during clear - let the force reset flag handle it
+    // themeManager.saveUnlockStatus();
+    
+    // Force apply default theme
+    themeManager.currentTheme = 'jellyfish';
+    themeManager.applyTheme('jellyfish');
+  }
+  
+  // Remove settings button glow effect
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.classList.remove('settings-glow');
   }
   
   // Reset game state variables to defaults
@@ -5486,6 +5801,19 @@ function clearAllGameData() {
     updateDebugPane();
   }
   
+  // Update theme selectors to reflect reset unlock status
+  if (typeof updateThemeSelectors === 'function') {
+    // Add a small delay to ensure DOM elements are ready
+    setTimeout(() => {
+      updateThemeSelectors();
+      
+      // Force another update after a longer delay to ensure everything is properly set
+      setTimeout(() => {
+        updateThemeSelectors();
+      }, 500);
+    }, 100);
+  }
+  
 
   
       // Also clear any saved game state that might restore the timestamp
@@ -5498,39 +5826,27 @@ function clearAllGameData() {
       
       // Save this "cleared" state to overwrite any existing data
       localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
-      
-      console.log('✅ Forced cleared game state saved to localStorage');
     } catch (e) {
-      console.log('❌ Error saving cleared state:', e);
+      // Silent error handling
     }
-  
-  console.log('✅ All game data cleared! Refresh the page to see the update modal.');
-  console.log('💡 Or call testUpdateSystem() to trigger it immediately.');
+    
+    // Force clear the main game save data to ensure unlock status is not restored
+    try {
+      localStorage.removeItem(SAVE_KEY);
+    } catch (e) {
+      // Silent error handling
+    }
 }
 
 // Function to check current storage state
 function checkStorageState() {
-  console.log('🔍 CHECKING STORAGE STATE...');
-  console.log('Current useLocalStorage flag:', useLocalStorage);
-  console.log('Current lastSeenUpdateTimestamp:', lastSeenUpdateTimestamp);
-  
   // Check cookies
-  console.log('\n🍪 COOKIES:');
   const cookies = document.cookie.split(';');
   const stackMergeCookies = cookies.filter(cookie => 
     cookie.trim().split('=')[0].startsWith('stackMerge_')
   );
-  if (stackMergeCookies.length > 0) {
-    stackMergeCookies.forEach(cookie => {
-      const [name, value] = cookie.split('=');
-      console.log(`  ${name.trim()}: ${value ? '✅ EXISTS' : '❌ EMPTY'}`);
-    });
-  } else {
-    console.log('  No stackMerge cookies found');
-  }
   
   // Check localStorage
-  console.log('\n💾 LOCALSTORAGE:');
   const localStorageKeys = [];
   try {
     for (let i = 0; i < localStorage.length; i++) {
@@ -5539,25 +5855,8 @@ function checkStorageState() {
         localStorageKeys.push(key);
       }
     }
-    
-    if (localStorageKeys.length > 0) {
-      localStorageKeys.forEach(key => {
-        const value = localStorage.getItem(key);
-        console.log(`  ${key}: ${value ? '✅ EXISTS' : '❌ EMPTY'}`);
-        if (key === 'stackMerge_save' && value) {
-          try {
-            const saveData = JSON.parse(value);
-            console.log(`    lastSeenUpdateTimestamp: ${saveData.lastSeenUpdateTimestamp || 0}`);
-          } catch (e) {
-            console.log('    Could not parse save data');
-          }
-        }
-      });
-    } else {
-      console.log('  No stackMerge localStorage keys found');
-    }
   } catch (e) {
-    console.log('  localStorage not accessible:', e);
+    // Silent error handling
   }
 }
 
@@ -5565,9 +5864,8 @@ function checkStorageState() {
 function setHelpButtonClicked() {
   try {
     localStorage.setItem(HELP_BUTTON_KEY, 'true');
-    console.log('✅ Help button clicked state saved to localStorage');
   } catch (error) {
-    console.error('❌ Failed to save help button state:', error);
+    // Silent error handling
   }
 }
 
@@ -5575,7 +5873,6 @@ function hasHelpButtonBeenClicked() {
   try {
     return localStorage.getItem(HELP_BUTTON_KEY) === 'true';
   } catch (error) {
-    console.error('❌ Failed to check help button state:', error);
     return false;
   }
 }
@@ -5583,64 +5880,30 @@ function hasHelpButtonBeenClicked() {
 // Clear saved game data
 function clearGameSave() {
   try {
-    console.log('=== CLEARING GAME SAVE ===');
-    
     // Clear localStorage save data
     localStorage.removeItem(SAVE_KEY);
-    console.log('✅ localStorage save data cleared');
-    
-    console.log('=== CLEAR COMPLETE ===');
   } catch (error) {
-    console.error('❌ Failed to clear game save:', error);
+    // Silent error handling
   }
 }
 
 // Auto-save game state periodically and on important events
 function setupAutoSave() {
   // Test cookie functionality first
-  console.log('=== TESTING COOKIE FUNCTIONALITY ===');
-  console.log('Current URL protocol:', window.location.protocol);
-  console.log('Current URL:', window.location.href);
-  console.log('Document cookie before test:', document.cookie);
   
   // Try to set a simple test cookie
   document.cookie = 'test_cookie=hello';
-  console.log('Document cookie after setting test:', document.cookie);
   
   // Check if test cookie was set
   const testCookie = document.cookie.includes('test_cookie');
-  console.log('Test cookie set successfully:', testCookie ? 'YES' : 'NO');
   
   if (!testCookie) {
-    console.error('❌ COOKIES ARE NOT WORKING - browser may be blocking them');
-    console.log('This could be due to:');
-    console.log('- Browser privacy settings');
-    console.log('- Incognito/private browsing mode');
-    console.log('- Browser extensions blocking cookies');
-    console.log('- HTTPS/HTTP mismatch');
-    console.log('- SameSite policy restrictions');
-    
     // Check if it's a local file issue
     if (window.location.protocol === 'file:') {
-      console.log('🚨 DETECTED LOCAL FILE PROTOCOL - Cookies are blocked by browser security');
-      console.log('This is expected behavior for file:// URLs');
-      console.log('Solutions:');
-      console.log('1. Use a local web server (http://localhost)');
-      console.log('2. Use localStorage fallback (automatic)');
-      console.log('3. Deploy to a web server');
-      console.log('');
-      console.log('💡 QUICK LOCAL SERVER SETUP:');
-      console.log('If you have Python installed:');
-      console.log('  python -m http.server 8000');
-      console.log('Then visit: http://localhost:8000');
-      console.log('');
-      console.log('If you have Node.js installed:');
-      console.log('  npx http-server');
-      console.log('Then visit: http://localhost:8080');
+      // Local file protocol detected - cookies are blocked by browser security
     }
     
     // Automatically switch to localStorage
-    console.log('🔄 Automatically switching to localStorage fallback...');
     useLocalStorage = true;
     
     // Test localStorage functionality
@@ -5648,38 +5911,31 @@ function setupAutoSave() {
       localStorage.setItem('test_storage', 'hello');
       const testValue = localStorage.getItem('test_storage');
       if (testValue === 'hello') {
-        console.log('✅ localStorage working correctly');
         localStorage.removeItem('test_storage');
-      } else {
-        console.error('❌ localStorage test failed');
       }
     } catch (e) {
-      console.error('❌ localStorage not available:', e);
+      // Silent error handling
     }
   } else {
-    console.log('✅ Basic cookie functionality working');
+    // Basic cookie functionality working
     
     // Clean up test cookie
     document.cookie = 'test_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    console.log('Test cookie cleaned up');
   }
   
   // Auto-save every 30 seconds during gameplay
   setInterval(() => {
     if (score > 0 || gold > 0) { // Only save if there's actual progress
-      console.log(`🔄 Auto-save interval triggered (using ${useLocalStorage ? 'localStorage' : 'cookies'})...`);
       saveGameState();
     }
   }, 30000);
   
   // Save on page unload/visibility change
   window.addEventListener('beforeunload', () => {
-    console.log('🔄 Page unloading - saving game state...');
     saveGameState();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      console.log('🔄 Page hidden - saving game state...');
       saveGameState();
     }
   });
@@ -5729,12 +5985,10 @@ function updateScoreDisplay() {
   
   // Check for new personal best during gameplay
   const previousHighScore = window.highScore || 0;
-  console.log('🔍 Score check - Current score:', score, 'Current high score:', window.highScore, 'Previous high score:', previousHighScore);
   
   if (score > previousHighScore && score > 0) {
     // Always update high score when current score exceeds it
     window.highScore = score;
-    console.log('✅ High score updated to:', window.highScore);
     
     // Update statistics modal if it's open
     if (statsModal && !statsModal.classList.contains('hidden')) {
@@ -5748,13 +6002,13 @@ function updateScoreDisplay() {
       // Show the personal best animation
       showPersonalBest();
       
-      console.log('🏆 New Personal Best during gameplay! Score:', score, 'Previous best:', previousHighScore);
+      // Show the personal best animation
+      showPersonalBest();
     } else if (!hasShownPersonalBest && window.totalGames === 0) {
       // First game ever - don't show personal best message
       hasShownPersonalBest = true; // Still mark as shown to prevent showing later in this game
-      console.log('🎮 First game ever - no personal best message shown. Score:', score, 'Total games:', window.totalGames);
     } else {
-      console.log('🏆 High score updated during gameplay! Score:', score, 'Previous best:', previousHighScore, 'Total games:', window.totalGames);
+      // High score updated during gameplay
     }
   }
   
@@ -5834,7 +6088,6 @@ let currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR;
 function getRandomWeight(){
   // Validate probabilities before selecting
   if (!validateProbabilityDistribution()) {
-    console.error('Probability validation failed, using uniform distribution');
     const randomIndex = Math.floor(Math.random() * weights.length);
     return weights[randomIndex];
   }
@@ -5845,13 +6098,11 @@ function getRandomWeight(){
   for(let i=0;i<probabilities.length;i++){
     cum += probabilities[i];
     if (r < cum) {
-      console.log(`Random weight selected: ${weights[i]} (probability: ${probabilities[i].toFixed(4)}, cumulative: ${cum.toFixed(4)})`);
       return weights[i];
     }
   }
   
   // Fallback - this should rarely happen if probabilities are correct
-  console.warn(`Random weight fallback: ${weights[probabilities.length-1]} (cumulative sum: ${cum.toFixed(6)})`);
   return weights[probabilities.length-1];
 }
 
@@ -5869,6 +6120,8 @@ let gold = 0; // Track accumulated gold
 let goldEarnedThisGame = 0; // Track gold earned in current game
 let lifetimeGoldEarned = 0; // Track total gold earned across all games
 let totalBlocksDropped = 0; // Track total blocks dropped across all games
+let totalBombsExploded = 0; // Track total bombs exploded across all games
+let totalBlocksTrashed = 0; // Track total blocks trashed across all games
 
 // Initialize high score tracking
 window.highScore = window.highScore || 0;
@@ -5907,7 +6160,6 @@ function checkForNewStack() {
   
   // Safety check: ensure we still have exactly 4 poles
   if (poles.length !== 4) {
-    console.error(`CRITICAL ERROR: checkForNewStack found ${poles.length} poles instead of 4! Resetting to 4 poles.`);
     poles = [[],[],[],[]];
   }
   
@@ -5917,12 +6169,8 @@ function checkForNewStack() {
   currentTargetBlockSize *= 2;
   // Don't call updateBlockRange() here - let the merge system handle block unlocking
   const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
-  console.log(`Advanced to Stage ${currentStage}! Gold earnings now multiplied by ${stageMultiplier}x`);
-  console.log(`Poles count remains at ${poles.length} (should always be 4)`);
-  console.log(`New target block size: ${currentTargetBlockSize} (need to merge to ${currentTargetBlockSize * 2} for next stage)`);
   
   // Save game state after stage progression
-  console.log('🔄 Triggering save after stage progression...');
   saveGameState();
 }
 
@@ -5935,51 +6183,37 @@ function checkForNewBlockSize(mergedSize) {
     // Check if this was a stage-triggering block
     if (mergedSize === currentTargetBlockSize * 2) {
       // This was a stage progression block
-      console.log(`Stage progression block ${mergedSize} added to droppable pieces`);
     } else {
       // This was a regular merge unlock
-      console.log(`Regular block size ${mergedSize} unlocked`);
     }
     
     // Implement a better probability distribution system
     // Lower tier blocks should remain more common, higher tiers progressively rarer
     updateProbabilityDistribution();
     
-    console.log(`New block size unlocked: ${mergedSize}`);
-    
     // Save game state after unlocking new block size
-    console.log('🔄 Triggering save after unlocking new block size...');
     saveGameState();
   }
 }
 
 function updateProbabilityDistribution() {
   try {
-    console.log('🔄 updateProbabilityDistribution called with decay factor:', currentActiveDecayFactor);
     // Call the custom version with the current active decay factor
     updateProbabilityDistributionCustom(currentActiveDecayFactor);
-    console.log('✅ updateProbabilityDistribution completed successfully');
   } catch (error) {
-    console.error('❌ Error in updateProbabilityDistribution:', error);
-    console.error('Error stack:', error.stack);
     throw error; // Re-throw to be caught by the caller
   }
 }
 
 function updateProbabilityDistributionCustom(decayFactor) {
   try {
-    console.log('🔄 updateProbabilityDistributionCustom called with decay factor:', decayFactor);
-    
     // Create a hybrid probability system with foundation blocks and exponential decay
     // Foundation blocks (1, 2, 4) get equal probabilities for stable early game
     // Higher blocks (8+) follow an exponential decay curve for progression
     
     const numBlocks = weights.length;
-    console.log('📊 Number of blocks available:', numBlocks);
-    console.log('📊 Current weights:', weights);
     
     if (numBlocks === 0) {
-      console.warn('No blocks available for probability distribution');
       return;
     }
     
@@ -6010,7 +6244,6 @@ function updateProbabilityDistributionCustom(decayFactor) {
     const totalProbability = baseProbabilities.reduce((sum, p) => sum + p, 0);
     
     if (totalProbability === 0) {
-      console.error('Total probability is 0, using uniform distribution');
       probabilities = new Array(numBlocks).fill(1.0 / numBlocks);
     } else {
       // Map the normalized probabilities back to the original weights order
@@ -6026,7 +6259,6 @@ function updateProbabilityDistributionCustom(decayFactor) {
     // Verify probabilities sum to 1.0 (with small floating point tolerance)
     const actualSum = probabilities.reduce((sum, p) => sum + p, 0);
     if (Math.abs(actualSum - 1.0) > 0.0001) {
-      console.warn(`Probability sum is ${actualSum.toFixed(6)}, expected 1.0. Normalizing...`);
       // Force normalization
       const correctedSum = probabilities.reduce((sum, p) => sum + p, 0);
       probabilities = probabilities.map(p => p / correctedSum);
@@ -6040,21 +6272,6 @@ function updateProbabilityDistributionCustom(decayFactor) {
     
     // Update the debug display
     updateDebugProbabilitiesDisplay();
-    
-    console.log('Updated probability distribution:', weights.map((w, i) => `${w}: ${probabilities[i].toFixed(4)}`).join(', '));
-    console.log('Probability sum:', probabilities.reduce((sum, p) => sum + p, 0).toFixed(6));
-    console.log('Current weights array:', weights);
-    console.log('Decay factor used:', decayFactor);
-    
-    // Log the foundation vs decay blocks for clarity
-    if (weights.length >= 3) {
-      console.log('Foundation blocks (equal prob):', weights.slice(0, 3).join(', '));
-      if (weights.length > 3) {
-        console.log('Decay blocks (exponential):', weights.slice(3).join(', '));
-      }
-    }
-    
-    console.log('✅ updateProbabilityDistributionCustom completed successfully');
   } catch (error) {
     console.error('❌ Error in updateProbabilityDistributionCustom:', error);
     console.error('Error stack:', error.stack);
@@ -6084,18 +6301,15 @@ function validateProbabilityDistribution() {
   // Check that probabilities sum to 1.0 (with tolerance for floating point errors)
   const sum = probabilities.reduce((s, p) => s + p, 0);
   if (Math.abs(sum - 1.0) > 0.0001) {
-    console.error(`Probabilities sum to ${sum.toFixed(6)}, expected 1.0`);
     return false;
   }
   
   // Check that all probabilities are finite numbers
   const invalidProbs = probabilities.filter(p => !isFinite(p));
   if (invalidProbs.length > 0) {
-    console.error('Found invalid probabilities:', invalidProbs);
     return false;
   }
   
-  console.log('Probability distribution validation passed ✓');
   return true;
 }
 
@@ -6111,11 +6325,6 @@ function showGoldEarned(amount) {
   goldEl.className = 'gold-earned';
   
   // Debug: Check if formatNumber is available and working
-  console.log('showGoldEarned called with amount:', amount);
-  console.log('formatNumber function available:', typeof formatNumber);
-  if (typeof formatNumber === 'function') {
-    console.log('Formatted amount:', formatNumber(amount));
-  }
   
   goldEl.textContent = `+${formatNumber(amount)}`;
   
@@ -6199,7 +6408,7 @@ function showPersonalBest() {
   // Play the personal best sound effect
   if (soundManager && soundManager.canPlayAudio()) {
     soundManager.playSound('personalBest', 'other').catch(error => {
-      console.log('Personal best sound failed:', error);
+      // Silent error handling
     });
   }
   
@@ -6220,15 +6429,8 @@ function showPersonalBest() {
 }
 
 function handleBombConversion() {
-  console.log('💣 Bomb conversion button clicked!');
-  console.log('Next queue:', nextQueue);
-  console.log('Current gold:', gold);
-  console.log('Bomb conversion cost:', bombConversionCost);
-  console.log('Bomb selected:', bombSelected);
-  
   // Check if there's a next block to work with
   if (nextQueue.length === 0) {
-    console.log('❌ No blocks in next queue');
     return;
   }
   
@@ -6241,8 +6443,6 @@ function handleBombConversion() {
     // Note: No gold to refund since payment hasn't been made yet
     bombConversionCost = previousBombCost; // Restore previous cost
     bombSelected = false;
-    
-    console.log(`Undid bomb selection, restored cost to ${previousBombCost}`);
     
     // No need to update gold display since no gold was deducted
     
@@ -6261,7 +6461,6 @@ function handleBombConversion() {
     updateBombConversionButtonState();
     
     // Save game state after undoing bomb selection
-    console.log('🔄 Triggering save after undoing bomb selection...');
     saveGameState();
     return;
   }
@@ -6298,8 +6497,6 @@ function handleBombConversion() {
   if (currentBlock) {
     currentBlock.bomb = true;
     bombSelected = true; // Mark that a bomb is selected
-    console.log(`Converted block ${currentBlock.w} to bomb for ${bombConversionCost} gold`);
-    
     // Update gold display
     updateGoldDisplay();
     const goldDisplay = document.querySelector('.gold-value');
@@ -6322,17 +6519,11 @@ function handleBombConversion() {
     updateBombConversionButtonState();
     
     // Save game state after bomb conversion and cost increase
-    console.log('🔄 Triggering save after bomb conversion and cost increase...');
     saveGameState();
   }
 }
 
 function handleTrashButton() {
-  console.log('🗑️ Trash button clicked!');
-  console.log('Next queue:', nextQueue);
-  console.log('Current gold:', gold);
-  console.log('Trash button cost:', trashButtonCost);
-  
   // Check if player has enough gold
   if (gold < trashButtonCost) {
     // Show feedback that they don't have enough gold
@@ -6358,7 +6549,9 @@ function handleTrashButton() {
   
   // Remove the current next block from the queue
   const removedBlock = nextQueue.shift();
-  console.log(`Removed block ${removedBlock.w} from queue for ${trashButtonCost} gold`);
+  
+  // Track total blocks trashed
+  totalBlocksTrashed++;
   
   // Add a new random block to the end of the queue to maintain 3 blocks
   nextQueue.push(getRandomPiece());
@@ -6396,16 +6589,11 @@ function handleTrashButton() {
   updateTrashButtonState();
   
   // Save game state after using trash button and cost increase
-  console.log('🔄 Triggering save after using trash button and cost increase...');
   saveGameState();
 }
 
 function updateBombConversionButtonState() {
   // Always update when called since we call this strategically
-  console.log('🔧 updateBombConversionButtonState called');
-  console.log('Bomb conversion button element:', bombConversionBtn);
-  console.log('Bomb conversion button mobile element:', bombConversionBtnMobile);
-  console.log('Current state - bombSelected:', bombSelected, 'gold:', gold, 'bombConversionCost:', bombConversionCost);
   
   if (bombConversionBtn) {
     // If a bomb is selected, the button should always be enabled for undo
@@ -6454,7 +6642,6 @@ function updateBombConversionButtonState() {
   
   // Also update mobile button if it exists
   if (bombConversionBtnMobile) {
-    console.log('🔧 Updating mobile bomb conversion button state');
     // If a bomb is selected, the button should always be enabled for undo
     if (bombSelected) {
       bombConversionBtnMobile.disabled = false;
@@ -6496,14 +6683,9 @@ function updateBombConversionButtonState() {
 
 function updateTrashButtonState() {
   // Always update when called since we call this strategically
-  console.log(`🔧 updateTrashButtonState called - gold: ${gold}, trashButtonCost: ${trashButtonCost}, lastGoldAmount: ${lastGoldAmount}`);
-  console.log(`Trash button element:`, trashButton);
-  console.log(`Mobile trash button element:`, trashButtonMobile);
-  console.log('Next queue length:', nextQueue.length);
   
   if (trashButton) {
     const hasEnoughGold = gold >= trashButtonCost;
-    console.log(`Trash button - hasEnoughGold: ${hasEnoughGold}, will disable: ${!hasEnoughGold}`);
     trashButton.disabled = !hasEnoughGold;
     
     // Update visual styling based on affordability
@@ -6511,22 +6693,16 @@ function updateTrashButtonState() {
     // White border (affordable): when gold >= cost (enabled)
     if (hasEnoughGold) {
       trashButton.classList.add('affordable');
-      console.log('Trash button: Added affordable class');
     } else {
       trashButton.classList.remove('affordable');
-      console.log('Trash button: Removed affordable class');
     }
     
     // Update the tracked gold amount
     lastGoldAmount = gold;
-    console.log(`Updated lastGoldAmount to: ${lastGoldAmount}`);
-  } else {
-    console.log('Trash button element not found');
   }
   
   // Also update mobile button if it exists
   if (trashButtonMobile) {
-    console.log('🔧 Updating mobile trash button state');
     const hasEnoughGold = gold >= trashButtonCost;
     trashButtonMobile.disabled = !hasEnoughGold;
     
@@ -6546,7 +6722,6 @@ function updateBombButtonIfGoldChanged() {
 
 // More targeted update function for trash button when we know gold has changed
 function updateTrashButtonIfGoldChanged() {
-  console.log(`updateTrashButtonIfGoldChanged called - gold: ${gold}, lastGoldAmount: ${lastGoldAmount}`);
   updateTrashButtonState();
 }
 
@@ -6569,10 +6744,12 @@ let debugStacks = null;
 let debugCapacity = null;
 let debugTarget = null;
 let debugMaxBlock = null;
-let debugBlocksDropped = null;
-let debugTotalBlocksDropped = null;
-let debugBombStatus = null;
-let debugStage = null;
+  let debugBlocksDropped = null;
+  let debugTotalBlocksDropped = null;
+  let debugTotalBombsExploded = null;
+  let debugTotalBlocksTrashed = null;
+  let debugBombStatus = null;
+  let debugStage = null;
 let debugAiToggle = null;
 let debugSpeedSlider = null;
 let debugSpeedLabel = null;
@@ -6604,12 +6781,7 @@ const bombCostElMobile = document.getElementById('bombCostMobile');
 const trashButtonMobile = document.getElementById('trashButtonMobile');
 const trashCostElMobile = document.getElementById('trashCostMobile');
 
-// Log button element status for debugging
-console.log('🔍 Button element status:');
-console.log('Bomb conversion button:', bombConversionBtn ? '✅ Found' : '❌ Not found');
-console.log('Trash button:', trashButton ? '✅ Found' : '❌ Not found');
-console.log('Mobile bomb conversion button:', bombConversionBtnMobile ? '✅ Found' : '❌ Not found');
-console.log('Mobile trash button:', trashButtonMobile ? '✅ Found' : '❌ Not found');
+// Button element status for debugging
 
 // Debug pane DOM refs
 debugPane = document.getElementById('debugPane');
@@ -6622,10 +6794,12 @@ debugStacks = document.getElementById('debugStacks');
 debugCapacity = document.getElementById('debugCapacity');
 debugTarget = document.getElementById('debugTarget');
 debugMaxBlock = document.getElementById('debugMaxBlock');
-      debugBlocksDropped = document.getElementById('debugBlocksDropped');
-      debugTotalBlocksDropped = document.getElementById('debugTotalBlocksDropped');
-debugBombStatus = document.getElementById('debugBombStatus');
-debugStage = document.getElementById('debugStage');
+              debugBlocksDropped = document.getElementById('debugBlocksDropped');
+        debugTotalBlocksDropped = document.getElementById('debugTotalBlocksDropped');
+        debugTotalBombsExploded = document.getElementById('debugTotalBombsExploded');
+        debugTotalBlocksTrashed = document.getElementById('debugTotalBlocksTrashed');
+        debugBombStatus = document.getElementById('debugBombStatus');
+        debugStage = document.getElementById('debugStage');
 const grantGoldBtn = document.getElementById('grantGoldBtn');
 const grantScoreBtn = document.getElementById('grantScoreBtn');
 
@@ -6637,7 +6811,6 @@ debugSpeedLabel = document.getElementById('debugSpeedLabel');
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'r') {
     e.preventDefault();
-    console.log('Emergency reset triggered via Ctrl+R');
     placing = false; // Force reset placing state
     
     // Re-enable hover effects and pointer events on all poles
@@ -6657,9 +6830,41 @@ document.addEventListener('keydown', (e) => {
 
 
 
+// Function to update help guide examples with current theme colors
+function updateHelpGuideColors() {
+  // Update merge examples
+  const mergeExamples = document.querySelectorAll('.merge-example .merge-block');
+  mergeExamples.forEach(block => {
+    const dataValue = block.getAttribute('data-value');
+    if (dataValue) {
+      const numValue = parseInt(dataValue);
+      if (!isNaN(numValue)) {
+        block.style.background = colorFor(numValue);
+        block.style.color = getTextColorFor(numValue);
+      }
+    }
+  });
+  
+  // Update stage progression examples
+  const stageBlocks = document.querySelectorAll('.next-stage-block');
+  stageBlocks.forEach(block => {
+    const text = block.textContent;
+    const numValue = parseInt(text);
+    if (!isNaN(numValue)) {
+      block.style.background = colorFor(numValue);
+      block.style.color = getTextColorFor(numValue);
+    }
+  });
+}
+
 // Help modal wiring
 function openHelp(){ 
   helpModal.classList.remove('hidden'); 
+  
+  // Update help guide colors with current theme
+  setTimeout(() => {
+    updateHelpGuideColors();
+  }, 100); // Small delay to ensure modal is fully rendered
   
   // Dynamically position the help modal content below the close button on mobile
   const helpModalContent = document.querySelector('.help-modal');
@@ -6736,14 +6941,7 @@ function positionHelpModalMobile() {
   // Reset padding to normal
   helpModalContent.style.paddingTop = '20px';
   
-  console.log('📱 Mobile help modal positioned:', {
-    safeTop: safeViewport.top,
-    safeBottom: safeViewport.bottom,
-    safeHeight: safeViewport.height,
-    closeButtonTop,
-    modalTop,
-    availableHeight
-  });
+  // Mobile help modal positioned
 }
 
 // Function to position help modal on desktop
@@ -6769,11 +6967,7 @@ function positionHelpModalDesktop() {
   // Reset other positioning properties
   helpModalContent.style.paddingTop = '20px';
   
-  console.log('🖥️ Desktop help modal positioned below close button:', {
-    closeButtonBottom,
-    modalTop,
-    availableHeight
-  });
+  // Desktop help modal positioned below close button
 }
 
 // Function to reposition help modal content when needed
@@ -6806,14 +7000,10 @@ if (helpBtn) {
 
     openHelp();
   });
-} else {
-  console.log('⚠️ Help button not found');
 }
 
 if (helpClose) {
   helpClose.addEventListener('click', closeHelp);
-} else {
-  console.log('⚠️ Help close button not found');
 }
 
 // Reset Local Data button event listener
@@ -6830,14 +7020,10 @@ if (resetDataBtn) {
       }, 500);
     }
   });
-} else {
-  console.log('⚠️ Reset data button not found');
 }
 
 if (helpModal) {
   helpModal.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
-} else {
-  console.log('⚠️ Help modal not found');
 }
 
 // Statistics modal DOM refs and functionality
@@ -6849,6 +7035,8 @@ function updateStatsModal() {
   const statsHighScore = document.getElementById('statsHighScore');
   const statsLifetimeGold = document.getElementById('statsLifetimeGold');
   const statsTotalBlocksDropped = document.getElementById('statsTotalBlocksDropped');
+  const statsTotalBombsExploded = document.getElementById('statsTotalBombsExploded');
+  const statsTotalBlocksTrashed = document.getElementById('statsTotalBlocksTrashed');
   
   if (statsHighScore) {
     statsHighScore.textContent = window.highScore || 0;
@@ -6862,7 +7050,13 @@ function updateStatsModal() {
     statsTotalBlocksDropped.textContent = formatNumber(totalBlocksDropped || 0);
   }
   
-  console.log('📊 Statistics modal updated - High Score:', window.highScore, 'Lifetime Gold:', lifetimeGoldEarned, 'Total Blocks Dropped:', totalBlocksDropped);
+  if (statsTotalBombsExploded) {
+    statsTotalBombsExploded.textContent = formatNumber(totalBombsExploded || 0);
+  }
+  
+  if (statsTotalBlocksTrashed) {
+    statsTotalBlocksTrashed.textContent = formatNumber(totalBlocksTrashed || 0);
+  }
 }
 
 // Function to open statistics modal
@@ -6879,14 +7073,10 @@ function closeStats() {
 // Statistics modal event listeners
 if (showStatsBtn) {
   showStatsBtn.addEventListener('click', openStats);
-} else {
-  console.log('⚠️ Show stats button not found');
 }
 
 if (statsModal) {
   statsModal.addEventListener('click', (e) => { if (e.target === statsModal) closeStats(); });
-} else {
-  console.log('⚠️ Stats modal not found');
 }
 
 // Sound button event listener
@@ -6903,10 +7093,10 @@ if (soundBtn) {
 const settingsBtn = document.getElementById('settingsBtn');
 if (settingsBtn) {
   settingsBtn.addEventListener('click', () => {
+    // Remove the glow effect when settings is opened
+    settingsBtn.classList.remove('settings-glow');
     openSettingsModal();
   });
-} else {
-  console.log('⚠️ Settings button not found');
 }
 
 
@@ -6916,8 +7106,6 @@ if (soundBtn) {
   const isMuted = soundManager.getMuteState();
   soundBtn.textContent = isMuted ? '🔇' : '🔊';
   soundBtn.title = 'Sound Controls';
-} else {
-  console.log('⚠️ Sound button not found for state initialization');
 }
 window.addEventListener('keydown', (e) => { 
   if (e.key === 'Escape' && helpModal && !helpModal.classList.contains('hidden')) {
@@ -6973,8 +7161,6 @@ if (gameOverButton) {
       gameOverButton.classList.remove('show');
     }
   });
-} else {
-  console.log('⚠️ Game over button not found');
 }
 
 // Global user interaction detection for universal audio compatibility
@@ -6998,8 +7184,6 @@ if (addBtn) {
 
     openNewGameModal();
   });
-} else {
-  console.log('⚠️ Add button not found');
 }
 
 // New game modal button event listeners
@@ -7009,15 +7193,11 @@ if (confirmNewGameBtn) {
 
     handleNewGameConfirmation();
   });
-} else {
-  console.log('⚠️ Confirm new game button not found');
 }
 
 const cancelNewGameBtn = document.getElementById('cancelNewGameBtn');
 if (cancelNewGameBtn) {
   cancelNewGameBtn.addEventListener('click', handleNewGameCancel);
-} else {
-  console.log('⚠️ Cancel new game button not found');
 }
 
 // Close new game modal when clicking outside
@@ -7028,8 +7208,6 @@ if (newGameModal) {
       closeNewGameModal();
     }
   });
-} else {
-  console.log('⚠️ New game modal not found');
 }
 
 // Close new game modal with Escape key
@@ -7043,8 +7221,14 @@ window.addEventListener('keydown', (e) => {
 function openSettingsModal() {
   const modal = document.getElementById('settingsModal');
   if (modal) {
-    console.log('⚙️ Opening settings modal...');
     modal.classList.remove('hidden');
+    
+    // Force update theme selectors when settings modal is opened
+    if (typeof updateThemeSelectors === 'function') {
+      setTimeout(() => {
+        updateThemeSelectors();
+      }, 50);
+    }
   }
 }
 
@@ -7052,6 +7236,12 @@ function closeSettingsModal() {
   const modal = document.getElementById('settingsModal');
   if (modal) {
     modal.classList.add('hidden');
+  }
+  
+  // Remove the glow effect when settings is closed
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.classList.remove('settings-glow');
   }
 }
 
@@ -7078,19 +7268,49 @@ function initializeSettingsModal() {
       closeSettingsModal();
     }
   });
+  
+  // Theme selector
+  const themeSelector = document.getElementById('themeSelector');
+  if (themeSelector) {
+    // Set initial value
+    themeSelector.value = themeManager.getCurrentTheme();
+    
+    // Add change event listener
+    themeSelector.addEventListener('change', (e) => {
+      const selectedTheme = e.target.value;
+      
+      // Check if theme is unlocked
+      if (!themeManager.isThemeUnlocked(selectedTheme)) {
+        // Show locked theme message
+        showLockedThemeMessage(selectedTheme, themeManager.getThemeRequirement(selectedTheme));
+        // Reset selector to current theme
+        e.target.value = themeManager.getCurrentTheme();
+        return;
+      }
+      
+      const success = themeManager.applyTheme(selectedTheme);
+      if (success) {
+        // Update help guide colors if help modal is open
+        if (helpModal && !helpModal.classList.contains('hidden')) {
+          updateHelpGuideColors();
+        }
+      }
+    });
+  }
+  
+
+
 }
+
+
 
 // Sound Control Modal Functions
 function openSoundControlModal() {
   const modal = document.getElementById('soundControlModal');
   if (modal) {
-    console.log('🎚️ Opening sound control modal...');
-    console.log('🔊 Current sound volumes before UI update:', soundManager.getAllSoundVolumes());
-    
     // Update UI with current sound settings
     updateSoundControlUI();
     
-    console.log('🔊 Sound volumes after UI update:', soundManager.getAllSoundVolumes());
     modal.classList.remove('hidden');
   }
 }
@@ -7151,14 +7371,12 @@ function initializeSoundControlModal() {
     if (slider && value) {
       // Initialize slider and value display with current volume from sound manager
       const currentVolume = soundManager.getSoundVolume(soundType);
-      console.log(`🎚️ Initializing ${soundType} slider to ${currentVolume}`);
       slider.value = currentVolume;
       value.textContent = currentVolume;
       
       slider.addEventListener('input', (e) => {
 
         const newVolume = parseInt(e.target.value);
-        console.log(`🎚️ ${soundType} volume slider changed to: ${newVolume}`);
         soundManager.setSoundVolume(soundType, newVolume);
         value.textContent = newVolume;
         
@@ -7169,7 +7387,6 @@ function initializeSoundControlModal() {
       // Play test sound only when slider is released (change event)
       slider.addEventListener('change', (e) => {
         const finalVolume = parseInt(e.target.value);
-        console.log(`🎵 ${soundType} volume slider released at: ${finalVolume}`);
         
 
         
@@ -7209,7 +7426,6 @@ function initializeSoundControlModal() {
 
 // Function to update volume sliders with current values
 function updateVolumeSliders() {
-  console.log('🔄 Updating volume sliders with current values...');
   const soundTypes = ['drop', 'merge', 'coin', 'bomb', 'other'];
   soundTypes.forEach(soundType => {
     const slider = document.getElementById(`${soundType}VolumeSlider`);
@@ -7217,33 +7433,24 @@ function updateVolumeSliders() {
     
     if (slider && value) {
       const currentVolume = soundManager.getSoundVolume(soundType);
-      console.log(`🎚️ Setting ${soundType} slider to ${currentVolume}`);
       slider.value = currentVolume;
       value.textContent = currentVolume;
     } else {
       console.warn(`⚠️ Missing elements for ${soundType}: slider=${!!slider}, value=${!!value}`);
     }
   });
-  console.log('✅ Volume sliders update complete');
 }
 
 // Initialize button states
-console.log('🔧 Initializing button states...');
-console.log('Bomb conversion button element:', bombConversionBtn);
-console.log('Trash button element:', trashButton);
-console.log('Mobile bomb conversion button element:', bombConversionBtnMobile);
-console.log('Mobile trash button element:', trashButtonMobile);
 
 try {
   updateBombConversionButtonState();
-  console.log('✅ Bomb conversion button state initialized');
 } catch (error) {
   console.error('❌ Error initializing bomb conversion button state:', error);
 }
 
 try {
   updateTrashButtonState();
-  console.log('✅ Trash button state initialized');
 } catch (error) {
   console.error('❌ Error initializing trash button state:', error);
 }
@@ -7265,8 +7472,6 @@ if (trashCostElMobile) {
 // Debug button wiring
 if (debugBtn) {
   debugBtn.addEventListener('click', openDebugPane);
-} else {
-  console.log('⚠️ Debug button not found');
 }
 
 // Initialize debug button visibility based on environment
@@ -7276,13 +7481,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (debugBtn) {
     if (isDevelopment()) {
       debugBtn.style.display = 'block';
-      console.log('🔧 Debug button enabled in development mode');
     } else {
       debugBtn.style.display = 'none';
-      console.log('🚫 Debug button disabled in production mode');
     }
-  } else {
-    console.log('⚠️ Debug button not found');
   }
   
   // Initialize sound control modal after DOM is loaded
@@ -7292,16 +7493,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeSettingsModal();
   
   // Force scroll to top immediately when DOM is ready
-  console.log('🔄 DOM ready - resetting scroll position to top...');
   
   // Try to clear any stored scroll position
   try {
     if (window.history && window.history.scrollRestoration) {
       window.history.scrollRestoration = 'manual';
-      console.log('🔧 Disabled browser scroll restoration');
     }
   } catch (e) {
-    console.log('⚠️ Could not disable scroll restoration:', e);
+    // Could not disable scroll restoration
   }
   
   window.scrollTo(0, 0);
@@ -7312,43 +7511,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Test function to verify volume changes are working
 function testVolumeChange(soundType, volume) {
-  console.log(`🧪 Testing ${soundType} volume change to ${volume}`);
-  
   // Get the actual volume value that would be used
   const actualVolume = soundManager.getActualVolume(soundType);
-  console.log(`🔊 ${soundType} actual volume: ${actualVolume} (${Math.round(actualVolume * 100)}%)`);
   
   // Test playing a sound if the volume is not 0
   if (actualVolume > 0) {
-    console.log(`🎵 ${soundType} volume is not muted, sound should play`);
-    
-
-    
     // Play a test sound based on the sound type
     switch (soundType) {
       case 'drop':
-        console.log('📦 Testing drop sound...');
         soundManager.playDropSound(1);
         break;
       case 'merge':
-        console.log('🔗 Testing merge sound...');
         soundManager.playMergeSound(2);
         break;
       case 'coin':
-        console.log('💰 Testing coin sound...');
         soundManager.playCoinSound();
         break;
       case 'bomb':
-        console.log('💥 Testing bomb sound...');
         soundManager.playBombSound();
         break;
       case 'other':
-        console.log('🚀 Testing stage up sound...');
         soundManager.playStageProgressionSound();
+        soundManager.playGameOverSound();
         break;
     }
-  } else {
-    console.log(`🔇 ${soundType} volume is muted (0), sound should NOT play`);
   }
 }
 
@@ -7357,8 +7543,6 @@ function testVolumeChange(soundType, volume) {
 function toggleAI(enable){
   if(enable === aiEnabled) return;
   aiEnabled = enable;
-  
-  console.log('AI toggled:', aiEnabled ? 'ON' : 'OFF');
   
   // Update debug pane display if it exists
   if (debugAiToggle) {
@@ -7371,17 +7555,14 @@ function toggleAI(enable){
     // start AI interval
     if(aiInterval) clearInterval(aiInterval);
     // make an immediate move then interval
-    console.log('AI: Starting immediate move');
     aiStep();
     // Set up the initial interval based on current speed
     const delays = [2000, 1500, 1000, 500, 50];
     const initialDelay = delays[currentSpeed];
-    console.log('AI: Setting up interval with delay:', initialDelay, 'ms');
     aiInterval = setInterval(aiStep, initialDelay);
   } else {
     if(aiInterval) clearInterval(aiInterval);
     aiInterval = null;
-    console.log('AI: Stopped and cleared interval');
     
     // Reset animation speed to default when auto-play is turned off
     currentSpeed = 2; // Medium
@@ -7434,8 +7615,6 @@ function updateAnimationSpeed() {
   animatedElements.forEach(el => {
     el.style.setProperty('--animation-speed', multiplier);
   });
-  
-  console.log(`Animation speed updated: ${multiplier} (speed level: ${currentSpeed})`);
 }
 
 function updateStackHeight() {
@@ -7450,19 +7629,14 @@ function updateStackHeight() {
     // Extra small mobile: 26px disc + 4px margin = 30px per slot
     // 10 slots: 30px × 10 = 300px + 16px padding (8px top + 8px bottom) = 316px
     baseHeight = 316;
-    console.log('Mobile (≤480px): Setting stack height to', baseHeight, 'px for 10 slots');
   } else if (window.innerWidth <= 768) {
     // Regular mobile: 30px disc + 6px margin = 36px per slot  
     // 10 slots: 36px × 10 = 360px + 24px padding (12px top + 12px bottom) = 384px
     baseHeight = 384;
-    console.log('Mobile (≤768px): Setting stack height to', baseHeight, 'px for 10 slots');
-  } else {
-    console.log('Desktop: Setting stack height to', baseHeight, 'px for 10 slots');
   }
   
   // Update CSS custom property for stack height
   document.documentElement.style.setProperty('--stack-height', baseHeight + 'px');
-  console.log('Updated --stack-height to', baseHeight, 'px');
 }
 
 function updateDebugPane() {
@@ -7472,8 +7646,10 @@ function updateDebugPane() {
   if (debugCapacity) debugCapacity.textContent = currentStackCapacity;
   if (debugTarget) debugTarget.textContent = currentTargetBlockSize * 2;
   if (debugMaxBlock) debugMaxBlock.textContent = Math.max(...weights);
-        if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
-      if (debugTotalBlocksDropped) debugTotalBlocksDropped.textContent = totalBlocksDropped;
+                if (debugBlocksDropped) debugBlocksDropped.textContent = blocksDropped;
+        if (debugTotalBlocksDropped) debugTotalBlocksDropped.textContent = totalBlocksDropped;
+        if (debugTotalBombsExploded) debugTotalBombsExploded.textContent = totalBombsExploded;
+        if (debugTotalBlocksTrashed) debugTotalBlocksTrashed.textContent = totalBlocksTrashed;
   if (debugBombStatus) debugBombStatus.textContent = blocksDropped >= BOMB_DELAY_BLOCKS ? 'Enabled' : 'Disabled';
   if (debugStage) debugStage.textContent = currentStage;
   
@@ -7493,7 +7669,7 @@ function closeDebugPane(){
   // Keep custom block mode active when debug pane is closed
   // customBlockMode will only be reset when "No Block" is selected
   
-  console.log('Debug pane closed, custom block mode remains active');
+  // Debug pane closed, custom block mode remains active
 }
 debugClose.addEventListener('click', closeDebugPane);
 debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
@@ -7516,8 +7692,8 @@ function closeNewGameModal() {
 
 function handleNewGameConfirmation() {
   closeNewGameModal();
-  // Play stage up sound effect when starting a new game
-  soundManager.playStageProgressionSound();
+  // Play new game sound effect when starting a new game
+  soundManager.playNewGameSound();
   resetGame(true);
 }
 
@@ -7612,6 +7788,22 @@ function syncDebugControls() {
     testGameOverBtn.addEventListener('click', handleTestGameOver);
   }
   
+  // Set up test unlock theme button event listener
+  const testUnlockThemeBtn = document.getElementById('testUnlockThemeBtn');
+  if (testUnlockThemeBtn) {
+    // Remove existing listeners to avoid duplicates
+    testUnlockThemeBtn.removeEventListener('click', handleTestUnlockTheme);
+    testUnlockThemeBtn.addEventListener('click', handleTestUnlockTheme);
+  }
+  
+  // Set up test lock theme button event listener
+  const testLockThemeBtn = document.getElementById('testLockThemeBtn');
+  if (testLockThemeBtn) {
+    // Remove existing listeners to avoid duplicates
+    testLockThemeBtn.removeEventListener('click', handleTestLockTheme);
+    testLockThemeBtn.addEventListener('click', handleTestLockTheme);
+  }
+  
   // Set up debug button event listeners
   if (grantGoldBtn) {
     // Remove existing listeners to avoid duplicates
@@ -7645,6 +7837,17 @@ function syncDebugControls() {
     bombToggle.removeEventListener('change', handleBombToggle);
     bombToggle.addEventListener('change', handleBombToggle);
   }
+  
+  // Set up debug theme selector event listener
+  const debugThemeSelector = document.getElementById('debugThemeSelector');
+  if (debugThemeSelector) {
+    // Remove existing listeners to avoid duplicates
+    debugThemeSelector.removeEventListener('change', handleDebugThemeChange);
+    debugThemeSelector.addEventListener('change', handleDebugThemeChange);
+    
+    // Set initial value
+    debugThemeSelector.value = themeManager.getCurrentTheme();
+  }
 }
 
 // Debug pane controls will be set up in syncDebugControls()
@@ -7658,6 +7861,29 @@ function handleVolumeChange(e) {
   const volume = parseInt(e.target.value) / 100;
   soundManager.setVolume(volume);
   updateDebugVolumeLabel();
+}
+
+function handleDebugThemeChange(e) {
+  const selectedTheme = e.target.value;
+  
+  // Check if theme is unlocked
+  if (!themeManager.isThemeUnlocked(selectedTheme)) {
+    // Show locked theme message
+    showLockedThemeMessage(selectedTheme, themeManager.getThemeRequirement(selectedTheme));
+    // Reset selector to current theme
+    e.target.value = themeManager.getCurrentTheme();
+    return;
+  }
+  
+  const success = themeManager.applyTheme(selectedTheme);
+  if (success) {
+    console.log('🎨 Debug theme changed to:', selectedTheme);
+    
+    // Update help guide colors if help modal is open
+    if (helpModal && !helpModal.classList.contains('hidden')) {
+      updateHelpGuideColors();
+    }
+  }
 }
 
 function handleMuteToggle(e) {
@@ -7751,7 +7977,7 @@ function handleTestPersonalBest() {
   // This provides a better UX by not keeping the debug pane open after testing
   setTimeout(() => {
     closeDebugPane();
-    console.log('🔧 Debug pane automatically closed after testing personal best message');
+    // Debug pane automatically closed after testing personal best message
   }, 150); // Small delay to ensure the message is visible before closing
 }
 
@@ -7771,8 +7997,60 @@ function handleTestGameOver() {
   // This provides a better UX by not keeping the debug pane open during testing
   setTimeout(() => {
     closeDebugPane();
-    console.log('🔧 Debug pane automatically closed after testing game over screen');
+    // Debug pane automatically closed after testing game over screen
   }, 150); // Small delay to ensure the game over screen is visible before closing
+}
+
+function handleTestUnlockTheme() {
+  console.log('🧪 Testing theme unlock...');
+  
+  // Test unlocking the Earth theme
+  if (themeManager.unlockTheme('alternate')) {
+    console.log('✅ Earth theme unlocked successfully');
+    
+    // Play theme unlock sound
+    if (soundManager && soundManager.canPlayAudio()) {
+      soundManager.playSound('themeUnlock', 'other').catch(error => {
+        console.log('Could not play theme unlock sound:', error);
+      });
+    }
+    
+    // Add green glow to settings button to indicate new theme available
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+      settingsBtn.classList.add('settings-glow');
+    }
+    
+    // Update theme selectors to show the new unlock status
+    updateThemeSelectors();
+  } else {
+    console.log('❌ Failed to unlock Earth theme');
+  }
+}
+
+function handleTestLockTheme() {
+  console.log('🧪 Testing theme lock...');
+  
+  // Test locking the Earth theme
+  if (themeManager.themeUnlockRequirements['alternate']) {
+    themeManager.themeUnlockRequirements['alternate'].unlocked = false;
+    themeManager.saveUnlockStatus();
+    console.log('🔒 Earth theme locked successfully');
+    
+    // Remove settings button glow effect
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+      settingsBtn.classList.remove('settings-glow');
+    }
+    
+    // Update theme selectors to show the new lock status
+    updateThemeSelectors();
+    
+    // Show a message
+    alert('Earth theme has been locked for testing. You can unlock it again with the Test Theme Unlock button or by scoring 5000+ in a real game.');
+  } else {
+    console.log('❌ Failed to lock Earth theme');
+  }
 }
 
 function handleBlockItemClick(blockItem) {
@@ -7801,7 +8079,7 @@ function handleBlockItemClick(blockItem) {
     // This allows immediate dropping of the selected block
     setTimeout(() => {
       closeDebugPane();
-      console.log('🔧 Debug pane automatically closed after selecting custom block');
+      // Debug pane automatically closed after selecting custom block
     }, 150); // Small delay to ensure the selection is visible before closing
   }
   
@@ -7901,27 +8179,56 @@ function updateProbabilityDistributionWithDecay(decayFactor) {
 }
 
 function colorFor(w){
-  const colors = [
-    '#cfef08', // lime green - value 1 (subtle)
-    '#10B981', // emerald-500 - value 2 (soft green)
-    '#2563EB', // blue-600 - value 4 (medium blue)
-    '#7C3AED', // violet-600 - value 8 (violet - midpoint between blue and dark purple)
-    '#581C87', // violet-800 - value 16 (dark purple)
-    '#D946EF', // fuchsia-500 - value 32 (bright fuchsia - clearly different from 16)
-    '#EC4899', // pink-500 - value 64 (hot pink)
-    '#e86758', // red-500 - value 128 (intense red)
-    '#F59E0B', // amber-500 - value 256 (bright amber)
-    '#ea580c', // orange-600 - value 512 (vibrant orange)
-    '#dc2626', // red-600 - value 1024 (bright red)
-    '#9d174d', // rose-700 - value 2048 (darker magenta)
-    '#7c2d6d',    // darker purple-magenta - value 4096
-    '#64748b', // gray - value 8192
-    '#fff'     // white - value 16384
-  ];
+  // Get current theme
+  const currentTheme = themeManager ? themeManager.getCurrentTheme() : 'jellyfish';
   
-  const log2w = Math.log2(w);
-  const colorIndex = Math.min(Math.floor(log2w), colors.length - 1);
-  return colors[colorIndex];
+  if (currentTheme === 'alternate') {
+    // Vibrant, clearly differentiated colors for each block value
+    const alternateColors = [
+      '#E4DFBB', // warm cream - value 1
+      '#7A6658', // medium brown - value 2
+      '#6D8C69', // sage green - value 4
+      '#0A472C', // dark green - value 8
+      '#054A91', // deep blue - value 16
+      '#36A1F3', // medium blue - value 32
+      '#EF767A', // coral pink - value 64
+      '#D9A06E', // light orange - value 128
+      '#C9AA30', // golden yellow - value 256
+      '#626C66', // gray-green - value 512
+      '#434A42', // dark gray-green - value 1024
+      '#3B2631', // dark burgundy - value 2048
+      '#32021F', // dark burgundy - value 4096
+      '#28112B', // very dark purple - value 8192
+      '#000000'  // pitch black - value 16384
+    ];
+    
+    const log2w = Math.log2(w);
+    const colorIndex = Math.min(Math.floor(log2w), alternateColors.length - 1);
+    return alternateColors[colorIndex];
+  } else {
+    // Default jellyfish theme colors
+    const jellyfishColors = [
+      '#cfef08', // lime green - value 1 (subtle)
+      '#10B981', // emerald-500 - value 2 (soft green)
+      '#2563EB', // blue-600 - value 4 (medium blue)
+      '#7C3AED', // violet-600 - value 8 (violet - midpoint between blue and dark purple)
+      '#581C87', // violet-800 - value 16 (dark purple)
+      '#D946EF', // fuchsia-500 - value 32 (bright fuchsia - clearly different from 16)
+      '#EC4899', // pink-500 - value 64 (hot pink)
+      '#e86758', // red-500 - value 128 (intense red)
+      '#F59E0B', // amber-500 - value 256 (bright amber)
+      '#ea580c', // orange-600 - value 512 (vibrant orange)
+      '#dc2626', // red-600 - value 1024 (bright red)
+      '#9d174d', // rose-700 - value 2048 (darker magenta)
+      '#7c2d6d',    // darker purple-magenta - value 4096
+      '#64748b', // gray - value 8192
+      '#fff'     // white - value 16384
+    ];
+    
+    const log2w = Math.log2(w);
+    const colorIndex = Math.min(Math.floor(log2w), jellyfishColors.length - 1);
+    return jellyfishColors[colorIndex];
+  }
 }
 
 function labelForPiece(piece){
@@ -7935,11 +8242,28 @@ function labelForPiece(piece){
 }
 
 function getTextColorFor(w){
-  // Return black text for lime green block (value 1) and blocks >= 16384, white for others
-  return (w === 1 || w >= 16384) ? '#000000' : '#ffffff';
+  // Get current theme
+  const currentTheme = themeManager ? themeManager.getCurrentTheme() : 'jellyfish';
+  
+  if (currentTheme === 'alternate') {
+    // For alternate theme, use white text for all blocks except value 1
+    return w === 1 ? '#000000' : '#ffffff';
+  } else {
+    // Default jellyfish theme: black text for lime green block (value 1) and blocks >= 16384, white for others
+    return (w === 1 || w >= 16384) ? '#000000' : '#ffffff';
+  }
 }
 
 function render(){
+  // Prevent infinite render loops
+  if (window.isRendering) {
+    console.warn('Render already in progress, skipping duplicate call');
+    return;
+  }
+  
+  // Set rendering flag to prevent safety checks from interfering
+  window.isRendering = true;
+  
   // build poles
   gameDiv.innerHTML = '';
   
@@ -7949,7 +8273,7 @@ function render(){
     poles = [[],[],[],[]];
   }
   
-  console.log(`Rendering ${poles.length} poles:`, poles.map(p => p.length));
+
   
   poles.forEach((pole, idx) => {
     const poleDiv = document.createElement('div');
@@ -8108,14 +8432,36 @@ function render(){
   // Final safety check: verify we only have 4 pole elements
   const renderedPoles = gameDiv.querySelectorAll('.pole');
   if (renderedPoles.length !== 4) {
-    console.error(`Error: Rendered ${renderedPoles.length} pole elements instead of 4! Clearing and re-rendering...`);
+    console.warn(`Warning: Rendered ${renderedPoles.length} pole elements instead of 4! Attempting to fix...`);
+    
+    // Try to fix by re-rendering once more
+    if (window.renderRetryCount === undefined) {
+      window.renderRetryCount = 1;
+    } else if (window.renderRetryCount < 2) {
+      window.renderRetryCount++;
+    } else {
+      // Too many retries, reset and start fresh
+      console.error(`Too many render retries (${window.renderRetryCount}), resetting game state`);
+      window.renderRetryCount = 0;
+      poles = [[],[],[],[]];
+      gameDiv.innerHTML = '';
+      window.isRendering = false;
+      setTimeout(() => render(), 100);
+      return;
+    }
+    
     gameDiv.innerHTML = '';
-    // Force a single re-render
-    setTimeout(() => render(), 0);
+    // Clear rendering flag before early return
+    window.isRendering = false;
+    // Force a single re-render with small delay
+    setTimeout(() => render(), 50);
     return;
   }
   
-  console.log(`Successfully rendered ${renderedPoles.length} poles`);
+  // Reset retry count on successful render
+  window.renderRetryCount = 0;
+  
+
   
   // update score display in game info
   updateScoreDisplay();
@@ -8131,6 +8477,9 @@ function render(){
 
   
   updateDebugPane();
+  
+  // Clear rendering flag
+  window.isRendering = false;
   
   renderNext();
 }
@@ -8174,9 +8523,7 @@ function renderNext(){
 }
 
 function placeOnPole(idx){
-  console.log('placeOnPole called with idx:', idx, 'placing:', placing);
   if (placing) { 
-    console.log('Placement in progress, ignoring click for pole:', idx);
     return; // Simply ignore clicks during placement instead of queueing
   }
   const pole = poles[idx];
@@ -8194,7 +8541,6 @@ function placeOnPole(idx){
   
   // Safety check: ensure this stack can actually accept the piece
   if (!canPlaceOnPole(nextPiece, pole)) {
-    console.log('Cannot place piece on this pole, ignoring click');
     return;
   }
   
@@ -8312,6 +8658,35 @@ function placeOnPole(idx){
       // scoring: add only the dropped piece's weight
       score += nextPiece.w;
       updateScoreDisplay();
+      
+      // Check for theme unlocks
+      if (score >= 5000 && !themeManager.isThemeUnlocked('alternate')) {
+        if (themeManager.unlockTheme('alternate')) {
+          console.log('🎉 Earth theme unlocked! Score:', score);
+          
+          // Play theme unlock sound
+          if (soundManager && soundManager.canPlayAudio()) {
+            soundManager.playSound('themeUnlock', 'other').catch(error => {
+              console.log('Could not play theme unlock sound:', error);
+            });
+          }
+          
+          // Add green glow to settings button to indicate new theme available
+          const settingsBtn = document.getElementById('settingsBtn');
+          if (settingsBtn) {
+            settingsBtn.classList.add('settings-glow');
+          }
+          
+          // Update theme selectors to show the new unlock status
+          if (typeof updateThemeSelectors === 'function') {
+            // Add a small delay to ensure DOM elements are ready
+            setTimeout(() => {
+              updateThemeSelectors();
+              console.log('🎨 Theme selectors updated after unlock');
+            }, 100);
+          }
+        }
+      }
       
       // Save game state after placing a block
       console.log('🔄 Triggering save after block placement...');
@@ -8652,6 +9027,7 @@ async function animateMergeCascade(index){
 
     if (isBombMerge){
       // Bomb merge - clear the entire stack
+      totalBombsExploded++; // Track total bombs exploded
       await animateClearPoleWithFallingBlock(index, pairIndex - 1, newW);
       // after animation, pole is cleared; continue which will break
       continue;
@@ -8730,6 +9106,9 @@ function checkGameOver(){
 }
 
 function showGameOver(){
+  // Play game over sound effect
+  soundManager.playGameOverSound();
+  
   // Show game over button overlay centered on screen with fade-in effect
   const gameOverButton = document.getElementById('gameOverButton');
   if (gameOverButton) {
@@ -8744,6 +9123,10 @@ function showGameOver(){
   if (largestMergeBlock && weights && weights.length > 0) {
     const highestBlock = Math.max(...weights);
     largestMergeBlock.setAttribute('data-value', highestBlock);
+    
+    // Apply themed colors using the colorFor function, just like regular game blocks
+    largestMergeBlock.style.background = colorFor(highestBlock);
+    largestMergeBlock.style.color = getTextColorFor(highestBlock);
     
     // Use the same number formatting as regular game blocks
     largestMergeBlock.textContent = highestBlock >= 100000 ? formatNumber(highestBlock) : String(highestBlock);
@@ -8805,6 +9188,8 @@ function showGameOver(){
   window.totalGames++;
   console.log('🎮 Game ended. Total games played:', window.totalGames);
   
+
+  
   // Save final game state when game over is reached
   console.log('🔄 Triggering final save at game over...');
   saveGameState();
@@ -8824,6 +9209,9 @@ function resetGame(isFreshGame = true){
   if (largestMergeBlock) {
     largestMergeBlock.textContent = '';
     largestMergeBlock.removeAttribute('data-value');
+    // Reset inline styles to default
+    largestMergeBlock.style.background = '';
+    largestMergeBlock.style.color = '';
   }
   
   // Clear the gold earned display
@@ -8839,6 +9227,12 @@ function resetGame(isFreshGame = true){
   const addBtn = document.getElementById('addBtn');
   if (addBtn) {
     addBtn.classList.remove('game-over-glow');
+  }
+  
+  // Remove glowing effect from the settings button
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.classList.remove('settings-glow');
   }
   
   poles = [[],[],[],[]];
@@ -9114,6 +9508,9 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   } else {
     // Start the explosion from the merged block (bomb location) and propagate outward in both directions
     const bombIndex = mergedIndex; // The bomb merge location
+    
+    // Track total bombs exploded
+    totalBombsExploded++;
     
     // First, apply the bomb explosion effect to the bomb block itself
     const bombDisc = allDiscs[bombIndex];
@@ -9416,7 +9813,12 @@ setupAutoSave();
 console.log('Auto-save system initialized');
 
 // Safety check: ensure we start with exactly 4 poles
-ensureCorrectPoleCount();
+// Only run after a short delay to ensure DOM is ready
+setTimeout(() => {
+  if (gameDiv && gameDiv.children) {
+    ensureCorrectPoleCount();
+  }
+}, 100);
 
 // Initialize debug pane - Block grid interface
 document.addEventListener('DOMContentLoaded', () => {
@@ -9466,22 +9868,64 @@ window.addEventListener('resize', () => {
 
 // Global safety check to ensure we always have exactly 4 poles
 function ensureCorrectPoleCount() {
+  // Add cooldown to prevent too frequent checks
+  if (window.lastSafetyCheck && Date.now() - window.lastSafetyCheck < 5000) {
+    return; // Wait at least 5 seconds between safety checks
+  }
+  
+  // Only run safety checks if the game is properly initialized
+  if (!gameDiv || !gameDiv.children) {
+    return; // Game not ready yet
+  }
+  
+  // Check if we're currently in the middle of a render operation
+  if (window.isRendering) {
+    return; // Skip check during render to avoid interference
+  }
+  
+  // Check if the game is still initializing
+  if (typeof poles === 'undefined' || poles.length === 0) {
+    return; // Game not fully initialized yet
+  }
+  
+  // Check if the game is still in the initial loading phase
+  if (window.gameInitializing) {
+    return; // Game is still initializing, skip safety checks
+  }
+  
   if (poles.length !== 4) {
-    console.error(`CRITICAL ERROR: Global pole count check found ${poles.length} poles instead of 4! Resetting to 4 poles.`);
+    console.warn(`Warning: Global pole count check found ${poles.length} poles instead of 4! Resetting to 4 poles.`);
     poles = [[],[],[],[]];
     // Force a re-render to fix the display
     render();
+    return;
   }
   
-  // Also check the DOM to ensure we have exactly 4 pole elements
-  if (gameDiv && gameDiv.children.length !== 4) {
-    console.error(`CRITICAL ERROR: DOM contains ${gameDiv.children.length} pole elements instead of 4! Re-rendering...`);
-    render();
+  // Only check DOM if we have a valid gameDiv and it's not empty
+  if (gameDiv.children.length === 0) {
+    // DOM is empty, this might be during initial load - don't trigger re-render
+    return;
   }
+  
+  // Only trigger re-render if we're significantly off (not just 1 element difference)
+  // This prevents unnecessary re-renders for minor DOM inconsistencies
+  if (gameDiv.children.length < 3 || gameDiv.children.length > 5) {
+    console.warn(`Warning: DOM contains ${gameDiv.children.length} pole elements instead of 4! Re-rendering...`);
+    render();
+  } else if (gameDiv.children.length !== 4) {
+    // Log minor inconsistencies but don't trigger re-render
+    console.log(`Note: DOM has ${gameDiv.children.length} pole elements (expected 4) - minor inconsistency`);
+  }
+  
+  // Update last safety check timestamp
+  window.lastSafetyCheck = Date.now();
 }
 
-// Run safety check every 5 seconds
-setInterval(ensureCorrectPoleCount, 5000);
+// Run safety check every 15 seconds (less frequent to reduce interference)
+// Start after a delay to ensure game is fully initialized
+setTimeout(() => {
+  setInterval(ensureCorrectPoleCount, 15000);
+}, 2000);
 
 function testProbabilityDistribution() {
   console.log('=== Testing Probability Distribution ===');
@@ -9704,16 +10148,52 @@ try {
   // localStorage is our primary storage method
   console.log('📱 Using localStorage for game data storage');
   
+  // Set game initializing flag
+  window.gameInitializing = true;
+  
   // Now try to load saved game state
   console.log('=== ATTEMPTING TO LOAD SAVED GAME STATE ===');
   const gameLoaded = loadGameState();
   console.log('Load result:', gameLoaded ? 'SUCCESS' : 'FAILED - starting fresh game');
+  
+  // If no game loaded, ensure unlock status is reset to defaults
+  // (but only if we're not in a clear operation)
+  if (!gameLoaded && themeManager && !window.preventThemeUnlockLoad) {
+    themeManager.themeUnlockRequirements = {
+      'jellyfish': { unlocked: true, requirement: 'Default theme' },
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+    };
+    themeManager.saveUnlockStatus();
+  }
+  
+  // Log final unlock status for debugging
+  if (themeManager) {
+    console.log('🎨 Final unlock status after initialization:', themeManager.themeUnlockRequirements);
+  }
   
   // Force a render after loading (or if loading failed)
   console.log('🔄 Rendering game display...');
   render();
   renderNext();
   console.log('✅ Game display rendered');
+  
+  // Game is now fully initialized
+  window.gameInitializing = false;
+  
+  // Initialize theme after game is fully rendered
+  if (themeManager) {
+    themeManager.initializeTheme();
+  }
+  
+  // Update theme selectors to show unlock status
+  if (typeof updateThemeSelectors === 'function') {
+    updateThemeSelectors();
+  }
+  
+  // Update debug block colors after theme initialization
+  if (typeof updateDebugBlockColors === 'function') {
+    updateDebugBlockColors();
+  }
   
   // Check for game updates after everything is loaded and rendered
   setTimeout(async () => {
