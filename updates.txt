@@ -9,3 +9,5 @@
 1755806110034|Personal High Scores|Added a personal high score tracking feature. Check your high score in the Help menu (? button)
 
 1755973636743|Player Statistics|Added new functionality to track lifetime statistics. Click the ? button and then click My Stats.
+
+1756019808306|Theme System|You can unlock and choose a new color scheme from the 🎨 Customization Menu.
