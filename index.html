@@ -5267,6 +5267,53 @@ function updateDebugBlockColors() {
   }
 }
 
+// Add debug logging for queue state
+function logQueueState(action) {
+  console.log(`🔍 Queue State [${action}]:`, {
+    length: nextQueue.length,
+    elements: nextQueue.map((item, idx) => ({
+      index: idx,
+      weight: item.w,
+      isBomb: item.bomb,
+      bombSelected: bombSelected
+    })),
+    bombSelected: bombSelected
+  });
+}
+
+// Function to validate and repair queue state
+function validateQueueState() {
+  if (!Array.isArray(nextQueue)) {
+    console.error('Queue is not an array, rebuilding...');
+    nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+    return false;
+  }
+  
+  if (nextQueue.length !== 3) {
+    console.error(`Queue has incorrect length ${nextQueue.length}, rebuilding...`);
+    nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+    return false;
+  }
+  
+  // Validate each element in the queue
+  for (let i = 0; i < nextQueue.length; i++) {
+    const item = nextQueue[i];
+    if (!item || typeof item.w !== 'number' || item.w <= 0 || !isFinite(item.w)) {
+      console.error(`Invalid item at index ${i}:`, item, 'replacing...');
+      nextQueue[i] = getRandomPiece();
+      return false;
+    }
+    
+    if (typeof item.bomb !== 'boolean') {
+      console.error(`Invalid bomb property at index ${i}:`, item.bomb, 'fixing...');
+      item.bomb = false;
+      return false;
+    }
+  }
+  
+  return true;
+}
+
 // Initialize sound manager
 const soundManager = new SoundManager();
 
@@ -6100,7 +6147,12 @@ function getRandomWeight(){
   }
   
   // Fallback - this should rarely happen if probabilities are correct
-  return weights[probabilities.length-1];
+  if (weights.length > 0) {
+    return weights[weights.length-1];
+  } else {
+    console.error('No weights available, falling back to 1');
+    return 1;
+  }
 }
 
 function getRandomPiece(){
@@ -6108,7 +6160,15 @@ function getRandomPiece(){
   const canSpawnBomb = blocksDropped >= BOMB_DELAY_BLOCKS;
   const bombChance = canSpawnBomb ? BOMB_CHANCE : 0;
   
-  return { w: getRandomWeight(), bomb: Math.random() < bombChance };
+  const weight = getRandomWeight();
+  
+  // Validate the weight before returning
+  if (typeof weight !== 'number' || weight <= 0 || !isFinite(weight)) {
+    console.error('Invalid weight generated:', weight, 'falling back to 1');
+    return { w: 1, bomb: false };
+  }
+  
+  return { w: weight, bomb: Math.random() < bombChance };
 }
 
 let poles = [[],[],[],[]];
@@ -6426,12 +6486,24 @@ function showPersonalBest() {
 }
 
 function handleBombConversion() {
+  logQueueState('bombConversion-start');
+  
+  // Validate queue state before proceeding
+  validateQueueState();
+  
   // Check if there's a next block to work with
   if (nextQueue.length === 0) {
+    console.warn('Attempted bomb conversion with empty queue');
     return;
   }
   
   const currentBlock = nextQueue[0];
+  
+  // Validate current block
+  if (!currentBlock || typeof currentBlock.w === 'undefined') {
+    console.error('Invalid block in queue:', currentBlock);
+    return;
+  }
   
   // If a bomb is already selected, allow undoing the selection
   if (bombSelected && currentBlock.bomb) {
@@ -6518,9 +6590,16 @@ function handleBombConversion() {
     // Save game state after bomb conversion and cost increase
     saveGameState();
   }
+  
+  logQueueState('bombConversion-end');
 }
 
 function handleTrashButton() {
+  logQueueState('trashButton-start');
+  
+  // Validate queue state before proceeding
+  validateQueueState();
+  
   // Check if player has enough gold
   if (gold < trashButtonCost) {
     // Show feedback that they don't have enough gold
@@ -6587,6 +6666,8 @@ function handleTrashButton() {
   
   // Save game state after using trash button and cost increase
   saveGameState();
+  
+  logQueueState('trashButton-end');
 }
 
 function updateBombConversionButtonState() {
@@ -8520,9 +8601,21 @@ function renderNext(){
 }
 
 function placeOnPole(idx){
+  logQueueState('placeOnPole-start');
+  
   if (placing) { 
     return; // Simply ignore clicks during placement instead of queueing
   }
+  
+  // Validate queue state before proceeding
+  validateQueueState();
+  
+  // Add bounds checking for nextQueue
+  if (nextQueue.length === 0) {
+    console.warn('Attempted to place block with empty queue');
+    return;
+  }
+  
   const pole = poles[idx];
   
   // Check if custom block mode is active
@@ -8733,6 +8826,8 @@ function placeOnPole(idx){
       }
       render();
       checkGameOver();
+      
+      logQueueState('placeOnPole-end');
       
 
       
@@ -9332,6 +9427,17 @@ function hasAnyMove(pieceOrWeight){
 }
 
 async function animateNextQueueAdvance(queueAlreadyModified = false){
+  logQueueState('queueAdvance-start');
+  
+  // Validate queue state before proceeding
+  if (nextQueue.length < 3) {
+    console.error('Queue has insufficient elements:', nextQueue.length);
+    // Rebuild queue if corrupted
+    nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
+    renderNext();
+    return;
+  }
+  
   // add consume animation to current
   const items = nextContainer.querySelectorAll('.next-disc');
   const current = items[0];
@@ -9358,8 +9464,11 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
     // Reset bomb selection state when the queue advances (bomb was placed)
     bombSelected = false;
     
-    nextQueue.shift();
-    nextQueue.push(getRandomPiece());
+    // Validate before modifying
+    if (nextQueue.length > 0) {
+      nextQueue.shift();
+      nextQueue.push(getRandomPiece());
+    }
   }
   
   renderNext();
@@ -9367,6 +9476,8 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
   // Update button states since queue changed
   updateBombButtonIfGoldChanged();
   updateTrashButtonIfGoldChanged();
+  
+  logQueueState('queueAdvance-end');
 }
 
 function getElementPageRect(el){
