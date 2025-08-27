@@ -11,3 +11,5 @@
 1755973636743|Player Statistics|Added new functionality to track lifetime statistics. Click the ? button and then click My Stats.
 
 1756019808306|Theme System|You can unlock and choose a new color scheme from the 🎨 Customization Menu.
+
+1756261222904|Testing New Item: Pickaxe|The Pickaxe removes a single block from anywhere in a stack. Press the pickaxe button, then click a block to mine it! Enter code 'Pickaxe' in the 🎨 Customization Menu.

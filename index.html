@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="msapplication-navbutton-color" content="#0f172a">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>[DEV] Stack Merge</title>
+<title>Stack Merge</title>
 <link rel="icon" type="image/png" href="http://localhost:8000/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +16,7 @@
   html {
     background: #0f172a;
     height: 100%;
+    overflow: visible; /* Allow all content to overflow */
   }
   
   :root{ 
@@ -55,9 +56,7 @@
     flex-direction:column; 
     align-items:center; 
     min-height: 100vh; /* Allow content to expand beyond viewport height */
-    overflow: auto; /* Allow scrolling when needed */
-    /* Ensure proper scrolling on mobile */
-    overflow-x: hidden;
+    overflow: visible; /* Allow all content to overflow */
     /* Prevent background flashing on mobile */
     background-color: var(--bg);
     background-image: none;
@@ -1347,7 +1346,7 @@
     min-height: auto;
     /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     /* Set width to match the 4 stacks + gaps */
     width: 632px;
     max-width: 100%;
@@ -1355,10 +1354,72 @@
     min-height: auto;
     /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     /* Set width to match the 4 stacks + gaps */
     width: 632px;
     max-width: 100%;
+    /* Hide scrollbar while maintaining scroll functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    /* Force overflow visibility to prevent any clipping */
+    clip-path: none;
+    mask: none;
+    -webkit-mask: none;
+  }
+  
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  .game-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Force game container to break out of any clipping contexts */
+  .game-container,
+  .game-container * {
+    overflow: visible !important;
+    clip-path: none !important;
+    mask: none !important;
+    -webkit-mask: none !important;
+  }
+  
+  /* Ensure game container can overflow beyond any parent boundaries */
+  .game-container {
+    position: relative;
+    z-index: 100;
+    isolation: isolate;
+  }
+  
+  /* Ensure game area can overflow */
+  .game {
+    position: relative;
+    z-index: 101;
+    isolation: isolate;
+  }
+  
+  /* Ensure poles can overflow */
+  .pole {
+    position: relative;
+    z-index: 102;
+    isolation: isolate;
+  }
+  
+  /* Ensure discs can overflow */
+  .disc {
+    position: relative;
+    z-index: 103;
+    isolation: isolate;
+  }
+  
+  /* Force game container to expand beyond any width restrictions */
+  .game-container {
+    max-width: none !important;
+    width: auto !important;
+    min-width: 632px;
+  }
+  
+  /* Ensure game area can expand */
+  .game {
+    max-width: none !important;
+    width: auto !important;
   }
   
   
@@ -1369,6 +1430,12 @@
     justify-content: center; 
     flex-wrap: nowrap;
     position: relative;
+    /* Ensure blocks can overflow and show their full shape */
+    overflow: visible;
+    /* Force overflow visibility to prevent any clipping */
+    clip-path: none;
+    mask: none;
+    -webkit-mask: none;
   }
   
 
@@ -1834,7 +1901,7 @@
   
   /* Next block display styling in debug panel */
 
-  .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; }
+  .pole { position:relative; width:140px; height:var(--stack-height, 525px); background:var(--panel); border-radius:15px; display:flex; flex-direction:column-reverse; align-items:center; padding:16px; box-sizing:border-box; cursor:pointer; transition: all 0.2s ease; z-index: 0; overflow: visible; clip-path: none; mask: none; -webkit-mask: none; }
   .pole:hover { border: 3px solid #0ea5e9; }
   .pole.full { opacity:0.6; cursor: not-allowed; }
   .pole.full:hover { opacity: 0.6; border: none; }
@@ -1852,7 +1919,7 @@
       transition: all 0.1s ease;
     }
   }
-  .disc { width:108px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:24px; margin-top:9px; box-shadow:0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family); transform-origin: center center; position: relative; z-index: 1; }
+  .disc { width:108px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:24px; margin-top:9px; box-shadow:0 3px 0 rgba(0,0,0,0.25); font-family: var(--font-family); transform-origin: center center; position: relative; z-index: 1; overflow: visible; clip-path: none; mask: none; -webkit-mask: none; }
   
   /* Bomb block styling */
   .bomb-content {
@@ -2849,7 +2916,7 @@
     display: flex;
     /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     width: 100%;
     max-width: 100%;
   }
@@ -4185,7 +4252,7 @@
             <span>Theme</span>
           </div>
           <div class="sound-control-controls">
-                    <select id="themeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option></select>
+                    <select id="themeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option><option value="miner">Miner</option></select>
           </div>
         </div>
         
@@ -4598,7 +4665,7 @@
       <div class="controls">
         <div class="control-row">
           <label for="debugThemeSelector">Theme:</label>
-                      <select id="debugThemeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option></select>
+                      <select id="debugThemeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option><option value="miner">Miner</option></select>
         </div>
       </div>
     </div>
@@ -5573,12 +5640,13 @@ class SoundManager {
 class ThemeManager {
   constructor() {
     this.currentTheme = 'jellyfish'; // Default theme
-    this.availableThemes = ['jellyfish', 'alternate'];
+    this.availableThemes = ['jellyfish', 'alternate', 'miner'];
     
     // Theme unlock requirements
     this.themeUnlockRequirements = {
       'jellyfish': { unlocked: true, requirement: 'Default theme' },
-      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' },
+      'miner': { unlocked: false, requirement: '?' }
     };
     
     // Load saved theme and unlock status from localStorage (but don't apply it yet)
@@ -5630,11 +5698,13 @@ class ThemeManager {
     }
     
     // Remove all theme classes from body
-    document.body.classList.remove('theme-alternate');
+    document.body.classList.remove('theme-alternate', 'theme-miner');
     
     // Add the selected theme class
     if (themeName === 'alternate') {
       document.body.classList.add('theme-alternate');
+    } else if (themeName === 'miner') {
+      document.body.classList.add('theme-miner');
     }
     
     this.currentTheme = themeName;
@@ -5766,10 +5836,22 @@ function updateThemeSelectors() {
         option.value = theme;
         
         if (themeManager.isThemeUnlocked(theme)) {
-          option.textContent = theme === 'jellyfish' ? 'Jellyfish' : 'Earth';
+          if (theme === 'jellyfish') {
+            option.textContent = 'Jellyfish';
+          } else if (theme === 'alternate') {
+            option.textContent = 'Earth';
+          } else if (theme === 'miner') {
+            option.textContent = 'Miner';
+          }
           option.disabled = false;
         } else {
-          option.textContent = `${theme === 'jellyfish' ? 'Jellyfish' : 'Earth'} (🔒 ${themeManager.getThemeRequirement(theme)})`;
+          if (theme === 'jellyfish') {
+            option.textContent = 'Jellyfish (🔒 Default theme)';
+          } else if (theme === 'alternate') {
+            option.textContent = `Earth (🔒 ${themeManager.getThemeRequirement(theme)})`;
+          } else if (theme === 'miner') {
+            option.textContent = `Miner (🔒 ${themeManager.getThemeRequirement(theme)})`;
+          }
           option.disabled = true;
         }
         
@@ -6356,7 +6438,8 @@ function clearAllGameData() {
   if (themeManager) {
     themeManager.themeUnlockRequirements = {
       'jellyfish': { unlocked: true, requirement: 'Default theme' },
-      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' },
+      'miner': { unlocked: false, requirement: '?' }
     };
     // Don't save unlock status during clear - let the force reset flag handle it
     // themeManager.saveUnlockStatus();
@@ -6376,7 +6459,8 @@ function clearAllGameData() {
     // Force reset the unlock requirements
     themeManager.themeUnlockRequirements = {
       'jellyfish': { unlocked: true, requirement: 'Default theme' },
-      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' },
+      'miner': { unlocked: false, requirement: '?' }
     };
     
     // Don't save unlock status during clear - let the force reset flag handle it
@@ -8162,11 +8246,15 @@ function closeSettingsModal() {
     modal.classList.add('hidden');
   }
   
-  // Remove the glow effect when settings is closed
+  // Only remove the glow effect if no new themes were unlocked
+  // (This prevents the glow from being removed when a theme is unlocked)
   const settingsBtn = document.getElementById('settingsBtn');
-  if (settingsBtn) {
+  if (settingsBtn && !window.themeJustUnlocked) {
     settingsBtn.classList.remove('settings-glow');
   }
+  
+  // Reset the flag
+  window.themeJustUnlocked = false;
 }
 
 function initializeSettingsModal() {
@@ -8272,6 +8360,38 @@ function handleCodeEntry(code) {
     
     // Save game state to persist pickaxe enabled status
     saveGameState();
+    
+    // Also unlock the miner theme when pickaxe code is entered
+    if (themeManager && !themeManager.isThemeUnlocked('miner')) {
+      if (themeManager.unlockTheme('miner')) {
+        console.log('🎉 Miner theme unlocked via Pickaxe code!');
+        
+        // Play theme unlock sound
+        if (soundManager && soundManager.canPlayAudio()) {
+          soundManager.playSound('themeUnlock', 'other').catch(error => {
+            console.log('Could not play theme unlock sound:', error);
+          });
+        }
+        
+        // Add green glow to settings button to indicate new theme available
+        const settingsBtn = document.getElementById('settingsBtn');
+        if (settingsBtn) {
+          settingsBtn.classList.add('settings-glow');
+        }
+        
+        // Set flag to prevent glow from being removed when modal closes
+        window.themeJustUnlocked = true;
+        
+        // Update theme selectors to show the new unlock status
+        if (typeof updateThemeSelectors === 'function') {
+          // Add a small delay to ensure DOM elements are ready
+          setTimeout(() => {
+            updateThemeSelectors();
+            console.log('🎨 Theme selectors updated after unlock');
+          }, 100);
+        }
+      }
+    }
     
     // Show success message
     showCodeSuccessMessage('Pickaxe enabled!');
@@ -9097,6 +9217,8 @@ function handleTestUnlockTheme() {
   } else {
     console.log('❌ Failed to unlock Earth theme');
   }
+  
+
 }
 
 function handleTestLockTheme() {
@@ -9338,6 +9460,27 @@ function colorFor(w){
     const log2w = Math.log2(w);
     const colorIndex = Math.min(Math.floor(log2w), alternateColors.length - 1);
     return alternateColors[colorIndex];
+  } else if (currentTheme === 'miner') {
+    // Miner theme colors - earthy, mining-inspired palette
+    const minerColors = [
+      '#78AB0D', // lime green - value 1
+      '#805F46', // warm brown - value 2
+      '#69241F', // dark brown - value 4
+      '#874814', // medium brown - value 8
+      '#AB8724', // golden brown - value 16
+      '#3D2316', // very dark brown - value 32
+      '#60150B', // dark red-brown - value 64
+      '#3D0F0F', // very dark red-brown - value 128
+      '#171717', // very dark gray - value 256
+      '#3D3B33', // dark gray-brown - value 512
+      '#272754', // dark blue-gray - value 1024
+      '#10503E', // dark teal - value 2048
+      '#2E8E75'  // teal green - value 4096
+    ];
+    
+    const log2w = Math.log2(w);
+    const colorIndex = Math.min(Math.floor(log2w), minerColors.length - 1);
+    return minerColors[colorIndex];
   } else {
     // Default jellyfish theme colors
     const jellyfishColors = [
@@ -9381,6 +9524,9 @@ function getTextColorFor(w){
   if (currentTheme === 'alternate') {
     // For alternate theme, use white text for all blocks except value 1
     return w === 1 ? '#000000' : '#ffffff';
+  } else if (currentTheme === 'miner') {
+    // For miner theme, use white text for all blocks for better contrast
+    return '#ffffff';
   } else {
     // Default jellyfish theme: black text for lime green block (value 1) and blocks >= 16384, white for others
     return (w === 1 || w >= 16384) ? '#000000' : '#ffffff';
@@ -9920,6 +10066,8 @@ function placeOnPole(idx){
           }
         }
       }
+      
+
       
       // Save game state after placing a block
       console.log('🔄 Triggering save after block placement...');
@@ -11443,7 +11591,8 @@ try {
   if (!gameLoaded && themeManager && !window.preventThemeUnlockLoad) {
     themeManager.themeUnlockRequirements = {
       'jellyfish': { unlocked: true, requirement: 'Default theme' },
-      'alternate': { unlocked: false, requirement: 'Score 5000+ points' }
+      'alternate': { unlocked: false, requirement: 'Score 5000+ points' },
+      'miner': { unlocked: false, requirement: '?' }
     };
     themeManager.saveUnlockStatus();
   }
