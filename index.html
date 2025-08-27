@@ -1,14 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Stack Merge</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<!-- saved from url=(0022)http://localhost:8000/ -->
+<html lang="en" style="--animation-speed: 1; --stack-height: 542px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="msapplication-navbutton-color" content="#0f172a">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>[DEV] Stack Merge</title>
+<link rel="icon" type="image/png" href="http://localhost:8000/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
+  /* Prevent white background flashing on mobile */
+  html {
+    background: #0f172a;
+    height: 100%;
+  }
+  
   :root{ 
     --bg:#0f172a; 
     --panel:#1e293b; 
@@ -17,6 +26,26 @@
     
     /* Theme colors are now handled dynamically via JavaScript */
   }
+  
+  /* Simple mobile hover disable - prevents hover effects on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    /* Disable all hover effects on mobile without changing colors or backgrounds */
+    *:hover {
+      transform: none !important;
+      box-shadow: inherit !important;
+    }
+    
+    /* Specifically disable hover effects for interactive elements */
+    .title-btn:hover,
+    .powerup-btn:hover,
+    .ai-btn:hover,
+    .pole:hover,
+    .disc:hover {
+      transform: none !important;
+      box-shadow: inherit !important;
+    }
+  }
+  
   body { 
     margin:0; 
     font-family: var(--font-family); 
@@ -27,6 +56,11 @@
     align-items:center; 
     min-height: 100vh; /* Allow content to expand beyond viewport height */
     overflow: auto; /* Allow scrolling when needed */
+    /* Ensure proper scrolling on mobile */
+    overflow-x: hidden;
+    /* Prevent background flashing on mobile */
+    background-color: var(--bg);
+    background-image: none;
   }
   
   /* Development mode - enable scrolling for debug access */
@@ -42,7 +76,14 @@
     margin-bottom: 20px; /* Add some bottom margin for mobile scrolling */
   }
   .topbar { width:100%; max-width:1200px; display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 16px 8px; box-sizing:border-box; }
-  h1 { margin:0; font-size:36px; font-weight:700; text-align:center; font-family: var(--font-family); }
+  h1 { 
+    margin:0; 
+    font-size:36px; 
+    font-weight:700; 
+    text-align:center; 
+    font-family: var(--font-family); 
+
+  }
   
   /* Title section styling */
   .title-section { 
@@ -53,6 +94,13 @@
     position: relative;
     margin-top: 24px;
     margin-bottom: 24px;
+    /* Prevent viewport shifting on mobile */
+    transform: translateZ(0);
+    will-change: auto;
+    /* Force stable positioning */
+    backface-visibility: hidden;
+    perspective: 1000px;
+
   }
   
   /* Left section - positioned to the left of center */
@@ -62,6 +110,10 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    /* Force stable positioning */
+    transform: translateZ(0);
+    will-change: auto;
+    backface-visibility: hidden;
   }
   
   /* Center section - absolutely centered title */
@@ -71,6 +123,12 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
+    /* Force stable positioning */
+    will-change: auto;
+    backface-visibility: hidden;
+
+    /* Prevent mobile viewport interference */
+    touch-action: manipulation;
   }
   
   /* Right section - positioned to the right of center */
@@ -80,6 +138,10 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    /* Force stable positioning */
+    transform: translateZ(0);
+    will-change: auto;
+    backface-visibility: hidden;
   }
   
   /* Title button styling */
@@ -185,6 +247,50 @@
     .title-section {
       gap: 16px;
     }
+    
+    /* Prevent viewport shifting on mobile */
+    .title-section {
+      transform: translateZ(0);
+      will-change: auto;
+      position: relative;
+      /* Force stable positioning */
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+    
+    .title-section .left-section,
+    .title-section .right-section {
+      transform: translateZ(0);
+      will-change: auto;
+      backface-visibility: hidden;
+    }
+    
+    /* Completely prevent any positioning changes on mobile */
+    .title-section .left-section,
+    .title-section .right-section {
+      transform: translateZ(0) !important;
+      will-change: auto !important;
+      backface-visibility: hidden !important;
+    }
+    
+    /* Don't override the center section's centering transform */
+    .title-section .center-section {
+      will-change: auto !important;
+      backface-visibility: hidden !important;
+      /* Force the centering transform to stay put */
+      transform: translateX(-50%) !important;
+      transform-origin: center center !important;
+    }
+    
+    /* Force the title section to stay exactly where it is */
+    .title-section {
+      position: relative !important;
+      left: 0 !important;
+      top: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      transform: translateZ(0) !important;
+    }
   }
   
   /* Mobile responsive spacing for title sections */
@@ -197,6 +303,47 @@
     .title-section .right-section {
       left: calc(50% + 110px);
       gap: 8px; /* Reduced gap between buttons on mobile */
+    }
+  }
+  
+      /* Mobile responsive powerup shop */
+  @media (max-width: 768px) {
+    .powerup-shop {
+      margin-top: 4px !important;
+      margin-bottom: 12px !important;
+      padding: 0 16px !important;
+      /* Ensure powerup shop is always visible on mobile */
+      position: relative;
+      z-index: 10;
+      background: var(--bg);
+      /* Force display and ensure proper positioning */
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      /* Ensure proper spacing from game area */
+      margin-top: 4px !important;
+      margin-bottom: 20px !important;
+    }
+    
+    .shop-grid {
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .powerup-btn {
+      min-width: 80px;
+      min-height: clamp(60px, 15vw, 80px);
+      max-height: clamp(60px, 15vw, 80px);
+      padding: 0 12px;
+      flex: 1 1 80px;
+    }
+    
+
+    
+    /* Ensure game container doesn't take up too much space */
+    .game-container {
+      margin-bottom: 0 !important;
+      padding-bottom: 8px !important;
     }
   }
   
@@ -220,13 +367,40 @@
     .title-section .right-section {
       gap: 8px; /* Slightly larger gap for better touch targets */
     }
+    
+    /* Extra small mobile powerup shop adjustments */
+    .powerup-shop {
+      margin-top: 4px !important;
+      margin-bottom: 8px !important;
+      padding: 0 12px !important;
+      /* Ensure visibility on extra small screens */
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      z-index: 10;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .shop-grid {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .powerup-btn {
+      min-width: 0;
+      min-height: clamp(50px, 12vw, 70px);
+      max-height: clamp(50px, 12vw, 70px);
+      padding: 0 clamp(6px, 1.5vw, 12px);
+      width: 100%;
+    }
+    
+
   }
   
   /* Disable hover effects on mobile/touch devices */
   @media (hover: none) and (pointer: coarse) {
     .title-btn:hover {
-      background: var(--panel);
-      border-color: #475569;
       transform: none;
       box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     }
@@ -234,10 +408,6 @@
     .title-btn#soundBtn:hover {
       transform: none;
     }
-    
-
-    
-
   }
   
 
@@ -251,7 +421,7 @@
   .next { display:flex; flex-direction:column; align-items:center; gap:12px; }
   .next .label { font-size:18px; opacity:0.9; font-family: var(--font-family); }
   .next-row { display:flex; align-items:center; gap:12px; }
-  .next-disc { width:108px; height:45px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:24px; box-shadow:0 3px 0 rgba(0,0,0,0.25); transition: transform calc(0.18s * var(--animation-speed, 1)) ease; font-family: var(--font-family); transform-origin: center center; }
+  .next-disc { width:108px; height:45px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:24px; box-shadow:0 3px 0 rgba(0,0,0,0.25); transition: transform calc(0.18s * var(--animation-speed, 1)) ease; font-family: var(--font-family); transform-origin: center center; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
   .next-disc.current { outline:3px solid #fff; outline-offset:3px; }
   .next-disc.consume-out { 
     animation: nextConsume calc(0.18s * var(--animation-speed, 1)) ease forwards; 
@@ -284,6 +454,10 @@
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     position: relative;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Score star emoji styling as a badge in top left corner */
@@ -295,6 +469,10 @@
     opacity: 1;
     z-index: 1;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .score-text {
@@ -304,6 +482,10 @@
     font-weight: 600;
     line-height: 1;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 
   /* Gold display styling to match score display */
@@ -330,6 +512,10 @@
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     position: relative;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Gold emoji styling as a badge in top left corner */
@@ -341,6 +527,10 @@
     opacity: 1;
     z-index: 1;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .gold-text {
@@ -350,6 +540,10 @@
     font-weight: 600;
     line-height: 1;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Stage multiplier badge styling centered on lower edge of gold counter */
@@ -373,6 +567,10 @@
     line-height: 1;
     box-sizing: border-box;
     white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Stage multiplier badge pulse animation */
@@ -472,27 +670,7 @@
     100% { transform: scale(1); }
   }
 
-  /* Bomb conversion button pulse animation */
-  .bomb-conversion-btn.pulse {
-    animation: bombBtnPulse 0.3s ease-out;
-  }
-  
-  @keyframes bombBtnPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-  
-  /* Trash button pulse animation */
-  .trash-btn.pulse {
-    animation: trashBtnPulse 0.3s ease-out;
-  }
-  
-  @keyframes trashBtnPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
+
 
   /* AI button styling to match score-value and interface */
   .ai-btn {
@@ -949,6 +1127,10 @@
     font-size: 24px; 
     box-shadow: 0 3px 0 rgba(0,0,0,0.25); 
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Block colors are now handled dynamically via JavaScript */
@@ -980,6 +1162,10 @@
     font-size: 42px;
     opacity: 1;
     z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .merge-block.bomb-block .bomb-text {
@@ -988,6 +1174,10 @@
     font-size: 24px;
     font-weight: 700;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .merge-block.explosion {
@@ -997,6 +1187,14 @@
     width: 108px;
     height: 42px;
     border-radius: 9px;
+  }
+  
+  /* Next stage block styling */
+  .next-stage-block {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .merge-arrow { 
@@ -1038,6 +1236,9 @@
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    /* Prevent viewport shifting on mobile */
+    transform-origin: center center;
+    touch-action: manipulation;
   }
 
   .stats-modal-backdrop {
@@ -1087,6 +1288,10 @@
     font-size: 18px;
     font-weight: 700;
     color: #f8fafc;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 
 
@@ -1097,6 +1302,9 @@
       width: auto;
       max-width: calc(100vw - 40px);
       padding: 16px;
+      /* Force the centering transform to stay put on mobile */
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
     }
 
     .stats-content {
@@ -1132,16 +1340,34 @@
     display: flex;
     align-items: flex-start;
     margin-top: 32px;
-    padding-bottom: 28px;
+    padding-bottom: 16px;
     justify-content: center;
     position: relative;
+    /* Ensure game container doesn't take up full height on mobile */
+    min-height: auto;
+    /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Set width to match the 4 stacks + gaps */
+    width: 632px;
+    max-width: 100%;
+    /* Ensure game container doesn't take up full height on mobile */
+    min-height: auto;
+    /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Set width to match the 4 stacks + gaps */
+    width: 632px;
+    max-width: 100%;
   }
+  
+  
   
   .game { 
     display: flex; 
     gap: 24px; 
     justify-content: center; 
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     position: relative;
   }
   
@@ -1155,66 +1381,153 @@
     margin-top: 18px; 
   }
   
-  /* Powerup Shop - Grid Layout */
+  /* Unified Powerup Shop - Below Game Area */
   .powerup-shop {
-    position: absolute;
-    left: calc(100% + 20px);
-    top: 0;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    align-items: stretch;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    width: 632px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+    box-sizing: border-box;
+    /* Ensure powerup shop is always visible */
+    position: relative;
+    z-index: 5;
+    background: var(--bg);
   }
+  
+  
+  
+
+  
+
   
   .shop-grid {
     display: flex;
-    flex-direction: column;
     gap: 16px;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 95%;
+    margin: 0 auto;
+    max-width: 1200px;
   }
+  
+  /* Ensure buttons stay on one line on desktop */
+  @media (min-width: 768px) {
+    .shop-grid {
+      flex-wrap: nowrap;
+      max-width: none;
+    }
+  }
+  
+  /* Ensure buttons don't become too wide on very large screens */
+  @media (min-width: 1200px) {
+    .shop-grid {
+      max-width: 1400px;
+    }
+  }
+  
+  /* Universal powerup button sizing - buttons stretch evenly */
+  .powerup-btn {
+    flex: 1 1 0;
+    min-width: 120px;
+    min-height: 80px;
+    padding: 0 12px;
+  }
+  
+
+  
+  /* Ensure buttons don't become too narrow on very small screens */
+  @media (max-width: 480px) {
+    .powerup-btn {
+      min-width: 50px;
+    }
+  }
+  
+
+  
+  /* Handle very narrow containers with responsive flexbox */
+  @media (max-width: 600px) {
+    .shop-grid {
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .powerup-btn {
+      min-width: 100px;
+      flex: 1 1 100px;
+    }
+  }
+  
+
+  
+
   
   .powerup-btn {
     background: var(--panel);
     color: var(--text);
-    border: 2px solid #DC2626;
-    min-width: 80px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
     min-height: 80px;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     font-family: var(--font-family);
     pointer-events: auto;
     gap: 8px;
     position: relative;
     padding: 0 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
   }
   
   .powerup-btn:hover {
     border: 3px solid #0ea5e9;
     background: #334155;
     transform: translateY(-1px);
-    box-shadow: 0 4px 0 rgba(220, 38, 38, 0.3);
+    box-shadow: 0 4px 0 rgba(14, 165, 233, 0.3);
   }
   
   .powerup-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.25);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
   }
   
   .powerup-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none;
-    box-shadow: 0 2px 0 rgba(220, 38, 38, 0.2);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+    background: #374151;
+    color: #9ca3af;
   }
   
   .powerup-btn.affordable {
     border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Unaffordable buttons - dimmed appearance */
+  .powerup-btn:not(.affordable):not(:disabled):not(.undo-mode) {
+    opacity: 0.6;
+    background: #374151;
+    color: #9ca3af;
+    border: 2px solid rgba(156, 163, 175, 0.3);
   }
   
   .powerup-btn.affordable:hover {
@@ -1243,6 +1556,8 @@
     content: "↩️";
   }
   
+
+  
   @keyframes undoModePulse {
     0%, 100% { 
       box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25);
@@ -1255,6 +1570,11 @@
   .powerup-emoji {
     font-size: 32px;
     line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .powerup-cost {
@@ -1265,10 +1585,20 @@
     font-size: 16px;
     white-space: nowrap;
     padding-right: 8px;
+    flex-shrink: 0;
+    min-width: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .cost-emoji {
     font-size: 18px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .cost-amount {
@@ -1276,7 +1606,153 @@
     font-weight: 700;
     font-size: 18px;
     white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
+  
+  /* Responsive sizing that automatically adapts to button count */
+  .powerup-emoji {
+    font-size: clamp(20px, 4vw, 32px);
+  }
+  
+  .powerup-cost {
+    font-size: clamp(10px, 2vw, 16px);
+    padding-right: clamp(2px, 0.5vw, 8px);
+  }
+  
+  .cost-emoji {
+    font-size: clamp(11px, 2.2vw, 18px);
+  }
+  
+  .cost-amount {
+    font-size: clamp(11px, 2.2vw, 18px);
+  }
+  
+  /* Better mobile typography scaling */
+  @media (max-width: 768px) {
+    .powerup-emoji {
+      font-size: clamp(24px, 6vw, 32px);
+    }
+    
+    .powerup-cost {
+      font-size: clamp(14px, 3.5vw, 18px);
+      padding-right: clamp(4px, 1vw, 8px);
+    }
+    
+    .cost-emoji {
+      font-size: clamp(16px, 4vw, 20px);
+    }
+    
+    .cost-amount {
+      font-size: clamp(16px, 4vw, 20px);
+    }
+    
+    
+    
+    .powerup-btn.undo-mode:hover {
+      border: 2px solid #10B981;
+      background: #065F46;
+      transform: none;
+      box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .powerup-emoji {
+      font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    .powerup-cost {
+      font-size: clamp(12px, 3vw, 16px);
+      padding-right: clamp(3px, 0.8vw, 6px);
+    }
+    
+    .cost-emoji {
+      font-size: clamp(14px, 3.5vw, 18px);
+    }
+    
+    .cost-amount {
+      font-size: clamp(14px, 3.5vw, 18px);
+    }
+    
+    /* Disable blue borders on mobile for powerup buttons */
+    .powerup-btn:hover {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: #334155;
+      transform: none;
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .powerup-btn.affordable:hover {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: #334155;
+      transform: none;
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .powerup-btn.undo-mode:hover {
+      border: 2px solid #10B981;
+      background: #065F46;
+      transform: none;
+      box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25);
+    }
+  }
+  
+
+
+  
+  /* Responsive button sizing that maintains proper edge padding */
+  @media (min-width: 1200px) {
+    .powerup-btn {
+      padding: 0 20px;
+    }
+    
+    .powerup-btn .powerup-emoji {
+      font-size: clamp(28px, 3vw, 36px);
+    }
+    
+    .powerup-btn .powerup-cost {
+      font-size: clamp(16px, 1.5vw, 20px);
+    }
+  }
+  
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .powerup-btn {
+      padding: 0 16px;
+    }
+    
+    .powerup-btn .powerup-emoji {
+      font-size: clamp(24px, 3vw, 32px);
+    }
+    
+    .powerup-btn .powerup-cost {
+      font-size: clamp(14px, 2vw, 18px);
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .powerup-btn {
+      padding: 0 14px;
+    }
+    
+    .powerup-btn .powerup-emoji {
+      font-size: clamp(20px, 5vw, 28px);
+    }
+    
+    .powerup-btn .powerup-cost {
+      font-size: clamp(12px, 3vw, 16px);
+    }
+  }
+  
+
+  
+
+  
+
+  
+
   
   /* Pulse animation for powerup buttons */
   .powerup-btn.pulse {
@@ -1289,54 +1765,72 @@
     100% { transform: scale(1); }
   }
   
-  /* Mobile Powerup Shop - Flexible and Responsive */
-  .mobile-powerup-shop {
-    display: none;
-    order: 4;
-    margin-top: 16px;
-    margin-bottom: 0;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
-  
-  .mobile-shop-grid {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  /* Mobile button sizing - Flexible based on available space */
-  .mobile-powerup-shop .powerup-btn {
-    min-width: clamp(50px, 15vw, 70px);
-    height: clamp(45px, 12vw, 65px);
-    min-height: 45px;
-    padding: 0 clamp(6px, 2vw, 10px);
-  }
-  
-  .mobile-powerup-shop .powerup-emoji {
-    font-size: clamp(20px, 5vw, 28px);
-  }
-  
-  .mobile-powerup-shop .powerup-cost {
-    font-size: clamp(12px, 3.5vw, 16px);
-    white-space: nowrap;
-  }
-  
-  .mobile-powerup-shop .cost-emoji {
-    font-size: clamp(13px, 3.5vw, 18px);
-  }
-  
-  .mobile-powerup-shop .cost-amount {
-    font-size: clamp(12px, 3.5vw, 18px);
-    white-space: nowrap;
-  }
-  
+  /* Mobile responsive powerup shop */
+  @media (max-width: 768px) {
+    .powerup-shop {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 10;
+      background: var(--bg);
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .shop-grid {
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .powerup-btn {
+      min-width: 80px;
+      min-height: clamp(60px, 15vw, 80px);
+      max-height: clamp(60px, 15vw, 80px);
+      padding: 0 12px;
+      flex: 1 1 80px;
+    }
+    
 
+    
+    .game-container {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
   
+  /* Extra small mobile powerup shop */
+  @media (max-width: 480px) {
+    .powerup-shop {
+      margin-top: 16px;
+      margin-bottom: 16px;
+      padding: 0 12px;
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      z-index: 10;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .shop-grid {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .powerup-btn {
+      min-width: 70px;
+      min-height: clamp(50px, 12vw, 70px);
+      max-height: clamp(50px, 12vw, 70px);
+      padding: 0 10px;
+      flex: 1 1 70px;
+    }
+    
 
-
+  }
   
   /* Next block display styling in debug panel */
 
@@ -1351,7 +1845,6 @@
     /* On touch devices, completely disable hover effects since they're not useful */
     .pole:hover {
       border: none !important;
-      opacity: 1 !important;
     }
     
     /* Reduce transition duration on touch devices for snappier feedback */
@@ -1379,6 +1872,10 @@
     font-size: 42px;
     opacity: 1;
     z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .bomb-text {
@@ -1387,6 +1884,10 @@
     font-size: 24px;
     font-weight: 700;
     font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* remove extra gap at the very top of a full pole (topmost disc has no margin) */
@@ -1732,6 +2233,9 @@
     transition: all 0.2s ease;
     box-shadow: 0 2px 0 rgba(0,0,0,0.25);
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .block-item:hover {
@@ -1761,6 +2265,10 @@
     cursor: pointer;
     transition: all 0.2s ease;
     border: 2px solid transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   .debug-pane .block-item:hover {
@@ -1964,6 +2472,10 @@
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     font-family: var(--font-family);
     transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 
   .gold-earned-info {
@@ -1998,6 +2510,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 
   .new-game-btn {
@@ -2286,6 +2802,10 @@
     width: 80px;
     height: 35px;
     font-size: 18px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Adjust bomb blocks in next queue for mobile */
@@ -2327,6 +2847,11 @@
     align-items: center;
     gap: 12px;
     display: flex;
+    /* Ensure horizontal scrolling if needed to keep all 4 stacks visible */
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    max-width: 100%;
   }
   
   .game {
@@ -2335,23 +2860,13 @@
   
 
   
-  /* Show mobile powerup shop and hide desktop powerup shop on mobile */
-  .powerup-shop {
-    display: none;
-  }
-  
-  .mobile-powerup-shop {
-    display: block;
-    order: 4;
-    margin-top: 8px;
-    margin-bottom: 0;
-  }
+
   
   /* Adjust game grid for mobile */
   .game {
     gap: 16px;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   
   /* Make poles smaller for mobile */
@@ -2379,115 +2894,10 @@
   .disc .bomb-text {
     font-size: 18px;
   }
-  
-  /* Adjust bomb conversion button for mobile */
-  .bomb-conversion-btn {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .bomb-conversion-btn .emoji {
-    font-size: 24px;
-  }
-  
-  .bomb-cost-text .emoji {
-    font-size: 20px;
-  }
-  
-  .bomb-cost-text .cost {
-    font-size: 16px;
-  }
-  
-  .trash-cost-text .emoji {
-    font-size: 20px;
-  }
-  
-  .trash-cost-text .cost {
-    font-size: 16px;
-  }
-  
-  /* Mobile button row styling */
-  .mobile-button-row .mobile-bomb-container,
-  .mobile-button-row .mobile-trash-container {
-    display: flex;
-    position: static;
-    margin: 0;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-  }
-  
+}
 
-  
-  /* Disable hover effects on mobile devices for bomb and trash buttons */
-  @media (max-width: 768px) {
-    /* Disable hover effects for all bomb and trash buttons on mobile */
-    .bomb-conversion-btn:hover,
-    .trash-btn:hover {
-      /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
-      transform: none !important;
-      border: 2px solid #DC2626 !important; /* Keep original border */
-      background: var(--panel) !important; /* Keep original background */
-      box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25) !important; /* Keep original shadow */
-    }
-    
-    .bomb-conversion-btn.affordable:hover {
-      /* Disable hover effects for affordable state on mobile */
-      transform: none !important;
-      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
-      background: var(--panel) !important; /* Keep original background */
-      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
-    }
-    
-    .bomb-conversion-btn.undo-mode:hover {
-      /* Disable hover effects for undo mode on mobile */
-      transform: none !important;
-      border: 2px solid #10B981 !important; /* Keep undo border */
-      background: #065F46 !important; /* Keep undo background */
-      box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25) !important; /* Keep undo shadow */
-    }
-    
-    .trash-btn.affordable:hover {
-      /* Disable hover effects for affordable state on mobile */
-      transform: none !important;
-      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
-      background: var(--panel) !important; /* Keep original background */
-      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
-    }
-    
-    /* Disable hover effects for mobile powerup buttons on mobile */
-    .mobile-powerup-shop .powerup-btn:hover {
-      /* Disable hover effects on mobile - no transform, border, background, or shadow changes */
-      transform: none !important;
-      border: 2px solid #DC2626 !important; /* Keep original border */
-      background: var(--panel) !important; /* Keep original background */
-      box-shadow: 0 3px 0 rgba(220, 38, 38, 0.25) !important; /* Keep original shadow */
-    }
-    
-    .mobile-powerup-shop .powerup-btn.affordable:hover {
-      /* Disable hover effects for affordable state on mobile */
-      transform: none !important;
-      border: 2px solid rgba(255, 255, 255, 0.3) !important; /* Keep affordable border */
-      background: var(--panel) !important; /* Keep original background */
-      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.1) !important; /* Keep affordable shadow */
-    }
-    
-    .mobile-powerup-shop .powerup-btn.undo-mode:hover {
-      /* Disable hover effects for undo mode on mobile */
-      transform: none !important;
-      border: 2px solid #10B981 !important; /* Keep undo border */
-      background: #065F46 !important; /* Keep undo background */
-      box-shadow: 0 3px 0 rgba(16, 185, 129, 0.25) !important; /* Keep undo shadow */
-    }
-  }
-  
-  /* Responsive adjustments for very small mobile screens */
-
-  
-  /* Pulse animation for mobile buttons */
-
-  
+/* Mobile responsive help modal and other mobile adjustments */
+@media (max-width: 768px) {
   /* Adjust bottom actions for mobile */
   .bottom-actions {
     margin-top: 16px;
@@ -2822,6 +3232,10 @@
     width: 70px;
     height: 30px;
     font-size: 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
   
   /* Adjust bomb blocks in next queue for extra small mobile */
@@ -2859,6 +3273,7 @@
   
   .game {
     gap: 12px;
+    flex-wrap: nowrap;
   }
   
   .bomb-conversion-btn {
@@ -2879,12 +3294,6 @@
     left: 50%;
     transform: translateX(-50%);
   }
-  
-
-  
-
-  
-
 }
 
 /* Landscape mobile orientation */
@@ -2893,11 +3302,13 @@
     flex-direction: row;
     align-items: flex-start;
     gap: 12px;
+    width: 100%;
+    max-width: 100%;
   }
   
-
-  
-
+  .game {
+    flex-wrap: nowrap;
+  }
   
   .pole {
     height: 250px;
@@ -3252,11 +3663,108 @@
     border-color: #64748b;
   }
 
+  /* Code input styling */
+  .code-input {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid #475569;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .code-input:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  }
+
+  .code-submit-btn {
+    background: #0ea5e9;
+    color: white;
+    border: 1px solid #0284c7;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    min-width: 80px;
+  }
+
+  .code-submit-btn:hover {
+    background: #0284c7;
+    border-color: #0369a1;
+  }
+
+  .code-submit-btn:active {
+    background: #0369a1;
+    transform: translateY(1px);
+  }
+
+  /* Code entry specific layout */
+  .code-entry-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .code-input-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .code-input-row .sound-control-label {
+    margin-bottom: 0;
+  }
+  
+  .code-input-row .sound-control-controls {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .code-input-row .code-input {
+    flex: 1;
+    min-width: 0;
+    max-width: 200px;
+  }
+  
+  .code-entry-container .code-submit-btn {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  /* Mobile responsive code entry layout */
+  @media (max-width: 768px) {
+    .code-input {
+      font-size: 16px; /* Prevent zoom on iOS */
+      padding: 10px 14px;
+    }
+    
+    .code-submit-btn {
+      padding: 12px 16px;
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+  }
+
+  /* Test mode styling for score */
+  .score-value.test-mode {
+    color: #ef4444 !important;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  }
 
 
 
 
-/* Mobile responsive design for sound control and settings modals */
+
+  /* Mobile responsive design for sound control and settings modals */
 @media (max-width: 768px) {
   .sound-control-modal,
   .settings-modal {
@@ -3505,7 +4013,7 @@
 }
 </style>
 </head>
-<body>
+<body class="development-mode">
   <!-- Probability test results modal (hidden by default) -->
   <div id="probTestModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="probTestTitle">
     <div class="modal prob-test-modal">
@@ -3540,19 +4048,23 @@
   <div class="game-info">
     <div class="score-display">
       <div class="score-label">Score</div>
-      <div class="score-value" id="scoreDisplay">0</div>
+      <div class="score-value" id="scoreDisplay"><div class="score-star">⭐</div><div class="score-text">2</div></div>
     </div>
     
     <div class="next">
       <div class="label">Next Blocks</div>
-      <div class="next-row" id="nextContainer" aria-live="polite"></div>
+      <div class="next-row" id="nextContainer" aria-live="polite"><div class="next-disc current" style="background: rgb(207, 239, 8); color: rgb(0, 0, 0); --animation-speed: 1;">1</div><div class="next-disc" style="background: rgb(16, 185, 129); color: rgb(255, 255, 255); --animation-speed: 1;">2</div><div class="next-disc" style="background: rgb(16, 185, 129); color: rgb(255, 255, 255); --animation-speed: 1;">2</div></div>
     </div>
     
 
     
     <div class="gold-display">
       <div class="gold-label">Gold</div>
-      <div class="gold-value" id="goldDisplay">0</div>
+      <div class="gold-value" id="goldDisplay">
+      <div class="gold-emoji">💰</div>
+      <div class="gold-text">0</div>
+      
+    </div>
     </div>
   </div>
   
@@ -3607,7 +4119,7 @@
           </div>
           <div class="sound-control-controls">
             <input type="range" id="dropVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
-            <span id="dropVolumeValue" class="volume-value"></span>
+            <span id="dropVolumeValue" class="volume-value">3</span>
           </div>
         </div>
         
@@ -3618,7 +4130,7 @@
           </div>
           <div class="sound-control-controls">
             <input type="range" id="mergeVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
-            <span id="mergeVolumeValue" class="volume-value"></span>
+            <span id="mergeVolumeValue" class="volume-value">3</span>
           </div>
         </div>
         
@@ -3629,7 +4141,7 @@
           </div>
           <div class="sound-control-controls">
             <input type="range" id="coinVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
-            <span id="coinVolumeValue" class="volume-value"></span>
+            <span id="coinVolumeValue" class="volume-value">3</span>
           </div>
         </div>
         
@@ -3640,7 +4152,7 @@
           </div>
           <div class="sound-control-controls">
             <input type="range" id="bombVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
-            <span id="bombVolumeValue" class="volume-value"></span>
+            <span id="bombVolumeValue" class="volume-value">3</span>
           </div>
         </div>
         
@@ -3651,7 +4163,7 @@
           </div>
           <div class="sound-control-controls">
             <input type="range" id="otherVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
-            <span id="otherVolumeValue" class="volume-value"></span>
+            <span id="otherVolumeValue" class="volume-value">3</span>
           </div>
         </div>
       </div>
@@ -3673,14 +4185,23 @@
             <span>Theme</span>
           </div>
           <div class="sound-control-controls">
-                    <select id="themeSelector" class="theme-selector">
-          <option value="jellyfish">Jellyfish</option>
-          <option value="alternate">Earth</option>
-        </select>
+                    <select id="themeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option></select>
           </div>
         </div>
         
-
+        <!-- Code Entry -->
+        <div class="code-entry-container">
+          <div class="code-input-row">
+            <div class="sound-control-label">
+              <span class="sound-control-emoji">🔑</span>
+              <span>Code:</span>
+            </div>
+            <div class="sound-control-controls">
+              <input type="text" id="codeInput" class="code-input" placeholder="" maxlength="20">
+            </div>
+          </div>
+          <button id="codeSubmitBtn" class="code-submit-btn">Submit Code</button>
+        </div>
         
 
       </div>
@@ -3690,59 +4211,46 @@
   </div>
 
   <div class="game-container">
-    <div class="game" id="game" role="application" aria-label="Stacks"></div>
-    
-    <!-- Powerup Shop - Grid Layout -->
-    <div class="powerup-shop">
-      <div class="shop-grid">
-        <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)">
-          <span class="powerup-emoji">💣</span>
-          <div class="powerup-cost">
-            <span class="cost-emoji">💰</span>
-            <span class="cost-amount" id="bombCost">25</span>
-          </div>
-        </button>
-        
-        <button id="trashButton" class="powerup-btn" title="Remove next block from queue">
-          <span class="powerup-emoji">🗑️</span>
-          <div class="powerup-cost">
-            <span class="cost-emoji">💰</span>
-            <span class="cost-amount" id="trashCost">25</span>
-          </div>
-        </button>
-      </div>
-    </div>
-    
-    <!-- Mobile Powerup Shop -->
-    <div class="mobile-powerup-shop">
-      <div class="mobile-shop-grid">
-        <button id="bombConversionBtnMobile" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)">
-          <span class="powerup-emoji">💣</span>
-          <div class="powerup-cost">
-            <span class="cost-emoji">💰</span>
-            <span class="cost-amount" id="bombCostMobile">25</span>
-          </div>
-        </button>
-        
-        <button id="trashButtonMobile" class="powerup-btn" title="Remove next block from queue">
-          <span class="powerup-emoji">🗑️</span>
-          <div class="powerup-cost">
-            <span class="cost-emoji">💰</span>
-            <span class="cost-amount" id="trashCostMobile">25</span>
-          </div>
-        </button>
-      </div>
+    <div class="game" id="game" role="application" aria-label="Stacks"><div class="pole" role="button" tabindex="0" aria-label="Stack 1, contains 1 blocks" style="--animation-speed: 1;"><div class="disc" style="background: rgb(207, 239, 8); color: rgb(0, 0, 0);">1</div></div><div class="pole" role="button" tabindex="0" aria-label="Stack 2, contains 1 blocks" style="--animation-speed: 1;"><div class="disc" style="background: rgb(207, 239, 8); color: rgb(0, 0, 0);">1</div></div><div class="pole" role="button" tabindex="0" aria-label="Stack 3, contains 0 blocks" style="--animation-speed: 1;"></div><div class="pole" role="button" tabindex="0" aria-label="Stack 4, contains 0 blocks" style="--animation-speed: 1;"></div></div>
+  </div>
+  
+  <!-- Unified Powerup Shop - Below Game Area -->
+  <div class="powerup-shop">
+    <div class="shop-grid">
+      <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="">
+        <span class="powerup-emoji">💣</span>
+        <div class="powerup-cost">
+          <span class="cost-emoji">💰</span>
+          <span class="cost-amount" id="bombCost">25</span>
+        </div>
+      </button>
+      
+      <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="">
+        <span class="powerup-emoji">🗑️</span>
+        <div class="powerup-cost">
+          <span class="cost-emoji">💰</span>
+          <span class="cost-amount" id="trashCost">25</span>
+        </div>
+      </button>
+      
+      <button id="pickaxeButton" class="powerup-btn hidden" title="Remove any block from stacks (press again to deactivate)" disabled="">
+        <span class="powerup-emoji">⛏️</span>
+        <div class="powerup-cost">
+          <span class="cost-emoji">💰</span>
+          <span class="cost-amount" id="pickaxeCost">25</span>
+        </div>
+      </button>
     </div>
   </div>
   
   <div class="bottom-actions">
-    <button id="debugBtn" class="ai-btn" title="Debug controls">⚙️</button>
+    <button id="debugBtn" class="ai-btn" title="Debug controls" style="display: block;">⚙️</button>
   </div>
 
 
   <!-- Help modal (hidden by default) -->
   <div id="helpModal" class="modal-backdrop help-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-    <div class="modal help-modal">
+    <div class="modal help-modal" style="top: 20px; max-height: 819px; padding-top: 20px;">
       <button id="helpClose" class="help-modal-close-btn" title="Close help guide">❌ Close</button>
       <h2 id="helpTitle">
         <span class="title-text">How to Play</span>
@@ -3883,6 +4391,30 @@
                   </div>
                 </button>
                 <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes next block</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pickaxe Section (Hidden) -->
+        <div class="help-section hidden">
+          <div class="help-section-header">
+            <span class="help-icon">⛏️</span>
+            <h3>Pickaxe</h3>
+          </div>
+          <div class="help-content">
+            <p>The pickaxe power-up allows you to remove any single block from anywhere in the stacks.</p>
+            <p>Click the pickaxe button, then click on any block to remove it. Other blocks will smoothly animate down, and merges will be processed automatically.</p>
+            <div style="display: flex; justify-content: center; margin: 16px 0;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <button class="powerup-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
+                  <span class="powerup-emoji" style="font-size: 24px;">⛏️</span>
+                  <div class="powerup-cost">
+                    <span class="cost-emoji">💰</span>
+                    <span class="cost-amount">25</span>
+                  </div>
+                </button>
+                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes any block</span>
               </div>
             </div>
           </div>
@@ -4066,10 +4598,7 @@
       <div class="controls">
         <div class="control-row">
           <label for="debugThemeSelector">Theme:</label>
-                      <select id="debugThemeSelector" class="theme-selector">
-              <option value="jellyfish">Jellyfish</option>
-              <option value="alternate">Earth</option>
-            </select>
+                      <select id="debugThemeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option></select>
         </div>
       </div>
     </div>
@@ -4099,22 +4628,22 @@
           <div class="value-display" id="bombStatus">No</div>
         </div>
         <div class="block-grid">
-          <div class="block-item no-block" data-value="none">No Block</div>
-          <div class="block-item" data-value="1">1</div>
-          <div class="block-item" data-value="2">2</div>
-          <div class="block-item" data-value="4">4</div>
-          <div class="block-item" data-value="8">8</div>
-          <div class="block-item" data-value="16">16</div>
-          <div class="block-item" data-value="32">32</div>
-          <div class="block-item" data-value="64">64</div>
-          <div class="block-item" data-value="128">128</div>
-          <div class="block-item" data-value="256">256</div>
-          <div class="block-item" data-value="512">512</div>
-          <div class="block-item" data-value="1024">1024</div>
-          <div class="block-item" data-value="2048">2048</div>
-          <div class="block-item" data-value="4096">4096</div>
-          <div class="block-item" data-value="8192">8192</div>
-          <div class="block-item" data-value="16384">16.4k</div>
+          <div class="block-item no-block selected" data-value="none">No Block</div>
+          <div class="block-item" data-value="1" style="background: rgb(207, 239, 8); color: rgb(0, 0, 0);">1</div>
+          <div class="block-item" data-value="2" style="background: rgb(16, 185, 129); color: rgb(255, 255, 255);">2</div>
+          <div class="block-item" data-value="4" style="background: rgb(37, 99, 235); color: rgb(255, 255, 255);">4</div>
+          <div class="block-item" data-value="8" style="background: rgb(124, 58, 237); color: rgb(255, 255, 255);">8</div>
+          <div class="block-item" data-value="16" style="background: rgb(88, 28, 135); color: rgb(255, 255, 255);">16</div>
+          <div class="block-item" data-value="32" style="background: rgb(217, 70, 239); color: rgb(255, 255, 255);">32</div>
+          <div class="block-item" data-value="64" style="background: rgb(236, 72, 153); color: rgb(255, 255, 255);">64</div>
+          <div class="block-item" data-value="128" style="background: rgb(232, 103, 88); color: rgb(255, 255, 255);">128</div>
+          <div class="block-item" data-value="256" style="background: rgb(245, 158, 11); color: rgb(255, 255, 255);">256</div>
+          <div class="block-item" data-value="512" style="background: rgb(234, 88, 12); color: rgb(255, 255, 255);">512</div>
+          <div class="block-item" data-value="1024" style="background: rgb(220, 38, 38); color: rgb(255, 255, 255);">1024</div>
+          <div class="block-item" data-value="2048" style="background: rgb(157, 23, 77); color: rgb(255, 255, 255);">2048</div>
+          <div class="block-item" data-value="4096" style="background: rgb(124, 45, 109); color: rgb(255, 255, 255);">4096</div>
+          <div class="block-item" data-value="8192" style="background: rgb(100, 116, 139); color: rgb(255, 255, 255);">8192</div>
+          <div class="block-item" data-value="16384" style="background: rgb(255, 255, 255); color: rgb(0, 0, 0);">16.4k</div>
         </div>
         <div class="selected-block-info">
           <button id="cascadeTestBtn" class="button primary">Cascade Test</button>
@@ -4123,31 +4652,51 @@
     </div>
     
     <div class="section">
+      <div class="section-title">Powerup Pricing</div>
+      <div class="controls">
+        <div class="control-row">
+          <button id="debugPowerupPricingBtn" class="button">Set Powerup Costs to 999k</button>
+        </div>
+        <div class="control-row">
+          <button id="debugResetPowerupPricingBtn" class="button">Reset Powerup Costs</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
       <div class="section-title">Game State</div>
       <div class="controls">
         <table class="debug-stats-table">
-          <tr><td>Score:</td><td id="debugScore">0</td></tr>
+          <tbody><tr><td>Score:</td><td id="debugScore">2</td></tr>
           <tr><td>Gold:</td><td id="debugGold">0</td></tr>
           <tr><td>Stacks:</td><td id="debugStacks">4</td></tr>
           <tr><td>Capacity:</td><td id="debugCapacity">10</td></tr>
           <tr><td>Target:</td><td id="debugTarget">1024</td></tr>
-          <tr><td>Max Block:</td><td id="debugMaxBlock">512</td></tr>
-          <tr><td>Blocks Dropped:</td><td id="debugBlocksDropped">0</td></tr>
-                      <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">0</td></tr>
-            <tr><td>Total Bombs Exploded:</td><td id="debugTotalBombsExploded">0</td></tr>
-            <tr><td>Total Blocks Trashed:</td><td id="debugTotalBlocksTrashed">0</td></tr>
+          <tr><td>Max Block:</td><td id="debugMaxBlock">2</td></tr>
+          <tr><td>Blocks Dropped:</td><td id="debugBlocksDropped">2</td></tr>
+                      <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">817</td></tr>
+            <tr><td>Total Bombs Exploded:</td><td id="debugTotalBombsExploded">40</td></tr>
+            <tr><td>Total Blocks Trashed:</td><td id="debugTotalBlocksTrashed">14</td></tr>
             <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
           <tr><td>Stage:</td><td id="debugStage">1</td></tr>
-        </table>
+        </tbody></table>
       </div>
     </div>
     
     <div class="section">
       <div class="section-title">Current Probabilities</div>
       <div class="controls">
-        <div id="debugProbabilities" style="font-size: 12px; font-family: monospace; max-height: 200px; overflow-y: auto; background: var(--bg); padding: 8px; border-radius: 4px; border: 1px solid #475569;">
-          <!-- Probabilities will be populated here -->
-        </div>
+        <div id="debugProbabilities" style="font-size: 12px; font-family: monospace; max-height: 200px; overflow-y: auto; background: var(--bg); padding: 8px; border-radius: 4px; border: 1px solid #475569;"><div style="margin-bottom: 8px;"><strong>Block | Probability | Cumulative</strong></div><div style="margin: 2px 0; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 2px; border: 2px solid #10B981;">
+      <span style="color: #10B981; font-weight: 600;">1</span> | 
+      <span style="color: #10B981;">50.00%</span> | 
+      <span style="color: #F59E0B;">50.00%</span>
+       <span style="color: #10B981; font-size: 10px;">(Foundation)</span>
+    </div><div style="margin: 2px 0; padding: 2px 4px; background: transparent; border-radius: 2px; border: 2px solid #10B981;">
+      <span style="color: #10B981; font-weight: 600;">2</span> | 
+      <span style="color: #10B981;">50.00%</span> | 
+      <span style="color: #F59E0B;">100.00%</span>
+       <span style="color: #10B981; font-size: 10px;">(Foundation)</span>
+    </div></div>
         <div class="control-row" style="margin-top: 12px;">
           <button id="testProbBtn" class="button">Test Probabilities</button>
         </div>
@@ -4239,7 +4788,7 @@ class SoundManager {
       merge: 3,     // Merge sounds
       coin: 3,      // Gold coin sounds
       bomb: 3,      // Bomb explosion sounds
-      other: 3      // Other sounds (stage up, etc.)
+      other: 2      // Other sounds (stage progression, etc.)
     };
     
     // Web Audio API components
@@ -4272,7 +4821,6 @@ class SoundManager {
       this.audioFiles = {
         drop: 'sounds/click2.wav',
         bomb: 'sounds/bomb.mp3',
-        stageUp: 'sounds/stage_up.mp3',
         stageProgression: 'sounds/stageprogression.mp3',
         newGame: 'sounds/newgame.mp3',
         gameOver: 'sounds/gameover.mp3',
@@ -4898,7 +5446,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
+      'bomb', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     return requiredSounds.every(soundKey => 
@@ -4913,7 +5461,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
+      'bomb', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
@@ -4973,7 +5521,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
+      'bomb', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     const loadedSounds = requiredSounds.filter(soundKey => 
@@ -4997,7 +5545,7 @@ class SoundManager {
     const requiredSounds = [
       'drop', 'cork0', 'cork1', 'cork2', 'cork3', 'cork4', 'cork5', 'cork6', 'cork7', 'cork8', 'cork9',
       'coin1', 'coin2', 'coin3', 'coin4', 'coin5', 'coin6', 'coin7',
-      'bomb', 'stageUp', 'stageProgression', 'newGame', 'gameOver', 'purchase'
+      'bomb', 'stageProgression', 'newGame', 'gameOver', 'purchase'
     ];
     
     return requiredSounds.filter(soundKey => this.isSoundReady(soundKey)).length;
@@ -5358,10 +5906,13 @@ function saveGameState() {
       nextQueue: nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()],
       bombConversionCost: bombConversionCost || 25,
       trashButtonCost: trashButtonCost || 25,
+      pickaxeButtonCost: pickaxeButtonCost || 25,
       bombConversionPresses: bombConversionPresses || 0,
       trashButtonPresses: trashButtonPresses || 0,
+      pickaxeButtonPresses: pickaxeButtonPresses || 0,
       bombSelected: bombSelected || false,
       previousBombCost: previousBombCost || bombConversionCost,
+      pickaxeEnabled: window.pickaxeEnabled || false,
 
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
@@ -5446,10 +5997,16 @@ function restoreGameState(gameState) {
     // Restore button costs from saved state
     const oldBombCost = bombConversionCost;
     const oldTrashCost = trashButtonCost;
+    const oldPickaxeCost = pickaxeButtonCost;
     bombConversionCost = gameState.bombConversionCost || 25;
     trashButtonCost = gameState.trashButtonCost || 25;
+    pickaxeButtonCost = gameState.pickaxeButtonCost || 25;
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
+    pickaxeButtonPresses = gameState.pickaxeButtonPresses || 0;
+    
+    // Restore pickaxe enabled state from saved state
+    window.pickaxeEnabled = gameState.pickaxeEnabled || false;
     
     // Restore bomb selection state from saved state
     bombSelected = gameState.bombSelected || false;
@@ -5512,15 +6069,31 @@ function restoreGameState(gameState) {
     if (trashCostEl) {
       trashCostEl.textContent = formatNumber(trashButtonCost);
     }
-    if (bombCostElMobile) {
-      bombCostElMobile.textContent = formatNumber(bombConversionCost);
+    if (pickaxeCostEl) {
+      pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
     }
-    if (trashCostElMobile) {
-      trashCostElMobile.textContent = formatNumber(trashButtonCost);
-    }
+
     
     // Update button states to reflect restored bomb selection state
     updateBombConversionButtonState();
+    updatePickaxeButtonState();
+    updateTrashButtonState();
+    
+    // Apply pickaxe visual state if it was enabled
+    if (window.pickaxeEnabled) {
+      // Make pickaxe button visible
+      if (pickaxeButton) {
+        pickaxeButton.classList.remove('hidden');
+      }
+      
+      // Apply test mode styling to score
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      if (scoreDisplay) {
+        scoreDisplay.classList.add('test-mode');
+      }
+      
+      // Button sizing is now handled automatically by CSS
+    }
     
     return true;
   } catch (error) {
@@ -5743,11 +6316,17 @@ function clearAllGameData() {
   hasShownPersonalBest = false;
   bombConversionCost = 25; // Reset to default cost
   trashButtonCost = 25; // Reset to default cost
+  pickaxeButtonCost = 25; // Reset to default cost
   bombConversionPresses = 0;
   trashButtonPresses = 0;
+  pickaxeButtonPresses = 0;
   bombSelected = false;
   previousBombCost = 25;
+  pickaxeMode = false; // Reset pickaxe mode
   currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR; // Reset to default decay factor
+  
+  // Update the cost displays immediately after resetting
+  updatePowerupCostDisplays();
   
   // Reset sound settings to defaults
   if (soundManager) {
@@ -5844,6 +6423,23 @@ function clearAllGameData() {
   if (typeof updateDebugPane === 'function') {
     updateDebugPane();
   }
+  
+  // Update cost displays after reset
+  if (bombCostEl) {
+    bombCostEl.textContent = formatNumber(bombConversionCost);
+  }
+  if (trashCostEl) {
+    trashCostEl.textContent = formatNumber(trashButtonCost);
+  }
+  if (pickaxeCostEl) {
+    pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
+  }
+
+  
+  // Update button states after reset
+  updateBombConversionButtonState();
+  updateTrashButtonState();
+  updatePickaxeButtonState();
   
   // Update theme selectors to reflect reset unlock status
   if (typeof updateThemeSelectors === 'function') {
@@ -6203,6 +6799,14 @@ let previousBombCost = 25; // Store the previous bomb cost before conversion
 let trashButtonCost = 25;
 let trashButtonPresses = 0; // Number of times button has been pressed
 
+// Pickaxe button state
+let pickaxeButtonCost = 25;
+let pickaxeButtonPresses = 0; // Number of times button has been pressed
+let pickaxeMode = false; // Track if pickaxe mode is active
+
+// Initialize pickaxe enabled state
+window.pickaxeEnabled = window.pickaxeEnabled || false;
+
 // Initialize next queue (probabilities will be set up after functions are defined)
 let nextQueue = [getRandomPiece(), getRandomPiece(), getRandomPiece()];
 
@@ -6518,16 +7122,11 @@ function handleBombConversion() {
     // Re-render to show the regular block
     renderNext();
     
-    // Update button cost display
-    if (bombCostEl) {
-      bombCostEl.textContent = formatNumber(bombConversionCost);
-    }
-    if (bombCostElMobile) {
-      bombCostElMobile.textContent = formatNumber(bombConversionCost);
-    }
-    
     // Update button state and appearance
     updateBombConversionButtonState();
+    updatePickaxeButtonState();
+    
+
     
     // Save game state after undoing bomb selection
     saveGameState();
@@ -6539,10 +7138,6 @@ function handleBombConversion() {
     // Show feedback that the block is already a bomb
     bombConversionBtn.classList.add('pulse');
     setTimeout(() => bombConversionBtn.classList.remove('pulse'), 300);
-    if (bombConversionBtnMobile) {
-      bombConversionBtnMobile.classList.add('pulse');
-      setTimeout(() => bombConversionBtnMobile.classList.remove('pulse'), 300);
-    }
     return;
   }
   
@@ -6551,10 +7146,6 @@ function handleBombConversion() {
     // Show feedback that they don't have enough gold
     bombConversionBtn.classList.add('pulse');
     setTimeout(() => bombConversionBtn.classList.remove('pulse'), 300);
-    if (bombConversionBtnMobile) {
-      bombConversionBtnMobile.classList.add('pulse');
-      setTimeout(() => bombConversionBtnMobile.classList.remove('pulse'), 300);
-    }
     return;
   }
   
@@ -6586,6 +7177,7 @@ function handleBombConversion() {
     // Note: Cost will increase when the bomb block is actually placed, not when selected
     // Update button state
     updateBombConversionButtonState();
+    updatePickaxeButtonState();
     
     // Save game state after bomb conversion and cost increase
     saveGameState();
@@ -6605,10 +7197,6 @@ function handleTrashButton() {
     // Show feedback that they don't have enough gold
     trashButton.classList.add('pulse');
     setTimeout(() => trashButton.classList.remove('pulse'), 300);
-    if (trashButtonMobile) {
-      trashButtonMobile.classList.add('pulse');
-      setTimeout(() => trashButtonMobile.classList.remove('pulse'), 300);
-    }
     return;
   }
   
@@ -6670,6 +7258,166 @@ function handleTrashButton() {
   logQueueState('trashButton-end');
 }
 
+function handlePickaxeButton() {
+  logQueueState('pickaxeButton-start');
+  
+  // Validate queue state before proceeding
+  validateQueueState();
+  
+  // Check if player has enough gold
+  if (gold < pickaxeButtonCost) {
+    // Show feedback that they don't have enough gold
+    pickaxeButton.classList.add('pulse');
+    setTimeout(() => pickaxeButton.classList.remove('pulse'), 300);
+    return;
+  }
+  
+  // Toggle pickaxe mode
+  if (pickaxeMode) {
+    // Deactivate pickaxe mode
+    pickaxeMode = false;
+    
+    updatePickaxeButtonState();
+    render(); // Re-render to remove pickaxe mode visual indicators
+    return;
+  }
+  
+  // Activate pickaxe mode
+  pickaxeMode = true;
+  
+  console.log(`🚨 PICKAXE MODE ACTIVATED: ${pickaxeMode} 🚨`);
+  
+  // Update button state to show pickaxe mode is active
+  updatePickaxeButtonState();
+  
+  // Re-render to show pickaxe mode visual indicators
+  render();
+  
+  logQueueState('pickaxeButton-end');
+}
+
+async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
+  console.log('🚨 PICKAXE FUNCTION CALLED! 🚨');
+  console.log(`Parameters: poleIndex=${poleIndex}, blockIndex=${blockIndex}`);
+  console.log(`Current pickaxeMode: ${pickaxeMode}`);
+  console.log(`Poles before removal:`, JSON.stringify(poles.map(p => p.length)));
+  
+  // Find the pole that was clicked
+  const pole = poles[poleIndex];
+  
+  // Check if the pole has any blocks
+  if (pole.length === 0) {
+    console.log('❌ Pole has no blocks to remove');
+    return; // Nothing to remove
+  }
+  
+  // If no specific block index provided, default to top block
+  if (blockIndex === null) {
+    blockIndex = pole.length - 1;
+  }
+  
+  // Ensure the block index is within bounds
+  if (blockIndex < 0 || blockIndex >= pole.length) {
+    console.log(`❌ Invalid block index: ${blockIndex}, pole length: ${pole.length}`);
+    return; // Invalid block index
+  }
+  
+  // DEACTIVATE PICKAXE MODE IMMEDIATELY - FIRST THING THAT HAPPENS
+  console.log(`🔄 DEACTIVATING PICKAXE MODE FIRST - Current pickaxeMode: ${pickaxeMode}`);
+  pickaxeMode = false;
+  
+  console.log(`✅ PICKAXE MODE DEACTIVATED: ${pickaxeMode} 🚨`);
+  
+  // Deduct gold for using the pickaxe
+  gold -= pickaxeButtonCost;
+  
+  // Increment press count and double the cost BEFORE updating button state
+  pickaxeButtonCost *= 2;
+  
+  // Update pickaxe button state IMMEDIATELY to remove undo state (with new cost)
+  updatePickaxeButtonState();
+  
+  console.log(`✅ Removing block at index ${blockIndex} from pole ${poleIndex}. Block value: ${pole[blockIndex].w}`);
+  console.log(`Pole ${poleIndex} blocks before removal:`, pole.map(b => b.w));
+  
+  // Play purchase sound immediately when pickaxe is used
+  soundManager.playPurchaseSound();
+  
+  // Add explosion effect to the block being removed
+  const poleDiv = gameDiv.children[poleIndex];
+  const blocks = poleDiv.querySelectorAll('.disc');
+  const blockToRemove = blocks[blockIndex];
+  
+  if (blockToRemove) {
+    // Add the bomb explosion effect to the block being removed
+    blockToRemove.classList.add('bomb-explosion');
+  }
+  
+  // Wait for the explosion animation to complete before removing the block
+  if (blockToRemove) {
+    await new Promise(resolve => {
+      // Check if animations are disabled (speed = 0)
+      const animationSpeed = parseFloat(document.documentElement.style.getPropertyValue('--animation-speed') || '1');
+      const isInstantAnimation = animationSpeed === 0;
+      
+      if (isInstantAnimation) {
+        // Instant animation - resolve immediately
+        resolve();
+      } else {
+        // Wait for the explosion animation to complete
+        setTimeout(resolve, 500); // 500ms matches the bomb explosion animation duration
+      }
+    });
+    
+    // Clean up the explosion class
+    blockToRemove.classList.remove('bomb-explosion');
+  }
+  
+  // Remove the specific block that was clicked
+  console.log(`🔨 About to remove block at index ${blockIndex} from pole ${poleIndex}`);
+  const removedBlock = poles[poleIndex].splice(blockIndex, 1)[0];
+  
+  console.log(`✅ Block removed from poles array. Pole ${poleIndex} now has ${poles[poleIndex].length} blocks`);
+  console.log(`✅ Removed block value: ${removedBlock.w}`);
+  console.log(`Pole ${poleIndex} blocks after removal:`, poles[poleIndex].map(b => b.w));
+  
+  // Verify the block was actually removed
+  console.log(`📊 Pole array before: ${pole.length}, after: ${poles[poleIndex].length}`);
+  
+  // Update gold display
+  updateGoldDisplay();
+  
+  // Save game state after using pickaxe
+  saveGameState();
+  
+  // Call render() to update visual state
+  console.log(`🎨 About to call render() function...`);
+  render();
+  console.log(`✅ Render() function completed`);
+  
+
+  
+  // Check if there are any merges possible after removing the block
+  if (poles[poleIndex].length > 1) {
+    // Look for any adjacent equal blocks that can merge
+    let hasMerges = false;
+    for (let i = 0; i < poles[poleIndex].length - 1; i++) {
+      if (poles[poleIndex][i].w === poles[poleIndex][i + 1].w && !poles[poleIndex][i].bomb && !poles[poleIndex][i + 1].bomb) {
+        hasMerges = true;
+        break;
+      }
+    }
+    
+    if (hasMerges) {
+      console.log('Merges possible after pickaxe removal, triggering merge cascade');
+      // Small delay to ensure render completes before merge cascade
+      setTimeout(() => animateMergeCascade(poleIndex), 50);
+    }
+  }
+}
+
+
+
 function updateBombConversionButtonState() {
   // Always update when called since we call this strategically
   
@@ -6718,45 +7466,7 @@ function updateBombConversionButtonState() {
     lastGoldAmount = gold;
   }
   
-  // Also update mobile button if it exists
-  if (bombConversionBtnMobile) {
-    // If a bomb is selected, the button should always be enabled for undo
-    if (bombSelected) {
-      bombConversionBtnMobile.disabled = false;
-      bombConversionBtnMobile.classList.remove('affordable');
-      bombConversionBtnMobile.classList.add('undo-mode');
-      bombConversionBtnMobile.title = "Press again to undo bomb selection";
-      const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
-      if (emojiEl) emojiEl.textContent = "↩️";
-    } else {
-      // Check if the next block is already a bomb (either natural or from previous conversion)
-      const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
-      
-      if (nextBlockIsBomb) {
-        // Next block is already a bomb, disable the button
-        bombConversionBtnMobile.disabled = true;
-        bombConversionBtnMobile.classList.remove('affordable');
-        bombConversionBtnMobile.classList.remove('undo-mode');
-        bombConversionBtnMobile.title = "Next block is already a bomb";
-        const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
-        if (emojiEl) emojiEl.textContent = "💣";
-      } else {
-        // Next block is not a bomb, check if player has enough gold
-        const hasEnoughGold = gold >= bombConversionCost;
-        bombConversionBtnMobile.disabled = !hasEnoughGold;
-        
-        if (hasEnoughGold) {
-          bombConversionBtnMobile.classList.add('affordable');
-        } else {
-          bombConversionBtnMobile.classList.remove('affordable');
-        }
-        bombConversionBtnMobile.classList.remove('undo-mode');
-        bombConversionBtnMobile.title = "Convert next block to bomb (press again to undo)";
-        const emojiEl = bombConversionBtnMobile.querySelector('.powerup-emoji');
-        if (emojiEl) emojiEl.textContent = "💣";
-      }
-    }
-  }
+
 }
 
 function updateTrashButtonState() {
@@ -6779,16 +7489,47 @@ function updateTrashButtonState() {
     lastGoldAmount = gold;
   }
   
-  // Also update mobile button if it exists
-  if (trashButtonMobile) {
-    const hasEnoughGold = gold >= trashButtonCost;
-    trashButtonMobile.disabled = !hasEnoughGold;
+
+}
+
+function updatePickaxeButtonState() {
+  // Always update when called since we call this strategically
+  
+  if (pickaxeButton) {
+    const hasEnoughGold = gold >= pickaxeButtonCost;
     
-    if (hasEnoughGold) {
-      trashButtonMobile.classList.add('affordable');
+    if (pickaxeMode) {
+      // Pickaxe mode is active - button should be enabled for deactivation
+      pickaxeButton.disabled = false;
+      pickaxeButton.classList.remove('affordable');
+      pickaxeButton.classList.add('undo-mode');
+      pickaxeButton.title = "Press again to deactivate pickaxe mode";
+      const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "↩️";
     } else {
-      trashButtonMobile.classList.remove('affordable');
+      // Pickaxe mode is not active - check if player has enough gold
+      pickaxeButton.disabled = !hasEnoughGold;
+      
+      // Update visual styling based on affordability
+      if (hasEnoughGold) {
+        pickaxeButton.classList.add('affordable');
+      } else {
+        pickaxeButton.classList.remove('affordable');
+      }
+      pickaxeButton.classList.remove('undo-mode');
+      pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
+      const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "⛏️";
+      
+      // Update the cost display immediately when the undo emoji changes to ⛏️
+      const pickaxeCostEl = document.getElementById('pickaxeCost');
+      if (pickaxeCostEl) {
+        pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
+      }
     }
+    
+    // Update the tracked gold amount
+    lastGoldAmount = gold;
   }
 }
 
@@ -6801,6 +7542,11 @@ function updateBombButtonIfGoldChanged() {
 // More targeted update function for trash button when we know gold has changed
 function updateTrashButtonIfGoldChanged() {
   updateTrashButtonState();
+}
+
+// More targeted update function for pickaxe button when we know gold has changed
+function updatePickaxeButtonIfGoldChanged() {
+  updatePickaxeButtonState();
 }
 
 // AI state
@@ -6853,11 +7599,9 @@ const bombCostEl = document.getElementById('bombCost');
 const trashButton = document.getElementById('trashButton');
 const trashCostEl = document.getElementById('trashCost');
 
-// Mobile button DOM refs
-const bombConversionBtnMobile = document.getElementById('bombConversionBtnMobile');
-const bombCostElMobile = document.getElementById('bombCostMobile');
-const trashButtonMobile = document.getElementById('trashButtonMobile');
-const trashCostElMobile = document.getElementById('trashCostMobile');
+// Pickaxe button DOM refs
+const pickaxeButton = document.getElementById('pickaxeButton');
+const pickaxeCostEl = document.getElementById('pickaxeCost');
 
 // Button element status for debugging
 
@@ -7051,6 +7795,7 @@ function positionHelpModalDesktop() {
 // Function to reposition help modal content when needed
 function repositionHelpModal() {
   const helpModalContent = document.querySelector('.help-modal');
+  // Only reposition if help modal is actually visible
   if (helpModalContent && !helpModalContent.classList.contains('hidden')) {
     if (window.innerWidth <= 768) {
       positionHelpModalMobile();
@@ -7064,8 +7809,15 @@ function repositionHelpModal() {
 window.addEventListener('resize', repositionHelpModal);
 
 // Listen for visual viewport changes (important for mobile browsers)
+// Only reposition when help modal is actually open to prevent unnecessary layout shifts
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', repositionHelpModal);
+  window.visualViewport.addEventListener('resize', () => {
+    // Only reposition if help modal is visible
+    const helpModalContent = document.querySelector('.help-modal');
+    if (helpModalContent && !helpModalContent.classList.contains('hidden')) {
+      repositionHelpModal();
+    }
+  });
 }
 
 // Listen for orientation changes
@@ -7211,23 +7963,14 @@ if (trashButton) {
   console.error('❌ Trash button not found!');
 }
 
-// Mobile button event listeners
-if (bombConversionBtnMobile) {
-  bombConversionBtnMobile.addEventListener('click', () => {
+// Pickaxe button event listener
+if (pickaxeButton) {
+  pickaxeButton.addEventListener('click', () => {
 
-    handleBombConversion();
+    handlePickaxeButton();
   });
 } else {
-  console.error('❌ Mobile bomb conversion button not found!');
-}
-
-if (trashButtonMobile) {
-  trashButtonMobile.addEventListener('click', () => {
-
-    handleTrashButton();
-  });
-} else {
-  console.error('❌ Mobile trash button not found!');
+  console.error('❌ Pickaxe button not found!');
 }
 
 // Game over popup - any click anywhere closes it
@@ -7376,11 +8119,138 @@ function initializeSettingsModal() {
     });
   }
   
-
-
+  // Code entry functionality
+  const codeInput = document.getElementById('codeInput');
+  const codeSubmitBtn = document.getElementById('codeSubmitBtn');
+  
+  if (codeInput && codeSubmitBtn) {
+    // Handle code submission
+    codeSubmitBtn.addEventListener('click', () => {
+      const code = codeInput.value.trim().toLowerCase();
+      handleCodeEntry(code);
+      codeInput.value = ''; // Clear input after submission
+    });
+    
+    // Handle Enter key press
+    codeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const code = codeInput.value.trim().toLowerCase();
+        handleCodeEntry(code);
+        codeInput.value = ''; // Clear input after submission
+      }
+    });
+  }
 }
 
 
+
+// Code entry handler
+function handleCodeEntry(code) {
+  if (code === 'pickaxe') {
+    // Enable pickaxe for this game run
+    window.pickaxeEnabled = true;
+    
+    // Make pickaxe button visible (but still follows normal game mechanics)
+    if (pickaxeButton) {
+      pickaxeButton.classList.remove('hidden');
+    }
+
+    
+    // Update pickaxe button states to reflect current gold and game state
+    updatePickaxeButtonState();
+    
+    // Change score color to red for test mode
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    if (scoreDisplay) {
+      scoreDisplay.classList.add('test-mode');
+    }
+    
+    // Button sizing is now handled automatically by CSS
+    
+    // Save game state to persist pickaxe enabled status
+    saveGameState();
+    
+    // Show success message
+    showCodeSuccessMessage('Pickaxe enabled!');
+    
+    // Close customization menu on success
+    closeSettingsModal();
+  } else {
+    // Show invalid code message
+    showCodeErrorMessage('Invalid code. Please try again.');
+    // Keep customization menu open on failure
+  }
+}
+
+// Show code success message
+function showCodeSuccessMessage(message) {
+  // Create a temporary success message
+  const successMsg = document.createElement('div');
+  successMsg.textContent = message;
+  successMsg.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--text);
+    padding: 20px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    font-size: 16px;
+    z-index: 10000;
+    border: 2px solid rgba(16, 185, 129, 0.8);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    backdrop-filter: blur(8px);
+    max-width: 280px;
+    text-align: center;
+  `;
+  
+  document.body.appendChild(successMsg);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (successMsg.parentNode) {
+      successMsg.parentNode.removeChild(successMsg);
+    }
+  }, 3000);
+}
+
+// Show code error message
+function showCodeErrorMessage(message) {
+  // Create a temporary error message
+  const errorMsg = document.createElement('div');
+  errorMsg.textContent = message;
+  errorMsg.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--text);
+    padding: 20px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    font-size: 16px;
+    z-index: 10000;
+    border: 2px solid rgba(239, 68, 68, 0.8);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    backdrop-filter: blur(8px);
+    max-width: 280px;
+    text-align: center;
+  `;
+  
+  document.body.appendChild(errorMsg);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (errorMsg.parentNode) {
+      errorMsg.parentNode.removeChild(errorMsg);
+    }
+  }, 3000);
+}
 
 // Sound Control Modal Functions
 function openSoundControlModal() {
@@ -7533,6 +8403,12 @@ try {
   console.error('❌ Error initializing trash button state:', error);
 }
 
+try {
+  updatePickaxeButtonState();
+} catch (error) {
+  console.error('❌ Error initializing pickaxe button state:', error);
+}
+
 // Initialize cost displays
 if (bombCostEl) {
   bombCostEl.textContent = formatNumber(bombConversionCost);
@@ -7540,11 +8416,8 @@ if (bombCostEl) {
 if (trashCostEl) {
   trashCostEl.textContent = formatNumber(trashButtonCost);
 }
-if (bombCostElMobile) {
-  bombCostElMobile.textContent = formatNumber(bombConversionCost);
-}
-if (trashCostElMobile) {
-  trashCostElMobile.textContent = formatNumber(trashButtonCost);
+if (pickaxeCostEl) {
+  pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
 }
 
 // Debug button wiring
@@ -7926,6 +8799,21 @@ function syncDebugControls() {
     // Set initial value
     debugThemeSelector.value = themeManager.getCurrentTheme();
   }
+  
+  // Set up powerup pricing debug button event listeners
+  const debugPowerupPricingBtn = document.getElementById('debugPowerupPricingBtn');
+  if (debugPowerupPricingBtn) {
+    // Remove existing listeners to avoid duplicates
+    debugPowerupPricingBtn.removeEventListener('click', handleDebugPowerupPricing);
+    debugPowerupPricingBtn.addEventListener('click', handleDebugPowerupPricing);
+  }
+  
+  const debugResetPowerupPricingBtn = document.getElementById('debugResetPowerupPricingBtn');
+  if (debugResetPowerupPricingBtn) {
+    // Remove existing listeners to avoid duplicates
+    debugResetPowerupPricingBtn.removeEventListener('click', handleDebugResetPowerupPricing);
+    debugResetPowerupPricingBtn.addEventListener('click', handleDebugResetPowerupPricing);
+  }
 }
 
 // Debug pane controls will be set up in syncDebugControls()
@@ -8013,6 +8901,8 @@ function handleGrantGold() {
   updateBombButtonIfGoldChanged();
   // Update trash button state
   updateTrashButtonIfGoldChanged();
+  // Update pickaxe button state
+  updatePickaxeButtonIfGoldChanged();
   
   // Play coin sound effect for earning gold
   soundManager.playCoinSound();
@@ -8128,6 +9018,58 @@ function handleTestLockTheme() {
     alert('Earth theme has been locked for testing. You can unlock it again with the Test Theme Unlock button or by scoring 5000+ in a real game.');
   } else {
     console.log('❌ Failed to lock Earth theme');
+  }
+}
+
+function handleDebugPowerupPricing() {
+  console.log('🧪 Setting powerup costs to 999k...');
+  
+  // Set all powerup costs to 999000
+  bombConversionCost = 999000;
+  trashButtonCost = 999000;
+  pickaxeButtonCost = 999000;
+  
+  // Update the display elements
+  updatePowerupCostDisplays();
+  
+  // Save the game state to persist the changes
+  saveGameState();
+  
+  console.log('✅ Powerup costs set to 999k each');
+}
+
+function handleDebugResetPowerupPricing() {
+  console.log('🧪 Resetting powerup costs to default...');
+  
+  // Reset all powerup costs to default (25)
+  bombConversionCost = 25;
+  trashButtonCost = 25;
+  pickaxeButtonCost = 25;
+  
+  // Update the display elements
+  updatePowerupCostDisplays();
+  
+  // Save the game state to persist the changes
+  saveGameState();
+  
+  console.log('✅ Powerup costs reset to default (25)');
+}
+
+function updatePowerupCostDisplays() {
+  // Get all the cost display elements
+  const bombCostEl = document.getElementById('bombCost');
+  const trashCostEl = document.getElementById('trashCost');
+  const pickaxeCostEl = document.getElementById('pickaxeCost');
+  
+  // Update powerup cost displays
+  if (bombCostEl) {
+    bombCostEl.textContent = formatNumber(bombConversionCost);
+  }
+  if (trashCostEl) {
+    trashCostEl.textContent = formatNumber(trashButtonCost);
+  }
+  if (pickaxeCostEl) {
+    pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
   }
 }
 
@@ -8333,14 +9275,17 @@ function getTextColorFor(w){
 }
 
 function render(){
+  console.log(`🎨 RENDER FUNCTION CALLED - pickaxeMode: ${pickaxeMode}, isRendering: ${window.isRendering}`);
+  
   // Prevent infinite render loops
   if (window.isRendering) {
-    console.warn('Render already in progress, skipping duplicate call');
+    console.warn('❌ Render already in progress, skipping duplicate call');
     return;
   }
   
   // Set rendering flag to prevent safety checks from interfering
   window.isRendering = true;
+  console.log(`🔒 Set isRendering flag to true`);
   
   // build poles
   gameDiv.innerHTML = '';
@@ -8429,10 +9374,48 @@ function render(){
     
     // Only add click handler if stack is not disabled
     if (!isDisabled) {
-      poleDiv.addEventListener('click', () => {
+      poleDiv.addEventListener('click', (e) => {
         // Ensure audio is unlocked on first click
         if (soundManager && !soundManager.audioUnlocked) {
           soundManager.unlockAudio();
+        }
+        
+        // Check if pickaxe mode is active
+        console.log(`🚨 CLICK HANDLER: pickaxeMode = ${pickaxeMode} 🚨`);
+        if (pickaxeMode) {
+          // In pickaxe mode, we need to check if a specific block was clicked
+          // The click event will bubble up from the individual block elements
+          const clickedElement = e.target;
+          
+                            // Check if the clicked element is a block (disc) or is contained within a disc
+          console.log(`🚨 CLICKED ELEMENT: ${clickedElement.className} 🚨`);
+          
+          // Find the closest disc element (either the clicked element or its parent)
+          let discElement = clickedElement;
+          while (discElement && !discElement.classList.contains('disc')) {
+            discElement = discElement.parentElement;
+          }
+          
+          if (discElement && discElement.classList.contains('disc')) {
+            // Find the index of this block within the pole
+            const blocks = poleDiv.querySelectorAll('.disc');
+            const domIndex = Array.from(blocks).indexOf(discElement);
+            
+            if (domIndex !== -1) {
+              // DOM index directly corresponds to game data index
+              // since blocks are rendered in the same order as the poles array
+              const gameDataIndex = domIndex;
+              
+              console.log(`🚨 ABOUT TO CALL handlePickaxeBlockRemoval(${idx}, ${gameDataIndex}) 🚨`);
+              console.log(`Block value: ${poles[idx][gameDataIndex].w}`);
+              
+              handlePickaxeBlockRemoval(idx, gameDataIndex).catch(console.error);
+              return;
+            }
+          }
+          
+          // If no specific block was clicked, don't do anything in pickaxe mode
+          return;
         }
         
         // Play drop sound IMMEDIATELY on click for iOS compatibility
@@ -8472,6 +9455,42 @@ function render(){
           // Ensure audio is unlocked on first touch
           if (soundManager && !soundManager.audioUnlocked) {
             soundManager.unlockAudio();
+          }
+          
+          // Check if pickaxe mode is active
+          if (pickaxeMode) {
+            // In pickaxe mode, we need to check if a specific block was touched
+            // The touch event will bubble up from the individual block elements
+            const touchedElement = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            
+            // Check if the touched element is a block (disc) within this pole or is contained within a disc
+            if (touchedElement && poleDiv.contains(touchedElement)) {
+              // Find the closest disc element (either the touched element or its parent)
+              let discElement = touchedElement;
+              while (discElement && !discElement.classList.contains('disc')) {
+                discElement = discElement.parentElement;
+              }
+              
+              if (discElement && discElement.classList.contains('disc')) {
+                // Find the index of this block within the pole
+                const blocks = poleDiv.querySelectorAll('.disc');
+                const blockIndex = Array.from(blocks).indexOf(discElement);
+                
+                if (blockIndex !== -1) {
+                  // DOM index directly corresponds to game data index
+                  const gameDataIndex = blockIndex;
+                  
+                  console.log(`Pickaxe touch: DOM index ${blockIndex}, game data index ${gameDataIndex}`);
+                  console.log(`Block value: ${poles[idx][gameDataIndex].w}`);
+                  
+                  handlePickaxeBlockRemoval(idx, gameDataIndex).catch(console.error);
+                  return;
+                }
+              }
+            }
+            
+            // If no specific block was touched, don't do anything in pickaxe mode
+            return;
           }
           
           // Play drop sound IMMEDIATELY on touch for iOS compatibility
@@ -8551,14 +9570,18 @@ function render(){
   updateBombButtonIfGoldChanged();
   // Update trash button state
   updateTrashButtonIfGoldChanged();
+  // Update pickaxe button state
+  updatePickaxeButtonIfGoldChanged();
   
 
   
   updateDebugPane();
   
   // Clear rendering flag
+  console.log(`🔓 Clearing isRendering flag`);
   window.isRendering = false;
   
+  console.log(`🎨 RENDER FUNCTION COMPLETED`);
   renderNext();
 }
 
@@ -8632,6 +9655,13 @@ function placeOnPole(idx){
   // Safety check: ensure this stack can actually accept the piece
   if (!canPlaceOnPole(nextPiece, pole)) {
     return;
+  }
+  
+  // RESET BOMB SELECTION IMMEDIATELY WHEN POLE IS CLICKED - BEFORE PLACEMENT BEGINS
+  if (bombSelected && nextPiece.bomb) {
+    bombSelected = false;
+    // Update button state IMMEDIATELY to remove undo mode
+    updateBombConversionButtonState();
   }
   
   // Note: Drop sound is now played immediately in the click/touch handler for iOS compatibility
@@ -8711,7 +9741,7 @@ function placeOnPole(idx){
       poles[idx].push(nextPiece);
       
       // Check if this is a purchased bomb that needs payment
-      if (bombSelected && nextPiece.bomb) {
+      if (nextPiece.bomb) {
         // Deduct gold for the bomb usage
         gold -= bombConversionCost;
         
@@ -8725,19 +9755,13 @@ function placeOnPole(idx){
         if (bombCostEl) {
           bombCostEl.textContent = formatNumber(bombConversionCost);
         }
-        if (bombCostElMobile) {
-          bombCostElMobile.textContent = formatNumber(bombConversionCost);
-        }
-        
-        // Reset bomb selection since it's now placed
-        bombSelected = false;
         
         // Update gold display
         updateGoldDisplay();
         
-        // Update button states
-        updateBombConversionButtonState();
+        // Update other button states
         updateBombButtonIfGoldChanged();
+        updatePickaxeButtonIfGoldChanged();
         
         console.log(`Bomb placed! Deducted ${bombConversionCost / 2} gold, new cost: ${bombConversionCost}`);
         
@@ -9112,6 +10136,8 @@ async function animateMergeCascade(index){
     updateBombButtonIfGoldChanged();
     // Update trash button state
     updateTrashButtonIfGoldChanged();
+    // Update pickaxe button state
+    updatePickaxeButtonIfGoldChanged();
     
     // Save game state after merge and gold earning
     console.log('🔄 Triggering save after merge...');
@@ -9349,6 +10375,14 @@ function resetGame(isFreshGame = true){
     // Reset trash button state
     trashButtonCost = 25;
     trashButtonPresses = 0;
+    
+    // Reset pickaxe button state
+    pickaxeButtonCost = 25;
+    pickaxeButtonPresses = 0;
+    pickaxeMode = false;
+    
+    // Reset pickaxe enabled state for new game
+    window.pickaxeEnabled = false;
   }
   
   // Update cost displays after reset (only if costs were actually reset)
@@ -9359,12 +10393,28 @@ function resetGame(isFreshGame = true){
     if (trashCostEl) {
       trashCostEl.textContent = formatNumber(trashButtonCost);
     }
-    if (bombCostElMobile) {
-      bombCostElMobile.textContent = formatNumber(bombConversionCost);
+    if (pickaxeCostEl) {
+      pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
     }
-    if (trashCostElMobile) {
-      trashCostElMobile.textContent = formatNumber(trashButtonCost);
+  }
+  
+  // Update button states after reset
+  if (isFreshGame) {
+    updateBombConversionButtonState();
+    updateTrashButtonState();
+    updatePickaxeButtonState();
+    
+    // Hide pickaxe button and remove test mode styling for new game
+    if (pickaxeButton) {
+      pickaxeButton.classList.add('hidden');
     }
+    
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    if (scoreDisplay) {
+      scoreDisplay.classList.remove('test-mode');
+    }
+    
+    // Button sizing is now handled automatically by CSS
   }
   
   // Reset weights and probabilities to initial state
@@ -9399,6 +10449,8 @@ function resetGame(isFreshGame = true){
   updateScoreDisplay();
   updateGoldDisplay();
   render();
+  
+  // Button sizing is now handled automatically by CSS
   
   // Clear saved game after reset
   clearGameSave();
@@ -9476,6 +10528,7 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
   // Update button states since queue changed
   updateBombButtonIfGoldChanged();
   updateTrashButtonIfGoldChanged();
+  updatePickaxeButtonIfGoldChanged();
   
   logQueueState('queueAdvance-end');
 }
@@ -9958,6 +11011,8 @@ updateAnimationSpeed();
 
 // Initialize bomb conversion button state
 updateBombConversionButtonState();
+// Initialize pickaxe button state
+updatePickaxeButtonState();
 
 // Handle window resize for mobile responsiveness
 window.addEventListener('resize', () => {
@@ -10285,6 +11340,8 @@ try {
   renderNext();
   console.log('✅ Game display rendered');
   
+  // Button sizing is now handled automatically by CSS
+  
   // Game is now fully initialized
   window.gameInitializing = false;
   
@@ -10385,6 +11442,7 @@ try {
 }
 
 </script>
-</body>
-</html>
 
+
+
+</body></html>
