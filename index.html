@@ -6328,6 +6328,11 @@ function clearAllGameData() {
   // Update the cost displays immediately after resetting
   updatePowerupCostDisplays();
   
+  // Update button states to ensure they're properly reset
+  updateBombConversionButtonState();
+  updatePickaxeButtonState();
+  updateTrashButtonState();
+  
   // Reset sound settings to defaults
   if (soundManager) {
     try {
@@ -6658,7 +6663,7 @@ function updateScoreDisplay() {
   }
 }
 
-function updateGoldDisplay() {
+function updateGoldDisplay(shouldPulse = false) {
   const goldDisplay = document.querySelector('.gold-value');
   if (goldDisplay) {
     const stageMultiplier = currentStage === 1 ? 1 : Math.pow(10, currentStage - 1);
@@ -6683,6 +6688,14 @@ function updateGoldDisplay() {
           badge.classList.remove('pulse');
         }, 600);
       }
+    }
+    
+    // Add pulse animation when explicitly requested (for gold changes)
+    if (shouldPulse) {
+      goldDisplay.classList.add('pulse');
+      setTimeout(() => {
+        goldDisplay.classList.remove('pulse');
+      }, 300);
     }
   }
   
@@ -7159,13 +7172,6 @@ function handleBombConversion() {
     bombSelected = true; // Mark that a bomb is selected
     // Update gold display
     updateGoldDisplay();
-    const goldDisplay = document.querySelector('.gold-value');
-    if (goldDisplay) {
-      goldDisplay.classList.add('pulse');
-      setTimeout(() => {
-        goldDisplay.classList.remove('pulse');
-      }, 300);
-    }
     
     // Re-render to show the bomb
     renderNext();
@@ -7178,6 +7184,7 @@ function handleBombConversion() {
     // Update button state
     updateBombConversionButtonState();
     updatePickaxeButtonState();
+    updateTrashButtonState();
     
     // Save game state after bomb conversion and cost increase
     saveGameState();
@@ -7220,15 +7227,8 @@ function handleTrashButton() {
   // Add a new random block to the end of the queue to maintain 3 blocks
   nextQueue.push(getRandomPiece());
   
-  // Update gold display
-  updateGoldDisplay();
-  const goldDisplay = document.querySelector('.gold-value');
-  if (goldDisplay) {
-    goldDisplay.classList.add('pulse');
-    setTimeout(() => {
-      goldDisplay.classList.remove('pulse');
-    }, 300);
-  }
+  // Update gold display with pulse animation
+  updateGoldDisplay(true);
   
   // Play the same animation as placing a block, but don't place it
   animateNextQueueAdvance(true).then(() => {
@@ -7278,6 +7278,9 @@ function handlePickaxeButton() {
     pickaxeMode = false;
     
     updatePickaxeButtonState();
+    // Also update other powerup button states to ensure they're properly re-enabled
+    updateBombConversionButtonState();
+    updateTrashButtonState();
     render(); // Re-render to remove pickaxe mode visual indicators
     return;
   }
@@ -7336,6 +7339,9 @@ async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
   
   // Update pickaxe button state IMMEDIATELY to remove undo state (with new cost)
   updatePickaxeButtonState();
+  // Also update other powerup button states to ensure they're properly re-enabled
+  updateBombConversionButtonState();
+  updateTrashButtonState();
   
   console.log(`✅ Removing block at index ${blockIndex} from pole ${poleIndex}. Block value: ${pole[blockIndex].w}`);
   console.log(`Pole ${poleIndex} blocks before removal:`, pole.map(b => b.w));
@@ -7384,8 +7390,8 @@ async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
   // Verify the block was actually removed
   console.log(`📊 Pole array before: ${pole.length}, after: ${poles[poleIndex].length}`);
   
-  // Update gold display
-  updateGoldDisplay();
+  // Update gold display with pulse animation
+  updateGoldDisplay(true);
   
   // Save game state after using pickaxe
   saveGameState();
@@ -7430,6 +7436,18 @@ function updateBombConversionButtonState() {
       bombConversionBtn.title = "Press again to undo bomb selection";
       const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
       if (emojiEl) emojiEl.textContent = "↩️";
+      
+      // Disable other powerup buttons when bomb is in undo mode
+      if (trashButton) {
+        trashButton.disabled = true;
+        trashButton.classList.remove('affordable');
+        trashButton.title = "Bomb is active - complete or undo first";
+      }
+      if (pickaxeButton) {
+        pickaxeButton.disabled = true;
+        pickaxeButton.classList.remove('affordable');
+        pickaxeButton.title = "Bomb is active - complete or undo first";
+      }
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -7460,6 +7478,29 @@ function updateBombConversionButtonState() {
         const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "💣";
       }
+      
+      // Re-enable other powerup buttons when bomb is not in undo mode
+      // Always re-enable them since we're not in bomb undo mode
+      if (trashButton) {
+        const hasEnoughGold = gold >= trashButtonCost;
+        trashButton.disabled = !hasEnoughGold;
+        if (hasEnoughGold) {
+          trashButton.classList.add('affordable');
+        } else {
+          trashButton.classList.remove('affordable');
+        }
+        trashButton.title = "Remove next block from queue";
+      }
+      if (pickaxeButton) {
+        const hasEnoughGold = gold >= pickaxeButtonCost;
+        pickaxeButton.disabled = !hasEnoughGold;
+        if (hasEnoughGold) {
+          pickaxeButton.classList.add('affordable');
+        } else {
+          pickaxeButton.classList.remove('affordable');
+        }
+        pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
+      }
     }
     
     // Update the tracked gold amount
@@ -7473,16 +7514,32 @@ function updateTrashButtonState() {
   // Always update when called since we call this strategically
   
   if (trashButton) {
-    const hasEnoughGold = gold >= trashButtonCost;
-    trashButton.disabled = !hasEnoughGold;
+    // Check if other powerups are in undo mode
+    const otherPowerupActive = bombSelected || pickaxeMode;
     
-    // Update visual styling based on affordability
-    // Red border (default): when gold < cost (disabled)
-    // White border (affordable): when gold >= cost (enabled)
-    if (hasEnoughGold) {
-      trashButton.classList.add('affordable');
-    } else {
+    if (otherPowerupActive) {
+      // Another powerup is active, disable trash button
+      trashButton.disabled = true;
       trashButton.classList.remove('affordable');
+      if (bombSelected) {
+        trashButton.title = "Bomb is active - complete or undo first";
+      } else if (pickaxeMode) {
+        trashButton.title = "Pickaxe is active - complete or deactivate first";
+      }
+    } else {
+      // No other powerups active, check if player has enough gold
+      const hasEnoughGold = gold >= trashButtonCost;
+      trashButton.disabled = !hasEnoughGold;
+      
+      // Update visual styling based on affordability
+      // Red border (default): when gold < cost (disabled)
+      // White border (affordable): when gold >= cost (enabled)
+      if (hasEnoughGold) {
+        trashButton.classList.add('affordable');
+      } else {
+        trashButton.classList.remove('affordable');
+      }
+      trashButton.title = "Remove next block from queue";
     }
     
     // Update the tracked gold amount
@@ -7506,25 +7563,71 @@ function updatePickaxeButtonState() {
       pickaxeButton.title = "Press again to deactivate pickaxe mode";
       const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
       if (emojiEl) emojiEl.textContent = "↩️";
-    } else {
-      // Pickaxe mode is not active - check if player has enough gold
-      pickaxeButton.disabled = !hasEnoughGold;
       
-      // Update visual styling based on affordability
-      if (hasEnoughGold) {
-        pickaxeButton.classList.add('affordable');
-      } else {
-        pickaxeButton.classList.remove('affordable');
+      // Disable other powerup buttons when pickaxe is in undo mode
+      if (bombConversionBtn) {
+        bombConversionBtn.disabled = true;
+        bombConversionBtn.classList.remove('affordable');
+        bombConversionBtn.title = "Pickaxe is active - complete or deactivate first";
       }
-      pickaxeButton.classList.remove('undo-mode');
-      pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
-      const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
-      if (emojiEl) emojiEl.textContent = "⛏️";
+      if (trashButton) {
+        trashButton.disabled = true;
+        trashButton.classList.remove('affordable');
+        trashButton.title = "Pickaxe is active - complete or deactivate first";
+      }
+    } else {
+      // Pickaxe mode is not active - check if other powerups are active first
+      if (bombSelected) {
+        // Bomb is active, disable pickaxe button
+        pickaxeButton.disabled = true;
+        pickaxeButton.classList.remove('affordable');
+        pickaxeButton.classList.remove('undo-mode');
+        pickaxeButton.title = "Bomb is active - complete or undo first";
+        const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "⛏️";
+      } else {
+        // No other powerups active - check if player has enough gold
+        pickaxeButton.disabled = !hasEnoughGold;
+        
+        // Update visual styling based on affordability
+        if (hasEnoughGold) {
+          pickaxeButton.classList.add('affordable');
+        } else {
+          pickaxeButton.classList.remove('affordable');
+        }
+        pickaxeButton.classList.remove('undo-mode');
+        pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
+        const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "⛏️";
+      }
       
       // Update the cost display immediately when the undo emoji changes to ⛏️
       const pickaxeCostEl = document.getElementById('pickaxeCost');
       if (pickaxeCostEl) {
         pickaxeCostEl.textContent = formatNumber(pickaxeButtonCost);
+      }
+      
+      // Re-enable other powerup buttons when pickaxe is not in undo mode
+      // But only if they're not in their own undo mode
+      if (bombConversionBtn && !bombSelected) {
+        const hasEnoughGold = gold >= bombConversionCost;
+        bombConversionBtn.disabled = !hasEnoughGold;
+        if (hasEnoughGold) {
+          bombConversionBtn.classList.add('affordable');
+        } else {
+          bombConversionBtn.classList.remove('affordable');
+        }
+        bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+      }
+      if (trashButton && !bombSelected) {
+        const hasEnoughGold = gold >= trashButtonCost;
+        trashButton.disabled = !hasEnoughGold;
+        if (hasEnoughGold) {
+          trashButton.classList.add('affordable');
+        } else {
+          trashButton.classList.remove('affordable');
+        }
+        trashButton.title = "Remove next block from queue";
       }
     }
     
@@ -8890,8 +8993,8 @@ function handleGrantGold() {
   gold += 1000;
   goldEarnedThisGame += 1000; // Track gold earned in current game
   lifetimeGoldEarned += 1000; // Track lifetime gold earned
-  // Update gold display
-  updateGoldDisplay();
+  // Update gold display with pulse animation
+  updateGoldDisplay(true);
   
   // Update statistics modal if it's open
   if (statsModal && !statsModal.classList.contains('hidden')) {
@@ -9032,6 +9135,11 @@ function handleDebugPowerupPricing() {
   // Update the display elements
   updatePowerupCostDisplays();
   
+  // Update button states to reflect new costs
+  updateBombConversionButtonState();
+  updatePickaxeButtonState();
+  updateTrashButtonState();
+  
   // Save the game state to persist the changes
   saveGameState();
   
@@ -9048,6 +9156,11 @@ function handleDebugResetPowerupPricing() {
   
   // Update the display elements
   updatePowerupCostDisplays();
+  
+  // Update button states to reflect new costs
+  updateBombConversionButtonState();
+  updatePickaxeButtonState();
+  updateTrashButtonState();
   
   // Save the game state to persist the changes
   saveGameState();
@@ -9589,7 +9702,8 @@ function renderNext(){
   nextContainer.innerHTML = '';
   nextQueue.forEach((p, idx) => {
     const d = document.createElement('div');
-    d.className = 'next-disc' + (idx === 0 ? ' current' : '');
+    // Disable highlighting of current piece when in pickaxe mode
+    d.className = 'next-disc' + (idx === 0 && !pickaxeMode ? ' current' : '');
     if (p.bomb) {
       d.innerHTML = labelForPiece(p);
     } else {
@@ -9657,12 +9771,7 @@ function placeOnPole(idx){
     return;
   }
   
-  // RESET BOMB SELECTION IMMEDIATELY WHEN POLE IS CLICKED - BEFORE PLACEMENT BEGINS
-  if (bombSelected && nextPiece.bomb) {
-    bombSelected = false;
-    // Update button state IMMEDIATELY to remove undo mode
-    updateBombConversionButtonState();
-  }
+  // Note: Drop sound is now played immediately in the click/touch handler for iOS compatibility
   
   // Note: Drop sound is now played immediately in the click/touch handler for iOS compatibility
   
@@ -9741,7 +9850,7 @@ function placeOnPole(idx){
       poles[idx].push(nextPiece);
       
       // Check if this is a purchased bomb that needs payment
-      if (nextPiece.bomb) {
+      if (nextPiece.bomb && bombSelected) {
         // Deduct gold for the bomb usage
         gold -= bombConversionCost;
         
@@ -9756,17 +9865,27 @@ function placeOnPole(idx){
           bombCostEl.textContent = formatNumber(bombConversionCost);
         }
         
-        // Update gold display
-        updateGoldDisplay();
+        // Update gold display with pulse animation
+        updateGoldDisplay(true);
         
-        // Update other button states
-        updateBombButtonIfGoldChanged();
-        updatePickaxeButtonIfGoldChanged();
+        // Update all button states to reflect new costs and ensure proper state
+        updateBombConversionButtonState();
+        updatePickaxeButtonState();
+        updateTrashButtonState();
         
         console.log(`Bomb placed! Deducted ${bombConversionCost / 2} gold, new cost: ${bombConversionCost}`);
         
         // Save game state after bomb payment
         saveGameState();
+      }
+      
+      // RESET BOMB SELECTION AFTER PLACEMENT LOGIC IS COMPLETE
+      if (bombSelected && nextPiece.bomb) {
+        bombSelected = false;
+        // Update button state to remove undo mode and re-enable other powerups
+        updateBombConversionButtonState();
+        updatePickaxeButtonState();
+        updateTrashButtonState();
       }
       
       // scoring: add only the dropped piece's weight
@@ -10117,7 +10236,7 @@ async function animateMergeCascade(index){
     gold += goldEarned;
     goldEarnedThisGame += goldEarned; // Track gold earned in current game
     lifetimeGoldEarned += goldEarned; // Track lifetime gold earned
-    updateGoldDisplay();
+    updateGoldDisplay(true);
     
     // Update statistics modal if it's open
     if (statsModal && !statsModal.classList.contains('hidden')) {
