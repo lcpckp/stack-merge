@@ -7854,7 +7854,7 @@ async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
     // Look for any adjacent equal blocks that can merge
     let hasMerges = false;
     for (let i = 0; i < poles[poleIndex].length - 1; i++) {
-      if (poles[poleIndex][i].w === poles[poleIndex][i + 1].w && !poles[poleIndex][i].bomb && !poles[poleIndex][i + 1].bomb) {
+      if (poles[poleIndex][i].w === poles[poleIndex][i + 1].w) {
         hasMerges = true;
         break;
       }
