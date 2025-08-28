@@ -44,3 +44,7 @@ jspm_packages/
 
 # dotenv environment variables file
 .env
+
+# Custom ignored folders
+Git Ignored/
+Git Ignored/
