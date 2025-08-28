@@ -6945,12 +6945,17 @@ function clearAllGameData() {
       // Silent error handling
     }
     
-    // Force clear the main game save data to ensure unlock status is not restored
-    try {
-      localStorage.removeItem(SAVE_KEY);
-    } catch (e) {
-      // Silent error handling
-    }
+      // Force clear the main game save data to ensure unlock status is not restored
+  try {
+    localStorage.removeItem(SAVE_KEY);
+  } catch (e) {
+    // Silent error handling
+  }
+  
+  // Force a complete re-render to ensure the queue display matches the reset state
+  if (typeof render === 'function') {
+    render();
+  }
 }
 
 // Function to check current storage state
