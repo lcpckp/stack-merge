@@ -2631,14 +2631,18 @@
     position: absolute; 
     top: 8px; 
     right: 12px; 
-    background: none; 
-    border: none; 
+    background: rgba(30, 41, 59, 0.8); 
+    border: 1px solid #64748b; 
     color: #94a3b8; 
     font-size: 20px; 
     cursor: pointer; 
     padding: 6px; 
     border-radius: 6px;
     font-family: var(--font-family);
+    transition: all 0.2s ease;
+    /* Ensure it's always touchable */
+    pointer-events: auto;
+    touch-action: manipulation;
   }
   .debug-pane .close-btn:hover { background: #475569; color: var(--text); }
   .debug-pane .status { 
@@ -2660,36 +2664,37 @@
 
   /* Game Over Button Overlay */
   .game-over-button-overlay {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
     background: rgba(30, 41, 59, 0.95); /* Semi-transparent panel background */
-    backdrop-filter: blur(8px); /* Add subtle blur effect */
     border: 2px solid rgba(255, 255, 255, 0.8); /* Semi-transparent white border */
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     z-index: 1000;
     opacity: 0;
-    visibility: hidden;
-    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth easing curve for fade-in */
+    pointer-events: none; /* Disable interactions when hidden */
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; /* Animate opacity and transform with same timing */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 16px;
     min-width: 200px;
+    /* Debug: add border to see positioning */
+    border: 3px solid red;
   }
 
   .game-over-button-overlay.hiding {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Fast transition for fade-out */
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1); /* Exact inverse of fade-in animation */
   }
 
   .game-over-button-overlay.show {
     opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto; /* Re-enable interactions when shown */
+    transform: translate(-50%, -50%) scale(1) !important;
   }
 
   .game-over-text {
@@ -2754,7 +2759,6 @@
     font-size: 24px;
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     font-family: var(--font-family);
-    transition: all 0.2s ease;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -4100,6 +4104,42 @@
     .code-submit-btn {
       padding: 12px 16px;
       font-size: 16px; /* Prevent zoom on iOS */
+    }
+  }
+  
+  /* Mobile responsive debug panel */
+  @media (max-width: 768px) {
+    .debug-pane {
+      width: 100vw; /* Full width on mobile */
+      right: 0;
+      z-index: 9999; /* Ensure it's above everything on mobile */
+      touch-action: manipulation; /* Improve touch handling */
+    }
+    
+    .debug-pane .close-btn {
+      position: fixed; /* Fixed positioning for better mobile touch */
+      top: 20px;
+      right: 20px;
+      z-index: 10000; /* Above the debug panel */
+      background: rgba(30, 41, 59, 0.9); /* More visible background */
+      border: 1px solid #64748b;
+      padding: 12px; /* Larger touch target */
+      min-width: 44px; /* iOS minimum touch target size */
+      min-height: 44px;
+      /* Ensure touch events work properly */
+      pointer-events: auto !important;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(14, 165, 233, 0.3); /* Visual feedback on touch */
+      user-select: none; /* Prevent text selection */
+    }
+    
+    /* Ensure the close button is always on top and touchable */
+    .debug-pane .close-btn:hover,
+    .debug-pane .close-btn:active,
+    .debug-pane .close-btn:focus {
+      background: rgba(51, 65, 85, 0.95);
+      border-color: #0ea5e9;
+      outline: none;
     }
   }
 
@@ -9023,6 +9063,58 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize settings modal after DOM is loaded
   initializeSettingsModal();
   
+  // Set up debug pane event listeners after DOM is loaded
+  if (debugClose) {
+    debugClose.addEventListener('click', closeDebugPane);
+    // Add touch event for mobile devices
+    debugClose.addEventListener('touchend', (e) => {
+      e.preventDefault(); // Prevent default touch behavior
+      closeDebugPane();
+    });
+  }
+  if (debugPane) {
+    debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
+    // Add touch event for mobile devices
+    debugPane.addEventListener('touchend', (e) => { if (e.target === debugPane) closeDebugPane(); });
+    
+    // Add double-tap fallback for mobile devices
+    let lastTap = 0;
+    debugPane.addEventListener('touchend', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+      if (tapLength < 500 && tapLength > 0) {
+        // Double tap detected - close the debug pane
+        console.log('Double tap detected - closing debug pane');
+        closeDebugPane();
+        e.preventDefault();
+      }
+      lastTap = currentTime;
+    });
+    
+    // Add swipe-to-close functionality for mobile
+    let startX = 0;
+    let startY = 0;
+    debugPane.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    });
+    
+    debugPane.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+      
+      // Detect right-to-left swipe (swipe left to close)
+      if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 50 && deltaX < 0) {
+        console.log('Swipe left detected - closing debug pane');
+        closeDebugPane();
+        e.preventDefault();
+      }
+    });
+  }
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && debugPane && debugPane.classList.contains('show')) closeDebugPane(); });
+  
   // Force scroll to top immediately when DOM is ready
   
   // Try to clear any stored scroll position
@@ -9144,19 +9236,39 @@ function updateDebugPane() {
 
 // Debug pane wiring
 function openDebugPane(){ 
-  debugPane.classList.add('show'); 
-  syncDebugControls();
+  if (debugPane) {
+    // Reset any fallback styles that might have been applied
+    debugPane.style.display = '';
+    debugPane.style.transform = '';
+    debugPane.style.transition = '';
+    
+    debugPane.classList.add('show'); 
+    syncDebugControls();
+    console.log('Debug pane opened');
+  } else {
+    console.log('Debug pane element not found when trying to open');
+  }
 }
 function closeDebugPane(){ 
-  debugPane.classList.remove('show'); 
-  // Keep custom block mode active when debug pane is closed
-  // customBlockMode will only be reset when "No Block" is selected
+  console.log('closeDebugPane called');
   
-  // Debug pane closed, custom block mode remains active
+  if (debugPane) {
+    console.log('Debug pane found, hiding with display:none');
+    
+    // Simple and reliable: just hide it immediately
+    debugPane.style.display = 'none';
+    
+    // Also remove the show class for consistency
+    debugPane.classList.remove('show');
+    
+    console.log('Debug pane hidden successfully');
+    
+    // Keep custom block mode active when debug pane is closed
+    // customBlockMode will only be reset when "No Block" is selected
+  } else {
+    console.log('Debug pane element not found');
+  }
 }
-debugClose.addEventListener('click', closeDebugPane);
-debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
-window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && debugPane.classList.contains('show')) closeDebugPane(); });
 
 // New Game Modal Functions
 function openNewGameModal() {
@@ -9444,6 +9556,8 @@ function handleTestPersonalBest() {
 }
 
 function handleTestGameOver() {
+  console.log('handleTestGameOver called');
+  
   // Set some sample data to make the game over screen look realistic
   if (weights && weights.length > 0) {
     const highestBlock = Math.max(...weights);
@@ -9452,12 +9566,31 @@ function handleTestGameOver() {
   // Show the game over screen
   showGameOver();
   
-  // Automatically close the debug pane after showing the game over screen
-  // This provides a better UX by not keeping the debug pane open during testing
-  setTimeout(() => {
-    closeDebugPane();
-    // Debug pane automatically closed after testing game over screen
-  }, 150); // Small delay to ensure the game over screen is visible before closing
+  // Only auto-close debug pane on mobile devices where screen space is limited
+  // On desktop, keep it open for easier testing
+  const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window) || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  console.log('Screen width:', window.innerWidth);
+  console.log('Touch support:', 'ontouchstart' in window);
+  console.log('User agent:', navigator.userAgent);
+  console.log('Is mobile detected:', isMobile);
+  
+  if (isMobile) {
+    console.log('Mobile detected - will auto-close debug pane');
+    // On mobile, close immediately to avoid covering the screen
+    setTimeout(() => {
+      console.log('Timeout callback executing...');
+      console.log('Debug pane element:', debugPane);
+      console.log('Debug pane has show class:', debugPane && debugPane.classList.contains('show'));
+      if (debugPane && debugPane.classList.contains('show')) {
+        closeDebugPane();
+        console.log('Debug pane automatically closed on mobile after testing game over screen');
+      } else {
+        console.log('Debug pane not found or not showing - cannot close');
+      }
+    }, 50); // Shorter delay on mobile for better UX
+  } else {
+    console.log('Desktop detected - keeping debug pane open for easier testing');
+  }
 }
 
 function handleTestUnlockTheme() {
