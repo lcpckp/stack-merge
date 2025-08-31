@@ -570,23 +570,26 @@
 
   .game-info { 
     display: grid; 
-    grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr); 
+    grid-template-columns: 1fr auto 1fr; 
+    grid-template-areas: "score next gold";
     align-items: center; 
     gap: 48px; 
     margin-top: 40px; /* Increased spacing between title and game info */
-    max-width: 800px;
+    width: auto; /* Allow natural expansion */
+    max-width: none; /* Remove max-width constraint */
     margin-left: auto;
     margin-right: auto;
     position: relative;
     padding: 0 24px;
     overflow: visible;
+
   }
   .score-display { 
     display: flex; 
     justify-content: flex-end; 
-    justify-self: start;
-    grid-column: 1;
-    width: 100%;
+    justify-self: end;
+    grid-area: score;
+    width: auto; /* Allow natural expansion */
   }
   .score-label { 
     font-size: 16px; 
@@ -608,8 +611,10 @@
     align-items: center; 
     gap: 12px; 
     justify-self: center;
-    grid-column: 2;
+    grid-area: next;
     position: relative;
+    /* Ensure next queue is always centered regardless of score/gold sizes */
+    z-index: 10;
   }
   .next .label { 
     font-size: 16px; 
@@ -656,6 +661,8 @@
     font-weight: 600; 
     font-size: 24px; 
     min-width: 120px; 
+    width: auto; /* Allow natural expansion */
+    max-width: none; /* Remove any max-width constraints */
     text-align: center;
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     position: relative;
@@ -665,6 +672,8 @@
     -moz-user-select: none;
     -ms-user-select: none;
     white-space: nowrap;
+    overflow: visible; /* Ensure content doesn't get clipped */
+
   }
   
   /* Score star emoji styling as a badge in top left corner */
@@ -696,13 +705,40 @@
     -ms-user-select: none;
   }
 
+  /* Score comma styling - smaller than digits but same color */
+  .score-comma {
+    font-size: 22px;
+    opacity: 1;
+    font-weight: 400;
+    color: inherit;
+  }
+
   /* Gold display styling to match score display */
   .gold-display { 
     display: flex; 
     justify-content: flex-start; 
-    justify-self: end;
-    grid-column: 3;
-    width: 100%;
+    justify-self: start;
+    grid-area: gold;
+    width: auto; /* Allow natural expansion */
+  }
+  
+  /* Score-gold container for desktop layout */
+  .score-gold-container {
+    display: contents; /* On desktop, this doesn't affect the grid layout */
+  }
+  
+  /* Ensure score and gold displays maintain their grid positioning on desktop */
+  .score-display {
+    grid-area: score;
+  }
+  
+  .gold-display {
+    grid-area: gold;
+  }
+  
+  /* Ensure the next section stays in the middle column on desktop */
+  .next {
+    grid-area: next;
   }
   .gold-label { 
     font-size: 16px; 
@@ -727,6 +763,8 @@
     font-weight: 600; 
     font-size: 24px; 
     min-width: 120px; 
+    width: auto; /* Allow natural expansion */
+    max-width: none; /* Remove any max-width constraints */
     text-align: center;
     box-shadow: 0 3px 0 rgba(0,0,0,0.25);
     position: relative;
@@ -736,6 +774,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     white-space: nowrap;
+    overflow: visible; /* Ensure content doesn't get clipped */
   }
   
   /* Gold emoji styling as a badge in top left corner */
@@ -2498,8 +2537,11 @@
   .debug-pane .bottom-buttons {
     margin-top: auto;
     padding-top: 16px;
+    padding-bottom: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
+    /* Ensure this section stays at the bottom */
+    position: relative;
   }
   
   /* Block grid styling */
@@ -3124,24 +3166,58 @@
   
   /* Adjust game info layout for mobile */
   .game-info {
-    grid-template-columns: minmax(100px, 1fr) auto minmax(100px, 1fr);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "score-gold"
+      "next";
+    align-items: center;
     gap: 32px;
     margin-top: 32px; /* Increased spacing below title on mobile to prevent label overlap */
     max-width: 100%;
     padding: 0 16px;
   }
   
+  /* Ensure the score-gold unit is centered as one block */
   .score-display, .gold-display {
-    gap: 8px;
+    flex-shrink: 0; /* Prevent shrinking */
   }
   
-  .score-display {
-    justify-self: start;
-    justify-content: flex-end;
+  /* Style the score-gold container on mobile */
+  .score-gold-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center; /* Center the displays within the container */
+    gap: 16px; /* Consistent spacing between score and gold */
+    grid-area: score-gold;
+    width: auto;
+    /* Center the entire unit on screen by centering the container */
+    margin: 0 auto;
   }
   
-  .gold-display {
-    justify-self: end;
+  /* Reset individual display positioning on mobile */
+  .score-display, .gold-display {
+    margin: 0; /* Remove individual margins */
+    /* Let each display size naturally based on content */
+    width: auto;
+    min-width: fit-content;
+    /* Ensure displays don't interfere with centering */
+    flex-shrink: 0;
+  }
+  
+  /* The key: center the container itself, not the content within it */
+  .score-gold-container {
+    justify-content: flex-start; /* Don't center content within container */
+    /* Container gets centered by margin: 0 auto, content flows naturally */
+  }
+  
+
+  
+  /* Ensure the game-info container properly centers its children */
+  .game-info {
+    /* Force the flexbox to center children properly */
+    align-items: center;
     justify-content: flex-start;
   }
   
@@ -3158,7 +3234,6 @@
   .next {
     order: 2;
     width: 100%;
-    grid-column: 1 / -1;
     justify-self: center;
     margin-top: 32px; /* Space for the label above the queue */
   }
@@ -3463,22 +3538,31 @@
   }
 }
 
-/* Extra small mobile devices */
-@media (max-width: 480px) {
-  .topbar {
-    padding: 2px 8px 6px;
-    margin: 0;
-  }
-  
-  /* Extra small mobile button sizing */
-  .title-btn {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 10px !important;
-    font-size: 22px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-  }
+  /* Extra small mobile devices */
+  @media (max-width: 480px) {
+    .topbar {
+      padding: 2px 8px 6px;
+      margin: 0;
+    }
+    
+    /* Extra small mobile debug pane adjustments */
+    .debug-pane {
+      padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); /* Even more bottom padding for very small screens */
+    }
+    
+    .debug-pane .bottom-buttons {
+      padding-bottom: 24px; /* Extra padding for very small screens */
+    }
+    
+    /* Extra small mobile button sizing */
+    .title-btn {
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 10px !important;
+      font-size: 22px !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+    }
   
   h1 {
     font-size: 22px;
@@ -3589,17 +3673,20 @@
   }
   
   .game-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "score-gold"
+      "next";
     gap: 16px;
     margin-top: 28px; /* Increased spacing below title on extra small mobile to prevent label overlap */
-    grid-template-columns: minmax(80px, 1fr) auto minmax(80px, 1fr);
     max-width: 100%;
     padding: 0 12px;
   }
   
   .next {
-    order: 2;
+    grid-area: next;
     width: 100%;
-    grid-column: 1 / -1;
     justify-self: center;
     margin-top: 32px; /* Space for the label above the queue */
   }
@@ -3612,6 +3699,26 @@
   .gold-display {
     justify-self: end;
     justify-content: flex-start;
+  }
+  
+  /* Style the score-gold container for extra small mobile */
+  .score-gold-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* Slightly smaller gap for extra small mobile */
+    grid-area: score-gold;
+    width: auto;
+    margin: 0 auto;
+  }
+  
+  /* Reset individual display positioning for extra small mobile */
+  .score-display, .gold-display {
+    margin: 0;
+    width: auto;
+    min-width: fit-content;
+    flex-shrink: 0;
   }
   
   .score-label, .next .label, .gold-label {
@@ -4190,6 +4297,11 @@
       right: 0;
       z-index: 9999; /* Ensure it's above everything on mobile */
       touch-action: manipulation; /* Improve touch handling */
+      /* Ensure bottom buttons are always accessible */
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); /* Add bottom padding to account for browser controls and safe areas */
+      /* Improve scrolling behavior on mobile */
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
     
     .debug-pane .close-btn {
@@ -4216,6 +4328,15 @@
       background: rgba(51, 65, 85, 0.95);
       border-color: #0ea5e9;
       outline: none;
+    }
+    
+    /* Ensure bottom buttons section is always accessible */
+    .debug-pane .bottom-buttons {
+      margin-top: auto;
+      padding-top: 16px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); /* Extra bottom padding for mobile with safe area support */
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
     }
   }
 
@@ -4511,27 +4632,27 @@
   </div>
 
   <div class="game-info">
-    <div class="score-display">
-      <div class="score-value" id="scoreDisplay">
-        <div class="score-label">Score</div>
-        <div class="score-star">⭐</div>
-        <div class="score-text">2</div>
+    <div class="score-gold-container">
+      <div class="score-display">
+        <div class="score-value" id="scoreDisplay">
+          <div class="score-label">Score</div>
+          <div class="score-star">⭐</div>
+          <div class="score-text">2</div>
+        </div>
+      </div>
+      
+      <div class="gold-display">
+        <div class="gold-value" id="goldDisplay">
+          <div class="gold-label">Gold</div>
+          <div class="gold-emoji">💰</div>
+          <div class="gold-text">0</div>
+        </div>
       </div>
     </div>
     
     <div class="next">
       <div class="label">Next Blocks</div>
       <div class="next-row" id="nextContainer" aria-live="polite"><div class="next-disc current" style="background: rgb(207, 239, 8); color: rgb(0, 0, 0); --animation-speed: 1;">1</div><div class="next-disc" style="background: rgb(16, 185, 129); color: rgb(255, 255, 255); --animation-speed: 1;">2</div><div class="next-disc" style="background: rgb(16, 185, 129); color: rgb(255, 255, 255); --animation-speed: 1;">2</div></div>
-    </div>
-    
-
-    
-    <div class="gold-display">
-      <div class="gold-value" id="goldDisplay">
-        <div class="gold-label">Gold</div>
-        <div class="gold-emoji">💰</div>
-        <div class="gold-text">0</div>
-      </div>
     </div>
   </div>
   
@@ -5185,8 +5306,8 @@
     <div class="section bottom-buttons">
       <div class="controls">
         <div class="button-row">
-          <button id="grantScoreBtn" class="button primary">Grant 1000 Score</button>
-          <button id="grantGoldBtn" class="button primary">Grant 1000 Gold</button>
+          <button id="grantScoreBtn" class="button primary">Grant 1 Score</button>
+          <button id="grantGoldBtn" class="button primary">Grant 1 Gold</button>
         </div>
       </div>
     </div>
@@ -7203,6 +7324,11 @@ function formatNumber(num) {
   }
 }
 
+// Score formatting utility function - displays all digits with commas every three digits, no decimals
+function formatScore(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="score-comma">,</span>');
+}
+
 // Multiplier formatting utility function
 function formatMultiplier(num) {
   if (num < 100000) {
@@ -7221,7 +7347,7 @@ function updateScoreDisplay() {
   if (scoreDisplay) {
     // Preserve the score label and update only the score content
     const scoreLabel = scoreDisplay.querySelector('.score-label');
-    scoreDisplay.innerHTML = `<div class="score-star">⭐</div><div class="score-text">${score}</div>`;
+    scoreDisplay.innerHTML = `<div class="score-star">⭐</div><div class="score-text">${formatScore(score)}</div>`;
     // Re-add the label if it was removed
     if (scoreLabel && !scoreDisplay.querySelector('.score-label')) {
       scoreDisplay.insertBefore(scoreLabel, scoreDisplay.firstChild);
@@ -7229,7 +7355,7 @@ function updateScoreDisplay() {
   }
   // Update debug score display with exact value
   if (debugScore) {
-    debugScore.textContent = score;
+    debugScore.innerHTML = formatScore(score);
   }
   
   // Check for new personal best during gameplay
@@ -8540,7 +8666,7 @@ function updateStatsModal() {
   const statsTotalBlocksTrashed = document.getElementById('statsTotalBlocksTrashed');
   
   if (statsHighScore) {
-    statsHighScore.textContent = window.highScore || 0;
+    statsHighScore.innerHTML = formatScore(window.highScore || 0);
   }
   
   if (statsLifetimeGold) {
@@ -9156,45 +9282,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   if (debugPane) {
-    debugPane.addEventListener('click', (e) => { if (e.target === debugPane) closeDebugPane(); });
-    // Add touch event for mobile devices
-    debugPane.addEventListener('touchend', (e) => { if (e.target === debugPane) closeDebugPane(); });
-    
-    // Add double-tap fallback for mobile devices
-    let lastTap = 0;
-    debugPane.addEventListener('touchend', (e) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTap;
-      if (tapLength < 500 && tapLength > 0) {
-        // Double tap detected - close the debug pane
-        console.log('Double tap detected - closing debug pane');
-        closeDebugPane();
-        e.preventDefault();
-      }
-      lastTap = currentTime;
-    });
-    
-    // Add swipe-to-close functionality for mobile
-    let startX = 0;
-    let startY = 0;
-    debugPane.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    });
-    
-    debugPane.addEventListener('touchend', (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-      const deltaX = endX - startX;
-      const deltaY = endY - startY;
-      
-      // Detect right-to-left swipe (swipe left to close)
-      if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 50 && deltaX < 0) {
-        console.log('Swipe left detected - closing debug pane');
-        closeDebugPane();
-        e.preventDefault();
-      }
-    });
+    // Removed problematic event listeners that were causing unexpected closing
+    // Debug pane now only closes via X button or Escape key
   }
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && debugPane && debugPane.classList.contains('show')) closeDebugPane(); });
   
@@ -9298,7 +9387,7 @@ function updateStackHeight() {
 }
 
 function updateDebugPane() {
-  if (debugScore) debugScore.textContent = score;
+  if (debugScore) debugScore.innerHTML = formatScore(score);
   if (debugGold) debugGold.textContent = gold;
   if (debugStacks) debugStacks.textContent = poles.length;
   if (debugCapacity) debugCapacity.textContent = currentStackCapacity;
@@ -9327,6 +9416,10 @@ function openDebugPane(){
     
     debugPane.classList.add('show'); 
     syncDebugControls();
+    
+    // Reset the grant buttons to start with 1 each time
+    resetGrantButtons();
+    
     console.log('Debug pane opened');
   } else {
     console.log('Debug pane element not found when trying to open');
@@ -9584,9 +9677,31 @@ function handleUpdateProbabilities() {
 
 
 function handleGrantGold() {
-  gold += 1000;
-  goldEarnedThisGame += 1000; // Track gold earned in current game
-  lifetimeGoldEarned += 1000; // Track lifetime gold earned
+  // Get the current button text to determine the amount to add
+  const button = document.getElementById('grantGoldBtn');
+  let currentAmount = 1; // Start with 1
+  
+  if (button) {
+    const buttonText = button.textContent;
+    const match = buttonText.match(/Grant (\d+) Gold/);
+    if (match) {
+      currentAmount = parseInt(match[1]);
+    }
+  }
+  
+  // Add the current amount
+  gold += currentAmount;
+  goldEarnedThisGame += currentAmount; // Track gold earned in current game
+  lifetimeGoldEarned += currentAmount; // Track lifetime gold earned
+  
+  // Double the amount for next time
+  const nextAmount = currentAmount * 2;
+  
+  // Update button text
+  if (button) {
+    button.textContent = `Grant ${nextAmount} Gold`;
+  }
+  
   // Update gold display with pulse animation
   updateGoldDisplay(true);
   
@@ -9608,8 +9723,44 @@ function handleGrantGold() {
   saveGameState();
 }
 
+function resetGrantButtons() {
+  // Reset both grant buttons to start with 1
+  const scoreBtn = document.getElementById('grantScoreBtn');
+  const goldBtn = document.getElementById('grantGoldBtn');
+  
+  if (scoreBtn) {
+    scoreBtn.textContent = 'Grant 1 Score';
+  }
+  
+  if (goldBtn) {
+    goldBtn.textContent = 'Grant 1 Gold';
+  }
+}
+
 function handleGrantScore() {
-  score += 1000;
+  // Get the current button text to determine the amount to add
+  const button = document.getElementById('grantScoreBtn');
+  let currentAmount = 1; // Start with 1
+  
+  if (button) {
+    const buttonText = button.textContent;
+    const match = buttonText.match(/Grant (\d+) Score/);
+    if (match) {
+      currentAmount = parseInt(match[1]);
+    }
+  }
+  
+  // Add the current amount
+  score += currentAmount;
+  
+  // Double the amount for next time
+  const nextAmount = currentAmount * 2;
+  
+  // Update button text
+  if (button) {
+    button.textContent = `Grant ${nextAmount} Score`;
+  }
+  
   // Update score display
   updateScoreDisplay();
   
@@ -10909,7 +11060,7 @@ function showGameOver(){
   if (finalScoreDisplay) {
     finalScoreDisplay.innerHTML = `
       <div class="score-star">⭐</div>
-      <div class="score-text">${score}</div>
+      <div class="score-text">${formatScore(score)}</div>
       <div id="newHighScoreMessage" class="new-high-score-badge hidden">NEW RECORD</div>
     `;
   }
@@ -10992,7 +11143,7 @@ function resetGame(isFreshGame = true){
     finalScoreDisplay.innerHTML = `
       <div class="score-star">⭐</div>
       <div class="score-text">0</div>
-      <div id="newHighScoreMessage" class="new-high-score-badge hidden">NEW RECORD</div>
+      <div id="newHighScoreBadge" class="new-high-score-badge hidden">NEW RECORD</div>
     `;
   }
   
