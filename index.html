@@ -4860,14 +4860,51 @@
             <h3>Basic Gameplay</h3>
           </div>
           <div class="help-content">
-            <p>Drop the incoming blocks onto stacks to gain score.</p>
-            <p>Avoid filling up stacks by merging blocks to create more space.</p>
-            <p>Survive as long as possible for a high score!</p>
-            <p><strong>Basic Controls:</strong></p>
-            <p>Click/Tap one of the four stacks to drop the next block from the queue.</p>
-            <p>Click/Tap the bomb button to convert the next block to a bomb.</p>
-            <p>Click/Tap the trash can button to remove the next block from the queue.</p>
-            <p>Open the Sound Control menu to adjust the volume of the game.</p>
+                        <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
+              <h4 style="margin: 0 0 16px 0; color: #fbbf24; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">⭐</span>
+                Main Objectives
+              </h4>
+              <ul style="margin: 0; padding-left: 20px; list-style: none;">
+                <li style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.5; display: flex; align-items: baseline; gap: 8px;">
+                  <span style="color: #fbbf24; font-size: 18px;">•</span>
+                  <span>Get a high score by surviving as long as possible. Dropping blocks increases your score.</span>
+                </li>
+                <li style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.5; display: flex; align-items: baseline; gap: 8px;">
+                  <span style="color: #fbbf24; font-size: 18px;">•</span>
+                  <span>Merging blocks creates more space and gains gold.</span>
+                </li>
+                <li style="margin: 0 0 8px 0; font-size: 16px; line-height: 1.5; display: flex; align-items: baseline; gap: 8px;">
+                  <span style="color: #fbbf24; font-size: 18px;">•</span>
+                  <span>Gold can be used to buy power-ups which will help you survive!</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div style="background: var(--panel); border-radius: 12px; padding: 20px; border: 1px solid #475569;">
+              <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🎮</span>
+                Controls
+              </h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">⬇️</span>
+                  <span style="font-size: 14px; font-weight: 500;">Tap on a column to drop the next block</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">💣</span>
+                  <span style="font-size: 14px; font-weight: 500;">Convert the next block to a bomb</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">🗑️</span>
+                  <span style="font-size: 14px; font-weight: 500;">Remove the next block from the queue</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">➕</span>
+                  <span style="font-size: 14px; font-weight: 500;">Start a new game</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -4879,7 +4916,7 @@
             <h3>Merging Blocks</h3>
           </div>
           <div class="help-content">
-            <p>When two blocks with the same value are stacked, they merge into one bigger block.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• When two blocks with the same value are stacked, they merge into one bigger block.</p>
             <div class="merge-example" style="display: flex; gap: 80px; justify-content: center;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="merge-before">
@@ -4914,6 +4951,20 @@
           </div>
         </div>
 
+        <!-- Gold Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">💰</span>
+            <h3>Gold</h3>
+          </div>
+          <div class="help-content">
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Merging blocks earns gold. Merge multiple blocks in a row to earn bonus gold.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Gold is used to purchase bombs and trash cans, which are valuable tools for survival.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• You can earn 10x, 100x, or 1000x+ the normal amount of gold! Read the <strong>Stage Progression</strong> section of this guide.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;"></p>
+          </div>
+        </div>
+
         <!-- Bombs Section -->
         <div class="help-section">
           <div class="help-section-header">
@@ -4921,8 +4972,8 @@
             <h3>Bombs</h3>
           </div>
           <div class="help-content">
-            <p>When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
-            <p>Bombs will appear in the queue naturally, but you can also buy them with gold.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Bombs will sometimes appear in the queue, but you can also buy them with gold.</p>
             <div class="merge-example">
               <div class="merge-before">
                 <div class="merge-blocks">
@@ -4955,14 +5006,14 @@
 
             <div style="display: flex; justify-content: center; margin: 16px 0;">
               <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                <button class="powerup-btn bomb-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
-                  <span class="powerup-emoji" style="font-size: 24px;">💣</span>
+                <button class="powerup-btn bomb-btn affordable" style="pointer-events: none; width: 160px; height: 80px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <span class="powerup-emoji" style="font-size: 28px;">💣</span>
                   <div class="powerup-cost">
                     <span class="cost-emoji">💰</span>
                     <span class="cost-amount">25</span>
                   </div>
                 </button>
-                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts next block to bomb</span>
+                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts the next block to a bomb</span>
               </div>
             </div>
           </div>
@@ -4975,17 +5026,17 @@
             <h3>Trash Can</h3>
           </div>
           <div class="help-content">
-            <p>The trash can power-up allows you to remove the next block from the queue.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• The trash can removes the next block from the queue.</p>
             <div style="display: flex; justify-content: center; margin: 16px 0;">
               <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                <button class="powerup-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
-                  <span class="powerup-emoji" style="font-size: 24px;">🗑️</span>
+                <button class="powerup-btn affordable" style="pointer-events: none; width: 160px; height: 80px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <span class="powerup-emoji" style="font-size: 28px;">🗑️</span>
                   <div class="powerup-cost">
                     <span class="cost-emoji">💰</span>
                     <span class="cost-amount">25</span>
                   </div>
                 </button>
-                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes next block</span>
+                <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes the next block</span>
               </div>
             </div>
           </div>
@@ -4998,12 +5049,12 @@
             <h3>Pickaxe</h3>
           </div>
           <div class="help-content">
-            <p>The pickaxe power-up allows you to remove any single block from anywhere in the stacks.</p>
-            <p>Click the pickaxe button, then click on any block to remove it. Other blocks will smoothly animate down, and merges will be processed automatically.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• The pickaxe power-up allows you to remove any single block from anywhere in the stacks.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Click the pickaxe button, then click on any block to remove it. Other blocks will smoothly animate down, and merges will be processed automatically.</p>
             <div style="display: flex; justify-content: center; margin: 16px 0;">
               <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                <button class="powerup-btn" style="pointer-events: none; min-width: 60px; min-height: 60px; padding: 0 8px;">
-                  <span class="powerup-emoji" style="font-size: 24px;">⛏️</span>
+                <button class="powerup-btn affordable" style="pointer-events: none; width: 160px; height: 80px; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <span class="powerup-emoji" style="font-size: 28px;">⛏️</span>
                   <div class="powerup-cost">
                     <span class="cost-emoji">💰</span>
                     <span class="cost-amount">25</span>
@@ -5015,19 +5066,6 @@
           </div>
         </div>
 
-        <!-- Gold Section -->
-        <div class="help-section">
-          <div class="help-section-header">
-            <span class="help-icon">💰</span>
-            <h3>Gold</h3>
-          </div>
-          <div class="help-content">
-            <p><strong>Earn gold by merging blocks!</strong></p>
-            <p>Each additional merge in a cascade earns additional gold.</p>
-            <p>Use gold to buy power-ups, but use them strategically as power-ups double in cost each time they are used.</p>
-          </div>
-        </div>
-
         <!-- Stage System Section -->
         <div class="help-section">
           <div class="help-section-header">
@@ -5035,9 +5073,10 @@
             <h3>Stage Progression</h3>
           </div>
           <div class="help-content">
-            <p>Merge two 512 blocks to create a 1024 block and gain a gold multiplier of 10x.</p>
-            <p>Merging two 1024 blocks will increase the multiplier to 100x.</p>
-            <p>Each additional block size up will increase your multiplier by 10x.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Creating a block with value 1024 will give you a permanent 10x gold multiplier.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Each additional block value above this will once again 10x the multiplier: 100x, 1,000x, 10,000x ...</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Power-ups increase in cost exponentially, so stage progression is crucial to survival in extended runs.</p>
+
             <div class="merge-example" style="justify-content: center; gap: 40px; padding: 20px;">
               <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
                 <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 40px; width: 100%; max-width: 600px;">
@@ -5099,17 +5138,17 @@
         </div>
 
         <!-- Sound Controls Section -->
-        <div class="help-section">
+        <div class="help-section hidden">
           <div class="help-section-header">
             <span class="help-icon">🔊</span>
             <h3>Sound Controls</h3>
           </div>
           <div class="help-content">
-            <p>Customize your audio experience with the sound control menu.</p>
-            <p><strong>Volume Slider:</strong> Adjust the overall volume from 0% (muted) to 100% (full volume).</p>
-            <p><strong>Mute Toggle:</strong> Quickly mute or unmute all game sounds with a single click.</p>
-            <p><strong>Sound Effects:</strong> The game includes various sound effects for merging blocks, collecting gold, using power-ups, and more.</p>
-            <p>Access the sound controls by clicking the speaker icon in the top bar.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Customize your audio experience with the sound control menu.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• <strong>Volume Slider:</strong> Adjust the overall volume from 0% (muted) to 100% (full volume).</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• <strong>Mute Toggle:</strong> Quickly mute or unmute all game sounds with a single click.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• <strong>Sound Effects:</strong> The game includes various sound effects for merging blocks, collecting gold, using power-ups, and more.</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Access the sound controls by clicking the speaker icon in the top bar.</p>
           </div>
         </div>
 
