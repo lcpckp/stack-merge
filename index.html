@@ -184,6 +184,7 @@
   .powerup-shop {
     max-width: 100%;
     overflow-x: hidden;
+    overflow-y: visible; /* Allow badges to extend vertically */
   }
   
   /* Ensure debug button is accessible on mobile in development */
@@ -212,7 +213,7 @@
     align-items: center;
     width: 100%;
     max-width: 800px;
-    margin: 16px auto 16px;
+    margin: 12px auto 12px;
     gap: 16px;
     /* Prevent viewport shifting on mobile */
     transform: translateZ(0);
@@ -386,7 +387,7 @@
       padding: 0 16px;
       grid-template-columns: minmax(80px, auto) minmax(160px, 1fr) minmax(80px, auto);
       max-width: 100%;
-      margin: 24px 16px 16px;
+      margin: 16px 16px 8px;
     }
     
     /* Prevent viewport shifting on mobile */
@@ -457,7 +458,7 @@
       /* Mobile responsive game area and powerup shop */
   @media (max-width: 768px) {
     .game-container {
-      margin-top: 12px;
+      margin-top: 16px;
       padding: 0 16px 16px;
       overflow-x: hidden;
     }
@@ -514,7 +515,7 @@
     /* Ensure game container doesn't take up too much space */
     .game-container {
       margin-bottom: 0 !important;
-      padding-bottom: 8px !important;
+      padding-bottom: 16px !important;
     }
   }
   
@@ -645,7 +646,7 @@
     grid-template-areas: "score next gold";
     align-items: center; 
     gap: 48px; 
-    margin-top: 40px; /* Increased spacing between title and game info */
+    margin-top: 32px; /* Reduced spacing between title and game info */
     width: auto; /* Allow natural expansion */
     max-width: none; /* Remove max-width constraint */
     margin-left: auto;
@@ -930,6 +931,13 @@
     -moz-user-select: none;
     -ms-user-select: none;
   }
+  
+  /* Disabled gold cost badge styling */
+  .powerup-cost-badge.disabled {
+    background: #fbbf24; /* Keep same gold color */
+    color: black; /* Keep black text for readability */
+    opacity: 0.7; /* Reduced opacity for disabled appearance */
+  }
 
   /* Powerup ownership badge styling centered on lower edge of powerup buttons */
   .powerup-ownership-badge {
@@ -966,6 +974,40 @@
   
   .powerup-ownership-badge.count-1-plus {
     background: #16a34a; /* Green for 1+ owned */
+  }
+  
+
+  
+  /* Bottom gold cost badge styling */
+  .powerup-cost-badge {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fbbf24; /* Gold color matching main display */
+    color: black;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 5px;
+    border-radius: 8px;
+    border: 2px solid var(--bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+    font-family: var(--font-family);
+    min-width: 18px;
+    text-align: center;
+    line-height: 1;
+    box-sizing: border-box;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: background-color 0.3s ease;
+    /* Allow badge to expand beyond button boundaries */
+    overflow: visible;
+    max-width: none;
+    width: auto;
   }
   
   /* Stage multiplier badge pulse animation */
@@ -2127,8 +2169,8 @@
   .game-container {
     display: flex;
     align-items: flex-start;
-    margin-top: 32px;
-    padding-bottom: 16px;
+    margin-top: 24px;
+    padding-bottom: 24px;
     justify-content: center;
     position: relative;
     /* Ensure game container doesn't take up full height on mobile */
@@ -2293,6 +2335,14 @@
     padding: 0;
   }
   
+  /* When shop bypass is enabled, buttons expand to fill available width */
+  .shop-grid.bypass-enabled .powerup-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+  }
+  
 
   
   /* Ensure buttons don't become too narrow on very small screens */
@@ -2302,6 +2352,14 @@
       min-width: 50px;
       min-height: 50px;
       max-width: 50px;
+    }
+    
+    /* When shop bypass is enabled, buttons expand to fill available width */
+    .shop-grid.bypass-enabled .powerup-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: none;
+      width: auto;
     }
   }
   
@@ -2320,6 +2378,14 @@
       max-width: 70px;
       flex: 0 0 70px;
     }
+    
+    /* When shop bypass is enabled, buttons expand to fill available width */
+    .shop-grid.bypass-enabled .powerup-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: none;
+      width: auto;
+    }
   }
   
 
@@ -2332,6 +2398,8 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
     min-width: 0;
     min-height: 80px;
+    /* Ensure badges can extend beyond button boundaries */
+    overflow: visible;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -3748,7 +3816,7 @@
       "next";
     align-items: center;
     gap: 32px;
-    margin-top: 32px; /* Increased spacing below title on mobile to prevent label overlap */
+    margin-top: 24px; /* Minimal spacing below title on mobile */
     max-width: 100%;
     padding: 0 16px;
   }
@@ -3898,7 +3966,7 @@
   
   /* Adjust game container for mobile */
   .game-container {
-    margin-top: 20px;
+    margin-top: 12px;
     padding-bottom: 20px;
     flex-direction: column;
     align-items: center;
@@ -4268,7 +4336,7 @@
       "score-gold"
       "next";
     gap: 16px;
-    margin-top: 28px; /* Increased spacing below title on extra small mobile to prevent label overlap */
+    margin-top: 24px; /* Minimal spacing below title on extra small mobile */
     max-width: 100%;
     padding: 0 12px;
   }
@@ -5321,27 +5389,31 @@
     <div class="shop-grid">
       <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="" style="display: none;">
         <span class="powerup-emoji">💣</span>
+        <div class="powerup-cost-badge" id="bombCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="bombOwnershipBadge">0</div>
       </button>
       
       <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="" style="display: none;">
         <span class="powerup-emoji">🗑️</span>
+        <div class="powerup-cost-badge" id="trashCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="trashOwnershipBadge">0</div>
       </button>
       
       <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="" style="display: none;">
         <span class="powerup-emoji">🔄</span>
+        <div class="powerup-cost-badge" id="swapCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="swapOwnershipBadge">0</div>
       </button>
       
       <button id="pickaxeButton" class="powerup-btn" title="Remove any block from stacks (press again to deactivate)" disabled="" style="display: none;">
         <span class="powerup-emoji">⛏️</span>
+        <div class="powerup-cost-badge" id="pickaxeCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="pickaxeOwnershipBadge">0</div>
       </button>
       
       <button id="shopButton" class="powerup-btn shop-btn" title="Open item shop">
         <span class="powerup-emoji">🛒</span>
-        <span class="shop-text">Item Shop</span>
+        <span class="shop-text">Shop</span>
       </button>
     </div>
   </div>
@@ -5741,7 +5813,7 @@
       <button id="shopClose" class="shop-modal-close-btn" title="Close shop">❌ Close</button>
       <div class="shop-modal-header">
         <h2 id="shopTitle">
-          <span class="title-text">🛒 Item Shop</span>
+          <span class="title-text">🛒 Shop</span>
         </h2>
         <div class="shop-gold-display">
           <div class="shop-gold-value" id="shopGoldDisplay">
@@ -5929,6 +6001,7 @@
         <div class="control-row">
           <button id="debugResetPowerupPricingBtn" class="button">Reset Powerup Costs</button>
         </div>
+
       </div>
     </div>
     
@@ -8290,6 +8363,9 @@ function updateGoldDisplay(shouldPulse = false) {
     debugGold.textContent = gold;
   }
   
+  // Update powerup badges when gold changes (to show/hide cost badges)
+  updatePowerupOwnershipBadges();
+  
   // Auto-save when gold changes
   if (gold > 0) {
     saveGameState();
@@ -8767,9 +8843,16 @@ function handleBombConversion() {
     return;
   }
   
-  // Check if player has at least one bomb owned
+  // Check if player has at least one bomb owned or can afford to buy one
   if (bombOwned < 1) {
-    return;
+    // If player can afford to buy a bomb, purchase it first
+    if (canAffordPowerup('bomb')) {
+      purchaseBomb(false); // false = not from shop
+      // After purchasing, stop here - don't continue with bomb conversion
+      return;
+    } else {
+      return;
+    }
   }
   
   // Store the current cost before converting
@@ -8813,9 +8896,16 @@ function handleTrashButton() {
   // Validate queue state before proceeding
   validateQueueState();
   
-  // Check if player has at least one trash can owned
+  // Check if player has at least one trash can owned or can afford to buy one
   if (trashOwned < 1) {
-    return;
+    // If player can afford to buy a trash can, purchase it first
+    if (canAffordPowerup('trash')) {
+      purchaseTrash(false); // false = not from shop
+      // After purchasing, stop here - don't continue with trash usage
+      return;
+    } else {
+      return;
+    }
   }
   
   // Check if there's a next block to remove
@@ -8875,9 +8965,16 @@ function handlePickaxeButton() {
   // Validate queue state before proceeding
   validateQueueState();
   
-  // Check if player has at least one pickaxe owned
+  // Check if player has at least one pickaxe owned or can afford to buy one
   if (pickaxeOwned < 1) {
-    return;
+    // If player can afford to buy a pickaxe, purchase it first
+    if (canAffordPowerup('pickaxe')) {
+      purchasePickaxe(false); // false = not from shop
+      // After purchasing, stop here - don't continue with pickaxe usage
+      return;
+    } else {
+      return;
+    }
   }
   
   // Toggle pickaxe mode
@@ -8919,9 +9016,16 @@ async function handleSwapButton() {
   // Validate queue state before proceeding
   validateQueueState();
   
-  // Check if player has at least one swap owned
+  // Check if player has at least one swap owned or can afford to buy one
   if (swapOwned < 1) {
-    return;
+    // If player can afford to buy a swap, purchase it first
+    if (canAffordPowerup('swap')) {
+      purchaseSwap(false); // false = not from shop
+      // After purchasing, stop here - don't continue with swap usage
+      return;
+    } else {
+      return;
+    }
   }
   
   // Check if there are at least 2 blocks in the queue to swap
@@ -9092,9 +9196,10 @@ function updateBombConversionButtonState() {
         const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "💣";
       } else {
-        // Next block is not a bomb, check if player has at least one bomb owned
+        // Next block is not a bomb, check if player has at least one bomb owned or can afford one
         const hasBombOwned = bombOwned >= 1;
-        bombConversionBtn.disabled = !hasBombOwned;
+        const canAffordBomb = canAffordPowerup('bomb');
+        bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
         bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
         const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
@@ -9105,12 +9210,14 @@ function updateBombConversionButtonState() {
       // Always re-enable them since we're not in bomb undo mode
       if (trashButton) {
         const hasTrashOwned = trashOwned >= 1;
-        trashButton.disabled = !hasTrashOwned;
+        const canAffordTrash = canAffordPowerup('trash');
+        trashButton.disabled = !hasTrashOwned && !canAffordTrash;
         trashButton.title = "Remove next block from queue";
       }
       if (pickaxeButton) {
         const hasPickaxeOwned = pickaxeOwned >= 1;
-        pickaxeButton.disabled = !hasPickaxeOwned;
+        const canAffordPickaxe = canAffordPowerup('pickaxe');
+        pickaxeButton.disabled = !hasPickaxeOwned && !canAffordPickaxe;
         pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
       }
     }
@@ -9138,9 +9245,10 @@ function updateTrashButtonState() {
         trashButton.title = "Pickaxe is active - complete or deactivate first";
       }
     } else {
-      // No other powerups active, check if player has at least one trash can owned
+      // No other powerups active, check if player has at least one trash can owned or can afford one
       const hasTrashOwned = trashOwned >= 1;
-      trashButton.disabled = !hasTrashOwned;
+      const canAffordTrash = canAffordPowerup('trash');
+      trashButton.disabled = !hasTrashOwned && !canAffordTrash;
       trashButton.title = "Remove next block from queue";
     }
     
@@ -9184,8 +9292,9 @@ function updatePickaxeButtonState() {
         const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "⛏️";
       } else {
-        // No other powerups active - check if player has at least one pickaxe owned
-        pickaxeButton.disabled = !hasPickaxeOwned;
+        // No other powerups active - check if player has at least one pickaxe owned or can afford one
+        const canAffordPickaxe = canAffordPowerup('pickaxe');
+        pickaxeButton.disabled = !hasPickaxeOwned && !canAffordPickaxe;
         pickaxeButton.classList.remove('undo-mode');
         pickaxeButton.title = "Remove any block from stacks (press again to deactivate)";
         const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
@@ -9202,12 +9311,14 @@ function updatePickaxeButtonState() {
       // But only if they're not in their own undo mode
       if (bombConversionBtn && !bombSelected) {
         const hasBombOwned = bombOwned >= 1;
-        bombConversionBtn.disabled = !hasBombOwned;
+        const canAffordBomb = canAffordPowerup('bomb');
+        bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
       }
       if (trashButton && !bombSelected) {
         const hasTrashOwned = trashOwned >= 1;
-        trashButton.disabled = !hasTrashOwned;
+        const canAffordTrash = canAffordPowerup('trash');
+        trashButton.disabled = !hasTrashOwned && !canAffordTrash;
         trashButton.title = "Remove next block from queue";
       }
     }
@@ -9233,17 +9344,18 @@ function updateSwapButtonState() {
         swapButton.title = "Pickaxe is active - complete or deactivate first";
       }
     } else {
-      // No other powerups active, check if player has at least one swap owned
+      // No other powerups active, check if player has at least one swap owned or can afford one
       const hasSwapOwned = swapOwned >= 1;
+      const canAffordSwap = canAffordPowerup('swap');
       
       // Check if next two blocks in queue are the same (would be wasteful to swap)
       const nextTwoBlocksSame = nextQueue.length >= 2 && 
                                 nextQueue[0].w === nextQueue[1].w;
       
-      // Disable if no swap owned OR if next two blocks are the same
-      swapButton.disabled = !hasSwapOwned || nextTwoBlocksSame;
+      // Disable if no swap owned AND can't afford one OR if next two blocks are the same
+      swapButton.disabled = (!hasSwapOwned && !canAffordSwap) || nextTwoBlocksSame;
       
-      if (!hasSwapOwned) {
+      if (!hasSwapOwned && !canAffordSwap) {
         swapButton.title = "Swap next two blocks in queue";
       } else if (nextTwoBlocksSame) {
         swapButton.title = "Next two blocks are the same - swap would be wasteful";
@@ -9271,6 +9383,14 @@ function updateTrashButtonIfGoldChanged() {
 // More targeted update function for swap button when we know gold has changed
 function updateSwapButtonIfGoldChanged() {
   updateSwapButtonState();
+}
+
+// General function to update all powerup buttons when gold has changed
+function updateAllPowerupButtonsIfGoldChanged() {
+  updateBombButtonIfGoldChanged();
+  updateTrashButtonIfGoldChanged();
+  updatePickaxeButtonIfGoldChanged();
+  updateSwapButtonIfGoldChanged();
 }
 
 // More targeted update function for pickaxe button when we know gold has changed
@@ -9306,6 +9426,9 @@ let debugMaxBlock = null;
   let debugLifetimeItemsPurchased = null;
   let debugBombStatus = null;
   let debugStage = null;
+
+// Debug option to bypass shop requirements
+let bypassShopRequirements = true;
 
 let customBlockMode = false;
 let customBlockSize = null;
@@ -9610,19 +9733,56 @@ function updateAllPowerupButtonStates() {
       pickaxeButton.disabled = !pickaxeMode; // Keep pickaxe enabled if it's the active one
     }
   } else {
-    // No powerups active, enable buttons based on ownership
+    // No powerups active, enable buttons based on ownership or affordability
     if (bombConversionBtn) {
-      bombConversionBtn.disabled = bombOwned < 1;
+      bombConversionBtn.disabled = bombOwned < 1 && !canAffordPowerup('bomb');
     }
     if (trashButton) {
-      trashButton.disabled = trashOwned < 1;
+      trashButton.disabled = trashOwned < 1 && !canAffordPowerup('trash');
     }
     if (swapButton) {
-      swapButton.disabled = swapOwned < 1;
+      // Use the proper swap button logic that checks if next two blocks are the same
+      const hasSwapOwned = swapOwned >= 1;
+      const canAffordSwap = canAffordPowerup('swap');
+      const nextTwoBlocksSame = nextQueue.length >= 2 && 
+                                nextQueue[0].w === nextQueue[1].w;
+      swapButton.disabled = (!hasSwapOwned && !canAffordSwap) || nextTwoBlocksSame;
     }
     if (pickaxeButton) {
-      pickaxeButton.disabled = pickaxeOwned < 1;
+      pickaxeButton.disabled = pickaxeOwned < 1 && !canAffordPowerup('pickaxe');
     }
+  }
+}
+
+// Function to check if player can afford a powerup
+function canAffordPowerup(powerupType) {
+  switch (powerupType) {
+    case 'bomb':
+      return gold >= bombConversionCost;
+    case 'trash':
+      return gold >= trashButtonCost;
+    case 'swap':
+      return gold >= swapButtonCost;
+    case 'pickaxe':
+      return gold >= pickaxeButtonCost;
+    default:
+      return false;
+  }
+}
+
+// Function to get the cost of a powerup
+function getPowerupCost(powerupType) {
+  switch (powerupType) {
+    case 'bomb':
+      return bombConversionCost;
+    case 'trash':
+      return trashButtonCost;
+    case 'swap':
+      return swapButtonCost;
+    case 'pickaxe':
+      return pickaxeButtonCost;
+    default:
+      return 0;
   }
 }
 
@@ -9665,21 +9825,121 @@ function updatePowerupOwnershipBadges() {
   const pickaxeOwnershipBadge = document.getElementById('pickaxeOwnershipBadge');
   const swapOwnershipBadge = document.getElementById('swapOwnershipBadge');
   
+  const bombCostBadge = document.getElementById('bombCostBadge');
+  const trashCostBadge = document.getElementById('trashCostBadge');
+  const pickaxeCostBadge = document.getElementById('pickaxeCostBadge');
+  const swapCostBadge = document.getElementById('swapCostBadge');
+  
+  // Bomb badges
   if (bombOwnershipBadge) {
-    bombOwnershipBadge.textContent = bombOwned;
-    updateBadgeColor(bombOwnershipBadge, bombOwned);
+    if (bombOwned > 0) {
+      // Show ownership badge when owned
+      bombOwnershipBadge.textContent = bombOwned;
+      bombOwnershipBadge.style.display = 'block';
+      updateBadgeColor(bombOwnershipBadge, bombOwned);
+    } else {
+      // Hide ownership badge when not owned
+      bombOwnershipBadge.style.display = 'none';
+    }
   }
+  if (bombCostBadge) {
+    if (bombOwned === 0) {
+      // Show cost badge only when not owned
+      bombCostBadge.textContent = formatNumber(bombConversionCost);
+      bombCostBadge.style.display = 'block';
+      if (canAffordPowerup('bomb')) {
+        bombCostBadge.classList.remove('disabled');
+      } else {
+        bombCostBadge.classList.add('disabled');
+      }
+    } else {
+      // Hide cost badge when owned
+      bombCostBadge.style.display = 'none';
+    }
+  }
+  
+  // Trash badges
   if (trashOwnershipBadge) {
-    trashOwnershipBadge.textContent = trashOwned;
-    updateBadgeColor(trashOwnershipBadge, trashOwned);
+    if (trashOwned > 0) {
+      // Show ownership badge when owned
+      trashOwnershipBadge.textContent = trashOwned;
+      trashOwnershipBadge.style.display = 'block';
+      updateBadgeColor(trashOwnershipBadge, trashOwned);
+    } else {
+      // Hide ownership badge when not owned
+      trashOwnershipBadge.style.display = 'none';
+    }
   }
+  if (trashCostBadge) {
+    if (trashOwned === 0) {
+      // Show cost badge only when not owned
+      trashCostBadge.textContent = formatNumber(trashButtonCost);
+      trashCostBadge.style.display = 'block';
+      if (canAffordPowerup('trash')) {
+        trashCostBadge.classList.remove('disabled');
+      } else {
+        trashCostBadge.classList.add('disabled');
+      }
+    } else {
+      // Hide cost badge when owned
+      trashCostBadge.style.display = 'none';
+    }
+  }
+  
+  // Pickaxe badges
   if (pickaxeOwnershipBadge) {
-    pickaxeOwnershipBadge.textContent = pickaxeOwned;
-    updateBadgeColor(pickaxeOwnershipBadge, pickaxeOwned);
+    if (pickaxeOwned > 0) {
+      // Show ownership badge when owned
+      pickaxeOwnershipBadge.textContent = pickaxeOwned;
+      pickaxeOwnershipBadge.style.display = 'block';
+      updateBadgeColor(pickaxeOwnershipBadge, pickaxeOwned);
+    } else {
+      // Hide ownership badge when not owned
+      pickaxeOwnershipBadge.style.display = 'none';
+    }
   }
+  if (pickaxeCostBadge) {
+    if (pickaxeOwned === 0) {
+      // Show cost badge only when not owned
+      pickaxeCostBadge.textContent = formatNumber(pickaxeButtonCost);
+      pickaxeCostBadge.style.display = 'block';
+      if (canAffordPowerup('pickaxe')) {
+        pickaxeCostBadge.classList.remove('disabled');
+      } else {
+        pickaxeCostBadge.classList.add('disabled');
+      }
+    } else {
+      // Hide cost badge when owned
+      pickaxeCostBadge.style.display = 'none';
+    }
+  }
+  
+  // Swap badges
   if (swapOwnershipBadge) {
-    swapOwnershipBadge.textContent = swapOwned;
-    updateBadgeColor(swapOwnershipBadge, swapOwned);
+    if (swapOwned > 0) {
+      // Show ownership badge when owned
+      swapOwnershipBadge.textContent = swapOwned;
+      swapOwnershipBadge.style.display = 'block';
+      updateBadgeColor(swapOwnershipBadge, swapOwned);
+    } else {
+      // Hide ownership badge when not owned
+      swapOwnershipBadge.style.display = 'none';
+    }
+  }
+  if (swapCostBadge) {
+    if (swapOwned === 0) {
+      // Show cost badge only when not owned
+      swapCostBadge.textContent = formatNumber(swapButtonCost);
+      swapCostBadge.style.display = 'block';
+      if (canAffordPowerup('swap')) {
+        swapCostBadge.classList.remove('disabled');
+      } else {
+        swapCostBadge.classList.add('disabled');
+      }
+    } else {
+      // Hide cost badge when owned
+      swapCostBadge.style.display = 'none';
+    }
   }
 }
 
@@ -9691,17 +9951,18 @@ function updatePowerupButtonVisibility() {
   const swapBtn = document.getElementById('swapButton');
   
   // Show/hide buttons based on whether they've ever been purchased
+  // If bypass is enabled, show all buttons regardless of purchase history
   if (bombBtn) {
-    bombBtn.style.display = bombEverPurchased ? 'flex' : 'none';
+    bombBtn.style.display = (bypassShopRequirements || bombEverPurchased) ? 'flex' : 'none';
   }
   if (trashBtn) {
-    trashBtn.style.display = trashEverPurchased ? 'flex' : 'none';
+    trashBtn.style.display = (bypassShopRequirements || trashEverPurchased) ? 'flex' : 'none';
   }
   if (pickaxeBtn) {
-    pickaxeBtn.style.display = pickaxeEverPurchased ? 'flex' : 'none';
+    pickaxeBtn.style.display = (bypassShopRequirements || pickaxeEverPurchased) ? 'flex' : 'none';
   }
   if (swapBtn) {
-    swapBtn.style.display = swapEverPurchased ? 'flex' : 'none';
+    swapBtn.style.display = (bypassShopRequirements || swapEverPurchased) ? 'flex' : 'none';
   }
 }
 
@@ -9711,16 +9972,29 @@ function updateShopButtonPositioning() {
   const shopGrid = document.querySelector('.shop-grid');
   
   if (shopBtn && shopGrid) {
-    if (anyItemEverPurchased) {
-      // After first purchase, use normal positioning (right-aligned)
-      shopBtn.style.marginLeft = 'auto';
-      shopBtn.style.marginRight = '0';
-      shopGrid.style.justifyContent = 'space-between';
+    if (bypassShopRequirements) {
+      // Hide shop button when bypass is enabled
+      shopBtn.style.display = 'none';
+      shopGrid.style.justifyContent = 'flex-start';
+      // Add CSS class to enable button expansion
+      shopGrid.classList.add('bypass-enabled');
     } else {
-      // Before first purchase, center the shop button
-      shopBtn.style.marginLeft = 'auto';
-      shopBtn.style.marginRight = 'auto';
-      shopGrid.style.justifyContent = 'center';
+      // Remove CSS class to restore normal button sizing
+      shopGrid.classList.remove('bypass-enabled');
+      
+      if (anyItemEverPurchased) {
+        // After first purchase, use normal positioning (right-aligned)
+        shopBtn.style.display = 'flex';
+        shopBtn.style.marginLeft = 'auto';
+        shopBtn.style.marginRight = '0';
+        shopGrid.style.justifyContent = 'space-between';
+      } else {
+        // Before first purchase, center the shop button
+        shopBtn.style.display = 'flex';
+        shopBtn.style.marginLeft = 'auto';
+        shopBtn.style.marginRight = 'auto';
+        shopGrid.style.justifyContent = 'center';
+      }
     }
   }
 }
@@ -9744,20 +10018,40 @@ function updateShopDisplay() {
   const shopSwapOwnershipBadge = document.getElementById('shopSwapOwnershipBadge');
   
   if (shopBombOwnershipBadge) {
-    shopBombOwnershipBadge.textContent = bombOwned;
-    updateBadgeColor(shopBombOwnershipBadge, bombOwned);
+    if (bombOwned > 0) {
+      shopBombOwnershipBadge.textContent = bombOwned;
+      shopBombOwnershipBadge.style.display = 'block';
+      updateBadgeColor(shopBombOwnershipBadge, bombOwned);
+    } else {
+      shopBombOwnershipBadge.style.display = 'none';
+    }
   }
   if (shopTrashOwnershipBadge) {
-    shopTrashOwnershipBadge.textContent = trashOwned;
-    updateBadgeColor(shopTrashOwnershipBadge, trashOwned);
+    if (trashOwned > 0) {
+      shopTrashOwnershipBadge.textContent = trashOwned;
+      shopTrashOwnershipBadge.style.display = 'block';
+      updateBadgeColor(shopTrashOwnershipBadge, trashOwned);
+    } else {
+      shopTrashOwnershipBadge.style.display = 'none';
+    }
   }
   if (shopPickaxeOwnershipBadge) {
-    shopPickaxeOwnershipBadge.textContent = pickaxeOwned;
-    updateBadgeColor(shopPickaxeOwnershipBadge, pickaxeOwned);
+    if (pickaxeOwned > 0) {
+      shopPickaxeOwnershipBadge.textContent = pickaxeOwned;
+      shopPickaxeOwnershipBadge.style.display = 'block';
+      updateBadgeColor(shopPickaxeOwnershipBadge, pickaxeOwned);
+    } else {
+      shopPickaxeOwnershipBadge.style.display = 'none';
+    }
   }
   if (shopSwapOwnershipBadge) {
-    shopSwapOwnershipBadge.textContent = swapOwned;
-    updateBadgeColor(shopSwapOwnershipBadge, swapOwned);
+    if (swapOwned > 0) {
+      shopSwapOwnershipBadge.textContent = swapOwned;
+      shopSwapOwnershipBadge.style.display = 'block';
+      updateBadgeColor(shopSwapOwnershipBadge, swapOwned);
+    } else {
+      shopSwapOwnershipBadge.style.display = 'none';
+    }
   }
   
   // Also update the powerup ownership badges
@@ -9871,8 +10165,60 @@ function showShopGoldLost(amount) {
   }, 1200);
 }
 
+// Function to show gold lost animation relative to main gold display
+function showMainGoldLost(amount) {
+  // Create the gold lost display element
+  const goldLostEl = document.createElement('div');
+  goldLostEl.className = 'gold-lost';
+  goldLostEl.textContent = `-${formatNumber(amount)}`;
+  
+  // Position it relative to the main gold display
+  const goldDisplay = document.querySelector('.gold-value');
+  if (goldDisplay) {
+    const rect = goldDisplay.getBoundingClientRect();
+    
+    // First, add the element to the DOM temporarily to measure its width
+    document.body.appendChild(goldLostEl);
+    const textWidth = goldLostEl.offsetWidth;
+    
+    // Calculate the desired position (2px right of main gold display right edge)
+    let desiredLeft = rect.right + 2;
+    
+    // Check if the text would be cut off by the right edge of the screen
+    const screenRight = window.innerWidth;
+    const textRightEdge = desiredLeft + textWidth;
+    
+    // If text would be cut off, adjust position to the left
+    if (textRightEdge > screenRight - 10) { // Leave 10px margin from screen edge
+      desiredLeft = screenRight - 10 - textWidth;
+    }
+    
+    // Ensure we don't go too far left (keep it within reasonable bounds)
+    const minLeft = Math.max(0, rect.left - 20); // Don't go more than 20px left of the gold display, and never go off-screen left
+    if (desiredLeft < minLeft) {
+      desiredLeft = minLeft;
+    }
+    
+    // Position the element so its left edge starts at desiredLeft
+    goldLostEl.style.left = desiredLeft + 'px';
+    goldLostEl.style.top = (rect.top + 5) + 'px';
+  } else {
+    // Fallback positioning if main gold display not found
+    goldLostEl.style.left = '50%';
+    goldLostEl.style.top = '50%';
+    goldLostEl.style.transform = 'translate(-50%, -50%)';
+  }
+  
+  // Remove after animation completes
+  setTimeout(() => {
+    if (goldLostEl.parentNode) {
+      goldLostEl.parentNode.removeChild(goldLostEl);
+    }
+  }, 1200);
+}
+
 // Shop purchase functions
-function purchaseBomb() {
+function purchaseBomb(fromShop = true) {
   if (gold >= bombConversionCost) {
     const cost = bombConversionCost;
     gold -= cost;
@@ -9885,18 +10231,25 @@ function purchaseBomb() {
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateBombConversionButtonState();
+    updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
     updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
-    triggerShopGoldShrink();
-    showShopGoldLost(cost);
-    // Trigger badge animation for shop bomb badge
-    triggerBadgeAnimation('shopBombOwnershipBadge');
+    
+    // Show appropriate gold lost animation based on where purchase came from
+    if (fromShop) {
+      triggerShopGoldShrink();
+      showShopGoldLost(cost);
+      // Trigger badge animation for shop bomb badge
+      triggerBadgeAnimation('shopBombOwnershipBadge');
+    } else {
+      showMainGoldLost(cost);
+    }
   }
 }
 
-function purchaseTrash() {
+function purchaseTrash(fromShop = true) {
   if (gold >= trashButtonCost) {
     const cost = trashButtonCost;
     gold -= cost;
@@ -9909,18 +10262,25 @@ function purchaseTrash() {
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateTrashButtonState();
+    updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
     updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
-    triggerShopGoldShrink();
-    showShopGoldLost(cost);
-    // Trigger badge animation for shop trash badge
-    triggerBadgeAnimation('shopTrashOwnershipBadge');
+    
+    // Show appropriate gold lost animation based on where purchase came from
+    if (fromShop) {
+      triggerShopGoldShrink();
+      showShopGoldLost(cost);
+      // Trigger badge animation for shop trash badge
+      triggerBadgeAnimation('shopTrashOwnershipBadge');
+    } else {
+      showMainGoldLost(cost);
+    }
   }
 }
 
-function purchasePickaxe() {
+function purchasePickaxe(fromShop = true) {
   if (gold >= pickaxeButtonCost) {
     const cost = pickaxeButtonCost;
     gold -= cost;
@@ -9933,18 +10293,25 @@ function purchasePickaxe() {
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updatePickaxeButtonState();
+    updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
     updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
-    triggerShopGoldShrink();
-    showShopGoldLost(cost);
-    // Trigger badge animation for shop pickaxe badge
-    triggerBadgeAnimation('shopPickaxeOwnershipBadge');
+    
+    // Show appropriate gold lost animation based on where purchase came from
+    if (fromShop) {
+      triggerShopGoldShrink();
+      showShopGoldLost(cost);
+      // Trigger badge animation for shop pickaxe badge
+      triggerBadgeAnimation('shopPickaxeOwnershipBadge');
+    } else {
+      showMainGoldLost(cost);
+    }
   }
 }
 
-function purchaseSwap() {
+function purchaseSwap(fromShop = true) {
   if (gold >= swapButtonCost) {
     const cost = swapButtonCost;
     gold -= cost;
@@ -9957,14 +10324,21 @@ function purchaseSwap() {
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateSwapButtonState();
+    updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
     updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
-    triggerShopGoldShrink();
-    showShopGoldLost(cost);
-    // Trigger badge animation for shop swap badge
-    triggerBadgeAnimation('shopSwapOwnershipBadge');
+    
+    // Show appropriate gold lost animation based on where purchase came from
+    if (fromShop) {
+      triggerShopGoldShrink();
+      showShopGoldLost(cost);
+      // Trigger badge animation for shop swap badge
+      triggerBadgeAnimation('shopSwapOwnershipBadge');
+    } else {
+      showMainGoldLost(cost);
+    }
   }
 }
 
@@ -10989,6 +11363,8 @@ function syncDebugControls() {
     debugResetPowerupPricingBtn.removeEventListener('click', handleDebugResetPowerupPricing);
     debugResetPowerupPricingBtn.addEventListener('click', handleDebugResetPowerupPricing);
   }
+  
+
 }
 
 // Debug pane controls will be set up in syncDebugControls()
@@ -11083,12 +11459,8 @@ function handleGrantGold() {
   if (statsModal && !statsModal.classList.contains('hidden')) {
     updateStatsModal();
   }
-  // Update bomb conversion button state
-  updateBombButtonIfGoldChanged();
-  // Update trash button state
-  updateTrashButtonIfGoldChanged();
-  // Update pickaxe button state
-  updatePickaxeButtonIfGoldChanged();
+  // Update all powerup button states when gold changes
+  updateAllPowerupButtonsIfGoldChanged();
   
   // Play coin sound effect for earning gold
   soundManager.playCoinSound();
@@ -11293,6 +11665,8 @@ function handleDebugResetPowerupPricing() {
   // Save the game state to persist the changes
   saveGameState();
 }
+
+
 
 function updatePowerupCostDisplays() {
   // Get all the cost display elements
@@ -11784,12 +12158,8 @@ function render(){
   // update gold display in game info
   updateGoldDisplay();
   
-  // Update bomb conversion button state
-  updateBombButtonIfGoldChanged();
-  // Update trash button state
-  updateTrashButtonState();
-  // Update pickaxe button state
-  updatePickaxeButtonIfGoldChanged();
+  // Update all powerup button states when gold changes
+  updateAllPowerupButtonsIfGoldChanged();
   
 
   
