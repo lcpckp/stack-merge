@@ -964,16 +964,8 @@
     background: #dc2626; /* Red for 0 owned */
   }
   
-  .powerup-ownership-badge.count-1 {
-    background: #ea580c; /* Orange for 1 owned */
-  }
-  
-  .powerup-ownership-badge.count-2 {
-    background: #eab308; /* Yellow for 2 owned */
-  }
-  
-  .powerup-ownership-badge.count-3-plus {
-    background: #16a34a; /* Green for 3+ owned */
+  .powerup-ownership-badge.count-1-plus {
+    background: #16a34a; /* Green for 1+ owned */
   }
   
   /* Stage multiplier badge pulse animation */
@@ -1475,6 +1467,17 @@
     0% { transform: scale(1); }
     50% { transform: scale(0.9); }
     100% { transform: scale(1); }
+  }
+
+  /* Badge scale animation for item shop purchases */
+  @keyframes badgeScale {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.2); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  
+  .powerup-ownership-badge.scale-animation {
+    animation: badgeScale 0.4s ease-out;
   }
 
   /* Gold lost animation for item shop */
@@ -5316,22 +5319,22 @@
   <!-- Unified Powerup Shop - Below Game Area -->
   <div class="powerup-shop">
     <div class="shop-grid">
-      <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="">
+      <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="" style="display: none;">
         <span class="powerup-emoji">💣</span>
         <div class="powerup-ownership-badge" id="bombOwnershipBadge">0</div>
       </button>
       
-      <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="">
+      <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="" style="display: none;">
         <span class="powerup-emoji">🗑️</span>
         <div class="powerup-ownership-badge" id="trashOwnershipBadge">0</div>
       </button>
       
-      <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="">
+      <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="" style="display: none;">
         <span class="powerup-emoji">🔄</span>
         <div class="powerup-ownership-badge" id="swapOwnershipBadge">0</div>
       </button>
       
-      <button id="pickaxeButton" class="powerup-btn" title="Remove any block from stacks (press again to deactivate)" disabled="">
+      <button id="pickaxeButton" class="powerup-btn" title="Remove any block from stacks (press again to deactivate)" disabled="" style="display: none;">
         <span class="powerup-emoji">⛏️</span>
         <div class="powerup-ownership-badge" id="pickaxeOwnershipBadge">0</div>
       </button>
@@ -5391,7 +5394,7 @@
                 <span style="font-size: 20px;">🎮</span>
                 Controls
               </h4>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
                   <span style="font-size: 24px;">⬇️</span>
                   <span style="font-size: 14px; font-weight: 500;">Tap on a column to drop the next block</span>
@@ -5413,8 +5416,8 @@
                   <span style="font-size: 14px; font-weight: 500;">Destroy any block in the game</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
-                  <span style="font-size: 24px;">❓</span>
-                  <span style="font-size: 14px; font-weight: 500;">Placeholder tip</span>
+                  <span style="font-size: 24px;">🔄</span>
+                  <span style="font-size: 14px; font-weight: 500;">Swap the next two blocks in the queue</span>
                 </div>
               </div>
             </div>
@@ -5548,7 +5551,7 @@
               </div>
             </div>
             
-            <div style="background: var(--panel); border-radius: 12px; padding: 20px; border: 1px solid #475569;">
+            <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
               <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">⛏️</span>
                 Pickaxe
@@ -5713,6 +5716,21 @@
           <span class="stat-label">🗑️ Total Blocks Trashed:</span>
           <span class="stat-value" id="statsTotalBlocksTrashed">0</span>
         </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">⛏️ Total Blocks Mined:</span>
+          <span class="stat-value" id="statsTotalBlocksMined">0</span>
+        </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">🔄 Total Swaps Used:</span>
+          <span class="stat-value" id="statsTotalSwapsUsed">0</span>
+        </div>
+        
+        <div class="stat-line">
+          <span class="stat-label">🛒 Lifetime Items Purchased:</span>
+          <span class="stat-value" id="statsLifetimeItemsPurchased">0</span>
+        </div>
       </div>
     </div>
   </div>
@@ -5790,7 +5808,7 @@
             <button class="shop-item-btn" id="shopPickaxeBtn" title="Purchase Pickaxe">
               <div class="shop-item-cost">
                 <span class="cost-emoji">💰</span>
-                <span class="cost-amount" id="shopPickaxeCost">25</span>
+                <span class="cost-amount" id="shopPickaxeCost">1000</span>
               </div>
             </button>
           </div>
@@ -5928,6 +5946,9 @@
                       <tr><td>Total Blocks Dropped:</td><td id="debugTotalBlocksDropped">817</td></tr>
             <tr><td>Total Bombs Exploded:</td><td id="debugTotalBombsExploded">40</td></tr>
             <tr><td>Total Blocks Trashed:</td><td id="debugTotalBlocksTrashed">14</td></tr>
+            <tr><td>Total Blocks Mined:</td><td id="debugTotalBlocksMined">0</td></tr>
+            <tr><td>Total Swaps Used:</td><td id="debugTotalSwapsUsed">0</td></tr>
+            <tr><td>Lifetime Items Purchased:</td><td id="debugLifetimeItemsPurchased">0</td></tr>
             <tr><td>Bomb Status:</td><td id="debugBombStatus">Disabled</td></tr>
           <tr><td>Stage:</td><td id="debugStage">1</td></tr>
         </tbody></table>
@@ -7385,6 +7406,9 @@ function saveGameState() {
       totalBlocksDropped: totalBlocksDropped || 0,
       totalBombsExploded: totalBombsExploded || 0,
       totalBlocksTrashed: totalBlocksTrashed || 0,
+      totalBlocksMined: totalBlocksMined || 0,
+      totalSwapsUsed: totalSwapsUsed || 0,
+      lifetimeItemsPurchased: lifetimeItemsPurchased || 0,
       currentTargetBlockSize: currentTargetBlockSize || STARTING_BLOCK_SIZE,
       currentStage: currentStage || 1,
       weights: weights || [1, 2],
@@ -7392,7 +7416,7 @@ function saveGameState() {
       nextQueue: nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()],
       bombConversionCost: bombConversionCost || 25,
       trashButtonCost: trashButtonCost || 25,
-      pickaxeButtonCost: pickaxeButtonCost || 25,
+      pickaxeButtonCost: pickaxeButtonCost || 1000,
       swapButtonCost: swapButtonCost || 25,
       bombConversionPresses: bombConversionPresses || 0,
       trashButtonPresses: trashButtonPresses || 0,
@@ -7405,6 +7429,11 @@ function saveGameState() {
       trashOwned: trashOwned || 0,
       pickaxeOwned: pickaxeOwned || 0,
       swapOwned: swapOwned || 0,
+      bombEverPurchased: bombEverPurchased || false,
+      trashEverPurchased: trashEverPurchased || false,
+      pickaxeEverPurchased: pickaxeEverPurchased || false,
+      swapEverPurchased: swapEverPurchased || false,
+      anyItemEverPurchased: anyItemEverPurchased || false,
 
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
@@ -7458,6 +7487,9 @@ function restoreGameState(gameState) {
     totalBlocksDropped = gameState.totalBlocksDropped || 0;
     totalBombsExploded = gameState.totalBombsExploded || 0;
     totalBlocksTrashed = gameState.totalBlocksTrashed || 0;
+    totalBlocksMined = gameState.totalBlocksMined || 0;
+    totalSwapsUsed = gameState.totalSwapsUsed || 0;
+    lifetimeItemsPurchased = gameState.lifetimeItemsPurchased || 0;
     
     // Restore high score from saved state
     window.highScore = gameState.highScore || 0;
@@ -7493,7 +7525,7 @@ function restoreGameState(gameState) {
     const oldSwapCost = swapButtonCost;
     bombConversionCost = gameState.bombConversionCost || 25;
     trashButtonCost = gameState.trashButtonCost || 25;
-    pickaxeButtonCost = gameState.pickaxeButtonCost || 25;
+    pickaxeButtonCost = gameState.pickaxeButtonCost || 1000;
     swapButtonCost = gameState.swapButtonCost || 25;
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
@@ -7513,8 +7545,21 @@ function restoreGameState(gameState) {
     pickaxeOwned = gameState.pickaxeOwned || 0;
     swapOwned = gameState.swapOwned || 0;
     
+    // Restore purchase tracking from saved state
+    bombEverPurchased = gameState.bombEverPurchased || false;
+    trashEverPurchased = gameState.trashEverPurchased || false;
+    pickaxeEverPurchased = gameState.pickaxeEverPurchased || false;
+    swapEverPurchased = gameState.swapEverPurchased || false;
+    anyItemEverPurchased = gameState.anyItemEverPurchased || false;
+    
     // Update powerup ownership badges
     updatePowerupOwnershipBadges();
+    
+    // Update powerup button visibility based on purchase history
+    updatePowerupButtonVisibility();
+    
+    // Update shop button positioning based on purchase history
+    updateShopButtonPositioning();
 
     
     // Restore sound volumes from saved state
@@ -7812,11 +7857,20 @@ function clearAllGameData() {
   // Reset total blocks trashed count
   totalBlocksTrashed = 0;
   
+  // Reset total blocks mined count
+  totalBlocksMined = 0;
+  
+  // Reset total swaps used count
+  totalSwapsUsed = 0;
+  
+  // Reset lifetime items purchased count
+  lifetimeItemsPurchased = 0;
+  
   // Reset other important game state variables
   hasShownPersonalBest = false;
   bombConversionCost = 25; // Reset to default cost
   trashButtonCost = 25; // Reset to default cost
-  pickaxeButtonCost = 25; // Reset to default cost
+  pickaxeButtonCost = 1000; // Reset to default cost
   swapButtonCost = 25; // Reset to default cost
   bombConversionPresses = 0;
   trashButtonPresses = 0;
@@ -8320,12 +8374,24 @@ let lifetimeGoldEarned = 0; // Track total gold earned across all games
 let totalBlocksDropped = 0; // Track total blocks dropped across all games
 let totalBombsExploded = 0; // Track total bombs exploded across all games
 let totalBlocksTrashed = 0; // Track total blocks trashed across all games
+let totalBlocksMined = 0; // Track total blocks mined with pickaxe across all games
+let totalSwapsUsed = 0; // Track total swaps used across all games
+let lifetimeItemsPurchased = 0; // Track total items purchased across all games
 
 // Shop owned quantities
 let bombOwned = 0; // Track owned bomb powerups
 let trashOwned = 0; // Track owned trash can powerups
 let pickaxeOwned = 0; // Track owned pickaxe powerups
 let swapOwned = 0; // Track owned swap powerups
+
+// Track if each powerup has ever been purchased (for showing in grid)
+let bombEverPurchased = false;
+let trashEverPurchased = false;
+let pickaxeEverPurchased = false;
+let swapEverPurchased = false;
+
+// Track if any item has ever been purchased (for shop button positioning)
+let anyItemEverPurchased = false;
 
 // Initialize high score tracking
 window.highScore = window.highScore || 0;
@@ -8352,7 +8418,7 @@ let trashButtonCost = 25;
 let trashButtonPresses = 0; // Number of times button has been pressed
 
 // Pickaxe button state
-let pickaxeButtonCost = 25;
+let pickaxeButtonCost = 1000;
 let pickaxeButtonPresses = 0; // Number of times button has been pressed
 let pickaxeMode = false; // Track if pickaxe mode is active
 
@@ -8782,9 +8848,6 @@ function handleTrashButton() {
     render();
   }); // true = queue already modified
   
-  // Increment press count and double the cost
-  trashButtonCost *= 2;
-  
   // Update button cost display
   const trashCostEl = document.getElementById('trashCost');
   if (trashCostEl) {
@@ -8870,6 +8933,9 @@ async function handleSwapButton() {
   swapOwned--;
   updatePowerupOwnershipBadges();
   
+  // Track total swaps used
+  totalSwapsUsed++;
+  
   // Play switch sound effect when swap ability is used
   if (soundManager && soundManager.canPlayAudio()) {
     soundManager.playSwitchSound();
@@ -8885,9 +8951,6 @@ async function handleSwapButton() {
   
   // Re-render to show the swapped blocks
   render();
-  
-  // Increment press count and double the cost
-  swapButtonCost *= 2;
   
   // Update button cost display
   const swapCostEl = document.getElementById('swapCost');
@@ -8938,8 +9001,8 @@ async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
   pickaxeOwned--;
   updatePowerupOwnershipBadges();
   
-  // Increment press count and double the cost BEFORE updating button state
-  pickaxeButtonCost *= 2;
+  // Track total blocks mined with pickaxe
+  totalBlocksMined++;
   
   // Update all powerup button states
   updateAllPowerupButtonStates();
@@ -9172,8 +9235,21 @@ function updateSwapButtonState() {
     } else {
       // No other powerups active, check if player has at least one swap owned
       const hasSwapOwned = swapOwned >= 1;
-      swapButton.disabled = !hasSwapOwned;
-      swapButton.title = "Swap next two blocks in queue";
+      
+      // Check if next two blocks in queue are the same (would be wasteful to swap)
+      const nextTwoBlocksSame = nextQueue.length >= 2 && 
+                                nextQueue[0].w === nextQueue[1].w;
+      
+      // Disable if no swap owned OR if next two blocks are the same
+      swapButton.disabled = !hasSwapOwned || nextTwoBlocksSame;
+      
+      if (!hasSwapOwned) {
+        swapButton.title = "Swap next two blocks in queue";
+      } else if (nextTwoBlocksSame) {
+        swapButton.title = "Next two blocks are the same - swap would be wasteful";
+      } else {
+        swapButton.title = "Swap next two blocks in queue";
+      }
     }
     
     // Update the tracked gold amount
@@ -9225,6 +9301,9 @@ let debugMaxBlock = null;
   let debugTotalBlocksDropped = null;
   let debugTotalBombsExploded = null;
   let debugTotalBlocksTrashed = null;
+  let debugTotalBlocksMined = null;
+  let debugTotalSwapsUsed = null;
+  let debugLifetimeItemsPurchased = null;
   let debugBombStatus = null;
   let debugStage = null;
 
@@ -9275,6 +9354,9 @@ debugMaxBlock = document.getElementById('debugMaxBlock');
         debugTotalBlocksDropped = document.getElementById('debugTotalBlocksDropped');
         debugTotalBombsExploded = document.getElementById('debugTotalBombsExploded');
         debugTotalBlocksTrashed = document.getElementById('debugTotalBlocksTrashed');
+        debugTotalBlocksMined = document.getElementById('debugTotalBlocksMined');
+        debugTotalSwapsUsed = document.getElementById('debugTotalSwapsUsed');
+        debugLifetimeItemsPurchased = document.getElementById('debugLifetimeItemsPurchased');
         debugBombStatus = document.getElementById('debugBombStatus');
         debugStage = document.getElementById('debugStage');
 const grantGoldBtn = document.getElementById('grantGoldBtn');
@@ -9549,17 +9631,30 @@ function updateBadgeColor(badgeElement, count) {
   if (!badgeElement) return;
   
   // Remove all existing color classes
-  badgeElement.classList.remove('count-0', 'count-1', 'count-2', 'count-3-plus');
+  badgeElement.classList.remove('count-0', 'count-1-plus');
   
   // Add appropriate color class based on count
   if (count === 0) {
     badgeElement.classList.add('count-0');
-  } else if (count === 1) {
-    badgeElement.classList.add('count-1');
-  } else if (count === 2) {
-    badgeElement.classList.add('count-2');
-  } else if (count >= 3) {
-    badgeElement.classList.add('count-3-plus');
+  } else if (count >= 1) {
+    badgeElement.classList.add('count-1-plus');
+  }
+}
+
+// Function to trigger badge scale animation
+function triggerBadgeAnimation(badgeId) {
+  const badge = document.getElementById(badgeId);
+  if (badge) {
+    // Remove any existing animation class
+    badge.classList.remove('scale-animation');
+    // Force a reflow to ensure the class removal is processed
+    badge.offsetHeight;
+    // Add the animation class
+    badge.classList.add('scale-animation');
+    // Remove the class after animation completes
+    setTimeout(() => {
+      badge.classList.remove('scale-animation');
+    }, 400);
   }
 }
 
@@ -9585,6 +9680,48 @@ function updatePowerupOwnershipBadges() {
   if (swapOwnershipBadge) {
     swapOwnershipBadge.textContent = swapOwned;
     updateBadgeColor(swapOwnershipBadge, swapOwned);
+  }
+}
+
+// Function to update powerup button visibility based on purchase history
+function updatePowerupButtonVisibility() {
+  const bombBtn = document.getElementById('bombConversionBtn');
+  const trashBtn = document.getElementById('trashButton');
+  const pickaxeBtn = document.getElementById('pickaxeButton');
+  const swapBtn = document.getElementById('swapButton');
+  
+  // Show/hide buttons based on whether they've ever been purchased
+  if (bombBtn) {
+    bombBtn.style.display = bombEverPurchased ? 'flex' : 'none';
+  }
+  if (trashBtn) {
+    trashBtn.style.display = trashEverPurchased ? 'flex' : 'none';
+  }
+  if (pickaxeBtn) {
+    pickaxeBtn.style.display = pickaxeEverPurchased ? 'flex' : 'none';
+  }
+  if (swapBtn) {
+    swapBtn.style.display = swapEverPurchased ? 'flex' : 'none';
+  }
+}
+
+// Function to update shop button positioning based on purchase history
+function updateShopButtonPositioning() {
+  const shopBtn = document.getElementById('shopButton');
+  const shopGrid = document.querySelector('.shop-grid');
+  
+  if (shopBtn && shopGrid) {
+    if (anyItemEverPurchased) {
+      // After first purchase, use normal positioning (right-aligned)
+      shopBtn.style.marginLeft = 'auto';
+      shopBtn.style.marginRight = '0';
+      shopGrid.style.justifyContent = 'space-between';
+    } else {
+      // Before first purchase, center the shop button
+      shopBtn.style.marginLeft = 'auto';
+      shopBtn.style.marginRight = 'auto';
+      shopGrid.style.justifyContent = 'center';
+    }
   }
 }
 
@@ -9740,15 +9877,22 @@ function purchaseBomb() {
     const cost = bombConversionCost;
     gold -= cost;
     bombOwned++;
+    bombEverPurchased = true; // Mark as ever purchased
+    anyItemEverPurchased = true; // Mark that any item has been purchased
+    lifetimeItemsPurchased++; // Track total items purchased
     bombConversionCost *= 2; // Double the cost
     updateGoldDisplay();
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateBombConversionButtonState();
+    updatePowerupButtonVisibility(); // Show the button in the grid
+    updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
     triggerShopGoldShrink();
     showShopGoldLost(cost);
+    // Trigger badge animation for shop bomb badge
+    triggerBadgeAnimation('shopBombOwnershipBadge');
   }
 }
 
@@ -9757,15 +9901,22 @@ function purchaseTrash() {
     const cost = trashButtonCost;
     gold -= cost;
     trashOwned++;
+    trashEverPurchased = true; // Mark as ever purchased
+    anyItemEverPurchased = true; // Mark that any item has been purchased
+    lifetimeItemsPurchased++; // Track total items purchased
     trashButtonCost *= 2; // Double the cost
     updateGoldDisplay();
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateTrashButtonState();
+    updatePowerupButtonVisibility(); // Show the button in the grid
+    updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
     triggerShopGoldShrink();
     showShopGoldLost(cost);
+    // Trigger badge animation for shop trash badge
+    triggerBadgeAnimation('shopTrashOwnershipBadge');
   }
 }
 
@@ -9774,15 +9925,22 @@ function purchasePickaxe() {
     const cost = pickaxeButtonCost;
     gold -= cost;
     pickaxeOwned++;
-    pickaxeButtonCost *= 2; // Double the cost
+    pickaxeEverPurchased = true; // Mark as ever purchased
+    anyItemEverPurchased = true; // Mark that any item has been purchased
+    lifetimeItemsPurchased++; // Track total items purchased
+    pickaxeButtonCost *= 1000; // Multiply cost by 1000x
     updateGoldDisplay();
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updatePickaxeButtonState();
+    updatePowerupButtonVisibility(); // Show the button in the grid
+    updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
     triggerShopGoldShrink();
     showShopGoldLost(cost);
+    // Trigger badge animation for shop pickaxe badge
+    triggerBadgeAnimation('shopPickaxeOwnershipBadge');
   }
 }
 
@@ -9791,15 +9949,22 @@ function purchaseSwap() {
     const cost = swapButtonCost;
     gold -= cost;
     swapOwned++;
+    swapEverPurchased = true; // Mark as ever purchased
+    anyItemEverPurchased = true; // Mark that any item has been purchased
+    lifetimeItemsPurchased++; // Track total items purchased
     swapButtonCost *= 2; // Double the cost
     updateGoldDisplay();
     updatePowerupOwnershipBadges();
     updateShopDisplay();
     updateSwapButtonState();
+    updatePowerupButtonVisibility(); // Show the button in the grid
+    updateShopButtonPositioning();
     saveGameState();
     soundManager.playPurchaseSound();
     triggerShopGoldShrink();
     showShopGoldLost(cost);
+    // Trigger badge animation for shop swap badge
+    triggerBadgeAnimation('shopSwapOwnershipBadge');
   }
 }
 
@@ -9959,6 +10124,9 @@ function updateStatsModal() {
   const statsTotalBlocksDropped = document.getElementById('statsTotalBlocksDropped');
   const statsTotalBombsExploded = document.getElementById('statsTotalBombsExploded');
   const statsTotalBlocksTrashed = document.getElementById('statsTotalBlocksTrashed');
+  const statsTotalBlocksMined = document.getElementById('statsTotalBlocksMined');
+  const statsTotalSwapsUsed = document.getElementById('statsTotalSwapsUsed');
+  const statsLifetimeItemsPurchased = document.getElementById('statsLifetimeItemsPurchased');
   
   if (statsHighScore) {
     statsHighScore.innerHTML = formatScore(window.highScore || 0);
@@ -9978,6 +10146,18 @@ function updateStatsModal() {
   
   if (statsTotalBlocksTrashed) {
     statsTotalBlocksTrashed.textContent = formatNumber(totalBlocksTrashed || 0);
+  }
+  
+  if (statsTotalBlocksMined) {
+    statsTotalBlocksMined.textContent = formatNumber(totalBlocksMined || 0);
+  }
+  
+  if (statsTotalSwapsUsed) {
+    statsTotalSwapsUsed.textContent = formatNumber(totalSwapsUsed || 0);
+  }
+  
+  if (statsLifetimeItemsPurchased) {
+    statsLifetimeItemsPurchased.textContent = formatNumber(lifetimeItemsPurchased || 0);
   }
 }
 
@@ -10588,6 +10768,9 @@ function updateDebugPane() {
         if (debugTotalBlocksDropped) debugTotalBlocksDropped.textContent = totalBlocksDropped;
         if (debugTotalBombsExploded) debugTotalBombsExploded.textContent = totalBombsExploded;
         if (debugTotalBlocksTrashed) debugTotalBlocksTrashed.textContent = totalBlocksTrashed;
+        if (debugTotalBlocksMined) debugTotalBlocksMined.textContent = totalBlocksMined;
+        if (debugTotalSwapsUsed) debugTotalSwapsUsed.textContent = totalSwapsUsed;
+        if (debugLifetimeItemsPurchased) debugLifetimeItemsPurchased.textContent = lifetimeItemsPurchased;
   if (debugBombStatus) debugBombStatus.textContent = blocksDropped >= BOMB_DELAY_BLOCKS ? 'Enabled' : 'Disabled';
   if (debugStage) debugStage.textContent = currentStage;
   
@@ -11095,7 +11278,7 @@ function handleDebugResetPowerupPricing() {
   // Reset all powerup costs to default (25)
   bombConversionCost = 25;
   trashButtonCost = 25;
-  pickaxeButtonCost = 25;
+  pickaxeButtonCost = 1000;
   swapButtonCost = 25;
   
   // Update the display elements
@@ -11472,8 +11655,10 @@ function render(){
       poleDiv.addEventListener('touchstart', (e) => {
         touchStartTime = Date.now();
         touchStartY = e.touches[0].clientY;
-        // Prevent default to avoid double-tap zoom on mobile
-        e.preventDefault();
+        // Prevent default to avoid double-tap zoom on mobile, but only if cancelable
+        if (e.cancelable) {
+          e.preventDefault();
+        }
         
         // Prime audio context on first touch to ensure instant playback
 
@@ -11783,9 +11968,6 @@ function placeOnPole(idx){
         // Decrease owned bomb count
         bombOwned--;
         updatePowerupOwnershipBadges();
-        
-        // Increment press count and double the cost for next time
-        bombConversionCost *= 2;
         
         // Update button cost display
         if (bombCostEl) {
@@ -12369,7 +12551,7 @@ function resetGame(isFreshGame = true){
     trashButtonPresses = 0;
     
       // Reset pickaxe button state
-  pickaxeButtonCost = 25;
+  pickaxeButtonCost = 1000;
   pickaxeButtonPresses = 0;
   pickaxeMode = false;
   
@@ -12384,8 +12566,21 @@ function resetGame(isFreshGame = true){
     pickaxeOwned = 0;
     swapOwned = 0;
     
+    // Reset purchase tracking
+    bombEverPurchased = false;
+    trashEverPurchased = false;
+    pickaxeEverPurchased = false;
+    swapEverPurchased = false;
+    anyItemEverPurchased = false;
+    
     // Update powerup ownership badges
     updatePowerupOwnershipBadges();
+    
+    // Update powerup button visibility (hide all since they're reset)
+    updatePowerupButtonVisibility();
+    
+    // Update shop button positioning (center it since no purchases have been made)
+    updateShopButtonPositioning();
     
     // Keep pickaxe enabled state for new game
     // window.pickaxeEnabled remains true
@@ -12528,6 +12723,7 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
   updateBombButtonIfGoldChanged();
   updateTrashButtonIfGoldChanged();
   updatePickaxeButtonIfGoldChanged();
+  updateSwapButtonState();
   
   logQueueState('queueAdvance-end');
 }
@@ -13321,6 +13517,12 @@ try {
   
   // Update shop display after loading game state
   updateShopDisplay();
+  
+  // Update shop button positioning based on purchase history
+  updateShopButtonPositioning();
+  
+  // Update powerup button visibility based on purchase history
+  updatePowerupButtonVisibility();
   
   // Button sizing is now handled automatically by CSS
   
