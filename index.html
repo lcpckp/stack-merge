@@ -7498,6 +7498,7 @@ function saveGameState() {
       bombSelected: bombSelected || false,
       previousBombCost: previousBombCost || bombConversionCost,
       pickaxeEnabled: window.pickaxeEnabled || true,
+      pickaxeMode: pickaxeMode || false,
       bombOwned: bombOwned || 0,
       trashOwned: trashOwned || 0,
       pickaxeOwned: pickaxeOwned || 0,
@@ -7612,6 +7613,9 @@ function restoreGameState(gameState) {
     bombSelected = gameState.bombSelected || false;
     previousBombCost = gameState.previousBombCost || bombConversionCost;
     
+    // Restore pickaxe mode state from saved state
+    pickaxeMode = gameState.pickaxeMode || false;
+    
     // Restore owned quantities from saved state
     bombOwned = gameState.bombOwned || 0;
     trashOwned = gameState.trashOwned || 0;
@@ -7700,6 +7704,11 @@ function restoreGameState(gameState) {
     updatePickaxeButtonState();
     updateTrashButtonState();
     updateSwapButtonState();
+    
+    // Re-render to apply pickaxe mode visual state if it was active
+    if (pickaxeMode) {
+      render();
+    }
     
     // Apply pickaxe visual state if it was enabled
     if (window.pickaxeEnabled) {
@@ -11911,7 +11920,7 @@ function render(){
     const playable = canPlaceOnPole(pieceToCheck, pole);
     const isDisabled = isAtCapacity && !playable;
     
-    poleDiv.className = 'pole' + (isDisabled ? ' full' : '');
+    poleDiv.className = 'pole' + (isDisabled && !pickaxeMode ? ' full' : '');
     
     // Preserve the no-hover state if we're currently placing
     if (placing) {
@@ -11920,20 +11929,28 @@ function render(){
     }
     
     // If stack is disabled (full and can't merge), disable interactions
+    // But allow pickaxe interactions even on disabled stacks
     if (isDisabled) {
-      poleDiv.classList.add('no-hover');
-      poleDiv.style.pointerEvents = 'none';
-      poleDiv.style.cursor = 'not-allowed';
+      if (!pickaxeMode) {
+        poleDiv.classList.add('no-hover');
+        poleDiv.style.pointerEvents = 'none';
+        poleDiv.style.cursor = 'not-allowed';
+      }
     }
     
     poleDiv.setAttribute('role', 'button');
-    poleDiv.tabIndex = isDisabled ? -1 : 0;
-    poleDiv.setAttribute('aria-label', `Stack ${idx + 1}, contains ${pole.length} blocks${isAtCapacity ? (playable ? ', merge available' : ', blocked') : ''}`);
+    poleDiv.tabIndex = (isDisabled && !pickaxeMode) ? -1 : 0;
+    poleDiv.setAttribute('aria-label', `Stack ${idx + 1}, contains ${pole.length} blocks${isAtCapacity ? (playable ? ', merge available' : (pickaxeMode ? ', pickaxe available' : ', blocked')) : ''}`);
     poleDiv.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (!isDisabled) {
-          placeOnPole(idx);
+        if (!isDisabled || pickaxeMode) {
+          if (pickaxeMode) {
+            // In pickaxe mode, remove the top block
+            handlePickaxeBlockRemoval(idx, null).catch(console.error);
+          } else {
+            placeOnPole(idx);
+          }
         }
       }
     });
@@ -11970,8 +11987,9 @@ function render(){
       poleDiv.appendChild(d);
     });
     
-    // Only add click handler if stack is not disabled
-    if (!isDisabled) {
+    // Add click handler if stack is not disabled OR if pickaxe mode is active
+    if (!isDisabled || pickaxeMode) {
+      console.log('Adding click handler to pole', idx, 'isDisabled:', isDisabled, 'pickaxeMode:', pickaxeMode);
       poleDiv.addEventListener('click', (e) => {
         // Ensure audio is unlocked on first click
         if (soundManager && !soundManager.audioUnlocked) {
@@ -11980,32 +11998,43 @@ function render(){
         
         // Check if pickaxe mode is active
         if (pickaxeMode) {
+          console.log('Pickaxe mode active, processing click on pole', idx);
           // In pickaxe mode, we need to check if a specific block was clicked
           // The click event will bubble up from the individual block elements
           const clickedElement = e.target;
+          console.log('Clicked element:', clickedElement);
           
           // Find the closest disc element (either the clicked element or its parent)
           let discElement = clickedElement;
           while (discElement && !discElement.classList.contains('disc')) {
             discElement = discElement.parentElement;
           }
+          console.log('Found disc element:', discElement);
           
           if (discElement && discElement.classList.contains('disc')) {
             // Find the index of this block within the pole
             const blocks = poleDiv.querySelectorAll('.disc');
             const domIndex = Array.from(blocks).indexOf(discElement);
+            console.log('DOM index:', domIndex);
             
             if (domIndex !== -1) {
               // DOM index directly corresponds to game data index
               // since blocks are rendered in the same order as the poles array
               const gameDataIndex = domIndex;
+              console.log('Calling handlePickaxeBlockRemoval with pole', idx, 'block', gameDataIndex);
               
               handlePickaxeBlockRemoval(idx, gameDataIndex).catch(console.error);
               return;
             }
           }
           
+          console.log('No specific block was clicked in pickaxe mode');
           // If no specific block was clicked, don't do anything in pickaxe mode
+          return;
+        }
+        
+        // If stack is disabled and we're not in pickaxe mode, don't allow normal placement
+        if (isDisabled && !pickaxeMode) {
           return;
         }
         
@@ -12081,6 +12110,11 @@ function render(){
             }
             
             // If no specific block was touched, don't do anything in pickaxe mode
+            return;
+          }
+          
+          // If stack is disabled and we're not in pickaxe mode, don't allow normal placement
+          if (isDisabled && !pickaxeMode) {
             return;
           }
           
