@@ -37,6 +37,128 @@
     touch-action: manipulation;
   }
   
+  /* Disable text selection and dragging */
+  * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+  
+  /* Allow text selection for input fields and textareas */
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Prevent mobile long-press highlight on pole elements */
+  .pole {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+  
+  /* Prevent focus outline on pole elements */
+  .pole:focus {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Prevent mobile long-press highlight on powerup buttons */
+  .powerup-btn {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+  
+  /* Prevent focus outline on powerup buttons */
+  .powerup-btn:focus {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Prevent focus outline on modal close buttons */
+  .help-modal-close-btn:focus,
+  .shop-modal-close-btn:focus {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Prevent focus outline on new game modal buttons */
+  .new-game-btn:focus,
+  .confirm-new-game-btn:focus,
+  .cancel-new-game-btn:focus {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Prevent focus outline on modal containers */
+  .modal:focus,
+  .new-game-modal:focus,
+  .help-modal:focus,
+  .shop-modal:focus,
+  .sound-control-modal:focus,
+  .settings-modal:focus {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* More specific powerup button focus prevention */
+  .powerup-btn:focus,
+  .powerup-btn:focus-visible,
+  .powerup-btn:focus-within {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-shadow: none !important;
+  }
+  
+  /* Nuclear option: Remove focusability entirely from powerup buttons */
+  .powerup-btn {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Force remove all focus styles globally for buttons */
+  button:focus,
+  button:focus-visible,
+  button:focus-within,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  [role="button"]:focus-within {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-shadow: none !important;
+  }
+  
+
+  
   /* Mobile hover disable rules */
   @media (hover: none) and (pointer: coarse) {
     /* Disable help modal hover effects */
@@ -4074,7 +4196,7 @@
   .help-modal .powerup-btn {
     min-width: 50px !important;
     min-height: 50px !important;
-    max-width: 50px !important;
+    max-width: 90px !important;
     padding: 0 !important;
   }
   
@@ -4218,7 +4340,7 @@
   .help-modal .powerup-btn {
     min-width: 45px !important;
     min-height: 45px !important;
-    max-width: 45px !important;
+    max-width: 80px !important;
     padding: 0 !important;
   }
   
@@ -5416,24 +5538,24 @@
                   <span style="font-size: 14px; font-weight: 500;">Tap on a column to drop the next block</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
-                  <span style="font-size: 24px;">🛒</span>
-                  <span style="font-size: 14px; font-weight: 500;">Buy items from the item shop</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
-                  <span style="font-size: 24px;">💣</span>
-                  <span style="font-size: 14px; font-weight: 500;">Convert the next block to a bomb</span>
+                  <span style="font-size: 24px;">💰</span>
+                  <span style="font-size: 14px; font-weight: 500;">Buy items with gold</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
                   <span style="font-size: 24px;">🗑️</span>
                   <span style="font-size: 14px; font-weight: 500;">Remove the next block from the queue</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
-                  <span style="font-size: 24px;">⛏️</span>
-                  <span style="font-size: 14px; font-weight: 500;">Destroy any block in the game</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
                   <span style="font-size: 24px;">🔄</span>
                   <span style="font-size: 14px; font-weight: 500;">Swap the next two blocks in the queue</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">💣</span>
+                  <span style="font-size: 14px; font-weight: 500;">Convert the next block to a bomb</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
+                  <span style="font-size: 24px;">⛏️</span>
+                  <span style="font-size: 14px; font-weight: 500;">Destroy any block in the game</span>
                 </div>
               </div>
             </div>
@@ -5497,6 +5619,46 @@
           </div>
         </div>
 
+        <!-- Bomb Blocks Section -->
+        <div class="help-section">
+          <div class="help-section-header">
+            <span class="help-icon">💣</span>
+            <h3>Bomb Blocks</h3>
+          </div>
+          <div class="help-content">
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
+            <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Bomb blocks will occasionally appear in the queue.</p>
+            <div class="merge-example">
+              <div class="merge-before">
+                <div class="merge-blocks">
+                  <div class="merge-block" data-value="2">2</div>
+                  <div class="merge-block bomb-block">
+                    <div class="bomb-content">
+                      <div class="bomb-emoji">💣</div>
+                      <div class="bomb-text">2</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="merge-arrow">→</div>
+              <div class="merge-after">
+                <div class="merge-blocks">
+                  <div class="merge-block bomb-block">
+                    <div class="bomb-content">
+                      <div class="bomb-emoji">💣</div>
+                      <div class="bomb-text">4</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; margin-left: 20px;">
+                <span style="font-size: 24px; font-weight: bold; color: #f8fafc;">=</span>
+                <span style="font-size: 18px; font-weight: bold; color: #ef4444; margin-left: 24px;">Stack Destroyed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Powerups Section -->
         <div class="help-section">
           <div class="help-section-header">
@@ -5505,62 +5667,16 @@
           </div>
           <div class="help-content">
             <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
-              <h4 style="margin: 0 0 16px 0; color: #fbbf24; font-size: 18px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">💣</span>
-                Bomb
-              </h4>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• When a bomb block merges with a block of the same value, it explodes and destroys the entire stack!</p>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Bombs will sometimes appear in the queue, but you can also buy them with gold.</p>
-              <div class="merge-example">
-                <div class="merge-before">
-                  <div class="merge-blocks">
-                    <div class="merge-block" data-value="2">2</div>
-                    <div class="merge-block bomb-block">
-                      <div class="bomb-content">
-                        <div class="bomb-emoji">💣</div>
-                        <div class="bomb-text">2</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="merge-arrow">→</div>
-                <div class="merge-after">
-                  <div class="merge-blocks">
-                    <div class="merge-block bomb-block">
-                      <div class="bomb-content">
-                        <div class="bomb-emoji">💣</div>
-                        <div class="bomb-text">4</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div style="display: flex; align-items: center; margin-left: 20px;">
-                  <span style="font-size: 24px; font-weight: bold; color: #f8fafc;">=</span>
-                  <span style="font-size: 18px; font-weight: bold; color: #ef4444; margin-left: 24px;">Stack Destroyed</span>
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; margin: 16px 0;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="powerup-btn bomb-btn" style="pointer-events: none; width: 80px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <span class="powerup-emoji" style="font-size: 28px;">💣</span>
-                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">2</div>
-                  </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts the next block to a bomb</span>
-                </div>
-              </div>
-            </div>
-            
-            <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
               <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">🗑️</span>
                 Trash Can
               </h4>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• The trash can removes the next block from the queue.</p>
-              <div style="display: flex; justify-content: center; margin: 16px 0;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="powerup-btn" style="pointer-events: none; width: 80px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative;">
+              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Trash Can removes the next block from the queue.</p>
+              <div style="display: flex; justify-content: center; margin: 16px 0 24px 0;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                  <button class="powerup-btn" style="pointer-events: none; width: 120px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative; visibility: visible !important; opacity: 1 !important;">
                     <span class="powerup-emoji" style="font-size: 28px;">🗑️</span>
-                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
+                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
                   </button>
                   <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes the next block</span>
                 </div>
@@ -5569,34 +5685,51 @@
             
             <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
               <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">⛏️</span>
-                Pickaxe
+                <span style="font-size: 20px;">🔄</span>
+                Swap
               </h4>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• The pickaxe will remove any single block from anywhere in the game.</p>
-              <div style="display: flex; justify-content: center; margin: 16px 0;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="powerup-btn" style="pointer-events: none; width: 80px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <span class="powerup-emoji" style="font-size: 28px;">⛏️</span>
-                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">3</div>
+              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Swap switches the next block in queue with the second block in queue.</p>
+              <div style="display: flex; justify-content: center; margin: 16px 0 24px 0;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                  <button class="powerup-btn" style="pointer-events: none; width: 120px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative; visibility: visible !important; opacity: 1 !important;">
+                    <span class="powerup-emoji" style="font-size: 28px;">🔄</span>
+                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
                   </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes any block</span>
+                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Swaps next two blocks</span>
+                </div>
+              </div>
+            </div>
+            
+            <div style="background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #475569;">
+              <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">💣</span>
+                Bomb
+              </h4>
+              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Bomb turns the next block in queue into a bomb block.</p>
+              <div style="display: flex; justify-content: center; margin: 16px 0 24px 0;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                  <button class="powerup-btn bomb-btn" style="pointer-events: none; width: 120px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative; visibility: visible !important; opacity: 1 !important;">
+                    <span class="powerup-emoji" style="font-size: 28px;">💣</span>
+                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
+                  </button>
+                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Converts the next block to a bomb</span>
                 </div>
               </div>
             </div>
             
             <div style="background: var(--panel); border-radius: 12px; padding: 20px; border: 1px solid #475569;">
               <h4 style="margin: 0 0 16px 0; color: var(--text); font-size: 18px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">🔄</span>
-                Swap
+                <span style="font-size: 20px;">⛏️</span>
+                Pickaxe
               </h4>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• The swap powerup switches the next block in queue with the second block in queue.</p>
-              <div style="display: flex; justify-content: center; margin: 16px 0;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                  <button class="powerup-btn" style="pointer-events: none; width: 80px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <span class="powerup-emoji" style="font-size: 28px;">🔄</span>
-                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #dc2626; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">2</div>
+              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Pickaxe will remove any single block from anywhere in the game.</p>
+              <div style="display: flex; justify-content: center; margin: 16px 0 24px 0;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                  <button class="powerup-btn" style="pointer-events: none; width: 120px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative; visibility: visible !important; opacity: 1 !important;">
+                    <span class="powerup-emoji" style="font-size: 28px;">⛏️</span>
+                    <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
                   </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Swaps next two blocks</span>
+                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Removes any block</span>
                 </div>
               </div>
             </div>
@@ -6031,6 +6164,42 @@
   </div>
 
 <script>
+// Focus Prevention - Remove focus from buttons immediately when they get focused
+document.addEventListener('DOMContentLoaded', function() {
+  // Remove focus from powerup buttons immediately when they get focused
+  const powerupButtons = document.querySelectorAll('.powerup-btn');
+  powerupButtons.forEach(button => {
+    button.addEventListener('focus', function() {
+      this.blur();
+    });
+    button.addEventListener('focusin', function() {
+      this.blur();
+    });
+  });
+  
+  // Remove focus from modal close buttons
+  const modalCloseButtons = document.querySelectorAll('.help-modal-close-btn, .shop-modal-close-btn');
+  modalCloseButtons.forEach(button => {
+    button.addEventListener('focus', function() {
+      this.blur();
+    });
+    button.addEventListener('focusin', function() {
+      this.blur();
+    });
+  });
+  
+  // Remove focus from new game modal buttons
+  const newGameButtons = document.querySelectorAll('.new-game-btn, .confirm-new-game-btn, .cancel-new-game-btn');
+  newGameButtons.forEach(button => {
+    button.addEventListener('focus', function() {
+      this.blur();
+    });
+    button.addEventListener('focusin', function() {
+      this.blur();
+    });
+  });
+});
+
 // Environment Detection
 const isLocalhost = (() => {
   const hostname = window.location.hostname;
@@ -6133,6 +6302,7 @@ class SoundManager {
         purchase: 'sounds/purchase2.mp3',
         personalBest: 'sounds/newrecord.mp3',
         themeUnlock: 'sounds/themeunlock.mp3',
+        itemUnlock: 'sounds/itemunlock.mp3',
         trash: 'sounds/trash.mp3',
         bombStart: 'sounds/bombstart.mp3',
         bombClose: 'sounds/bombclose.mp3',
@@ -6950,6 +7120,23 @@ class SoundManager {
     
     // Use the simple playSound method
     this.playSound('switch', 'other').catch(error => {
+      // Silent error handling
+    });
+  }
+
+  playItemUnlockSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playItemUnlockSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('itemUnlock', 'other').catch(error => {
       // Silent error handling
     });
   }
@@ -9890,6 +10077,9 @@ function updatePowerupButtonVisibility() {
   const pickaxeBtn = document.getElementById('pickaxeButton');
   const swapBtn = document.getElementById('swapButton');
   
+  // Track if any powerup was discovered for the first time in this update
+  let anyPowerupDiscovered = false;
+  
   // Show/hide buttons based on whether they've ever been purchased OR if they're currently purchasable
   // Use visibility instead of display to maintain layout positioning
   if (bombBtn) {
@@ -9904,6 +10094,7 @@ function updatePowerupButtonVisibility() {
       // Mark as discovered if it became visible due to affordability
       if (canAffordPowerup('bomb') && !bombDiscoveredThisGame) {
         bombDiscoveredThisGame = true;
+        anyPowerupDiscovered = true;
       }
     } else {
       bombBtn.style.visibility = 'hidden';
@@ -9923,6 +10114,7 @@ function updatePowerupButtonVisibility() {
       // Mark as discovered if it became visible due to affordability
       if (canAffordPowerup('trash') && !trashDiscoveredThisGame) {
         trashDiscoveredThisGame = true;
+        anyPowerupDiscovered = true;
       }
     } else {
       trashBtn.style.visibility = 'hidden';
@@ -9942,6 +10134,7 @@ function updatePowerupButtonVisibility() {
       // Mark as discovered if it became visible due to affordability
       if (canAffordPowerup('pickaxe') && !pickaxeDiscoveredThisGame) {
         pickaxeDiscoveredThisGame = true;
+        anyPowerupDiscovered = true;
       }
     } else {
       pickaxeBtn.style.visibility = 'hidden';
@@ -9961,12 +10154,18 @@ function updatePowerupButtonVisibility() {
       // Mark as discovered if it became visible due to affordability
       if (canAffordPowerup('swap') && !swapDiscoveredThisGame) {
         swapDiscoveredThisGame = true;
+        anyPowerupDiscovered = true;
       }
     } else {
       swapBtn.style.visibility = 'hidden';
       swapBtn.style.pointerEvents = 'none';
       swapBtn.style.opacity = '0';
     }
+  }
+  
+  // Play item unlock sound if any powerup was discovered for the first time
+  if (anyPowerupDiscovered && soundManager && soundManager.canPlayAudio()) {
+    soundManager.playItemUnlockSound();
   }
 }
 
@@ -10261,7 +10460,7 @@ function purchasePickaxe(fromShop = true) {
     pickaxeEverPurchased = true; // Mark as ever purchased
 
     lifetimeItemsPurchased++; // Track total items purchased
-    pickaxeButtonCost *= 1000; // Multiply cost by 1000x
+    pickaxeButtonCost *= 10; // Multiply cost by 10x
     updateGoldDisplay();
     updatePowerupOwnershipBadges();
     updateShopDisplay();
