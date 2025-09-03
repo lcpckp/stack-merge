@@ -456,8 +456,8 @@
       /* Mobile responsive game area and powerup shop */
   @media (max-width: 768px) {
     .game-container {
-      margin-top: 16px;
-      padding: 0 16px 16px;
+      margin-top: 24px;
+      padding: 0 16px 8px;
       overflow-x: hidden;
     }
     
@@ -478,8 +478,8 @@
     }
     
     .powerup-shop {
-      margin-top: 4px !important;
-      margin-bottom: 12px !important;
+      margin-top: 0px !important;
+      margin-bottom: 8px !important;
       padding: 0 16px !important;
       /* Ensure powerup shop is always visible on mobile */
       position: relative;
@@ -490,9 +490,6 @@
       visibility: visible !important;
       overflow: visible;
       opacity: 1 !important;
-      /* Ensure proper spacing from game area */
-      margin-top: 4px !important;
-      margin-bottom: 20px !important;
     }
     
     .shop-grid {
@@ -576,8 +573,8 @@
     
       /* Extra small mobile adjustments */
   .game-container {
-    margin-top: 8px;
-    padding: 0 12px 12px;
+    margin-top: 16px;
+    padding: 0 12px 6px;
   }
   
   .game {
@@ -596,7 +593,7 @@
   }
   
   .powerup-shop {
-    margin-top: 4px !important;
+    margin-top: 0px !important;
     margin-bottom: 8px !important;
     padding: 0 12px !important;
     /* Ensure visibility on extra small screens */
@@ -2277,7 +2274,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    margin-top: 12px;
+    margin-top: 4px;
     margin-bottom: 16px;
     width: 100%;
     max-width: 632px;
@@ -2290,6 +2287,13 @@
     position: relative;
     z-index: 5;
     background: var(--bg);
+  }
+  
+  /* Desktop-specific spacing adjustment */
+  @media (min-width: 769px) {
+    .powerup-shop {
+      margin-top: 16px;
+    }
   }
   
   
@@ -2663,7 +2667,7 @@
   /* Mobile responsive powerup shop */
   @media (max-width: 768px) {
     .powerup-shop {
-      margin-top: 20px;
+      margin-top: 8px;
       margin-bottom: 20px;
       padding: 0 16px;
       position: relative;
@@ -2702,7 +2706,7 @@
   /* Extra small mobile powerup shop */
   @media (max-width: 480px) {
     .powerup-shop {
-      margin-top: 16px;
+      margin-top: 8px;
       margin-bottom: 16px;
       padding: 0 12px;
       display: flex !important;
@@ -3909,8 +3913,8 @@
   
   /* Adjust game container for mobile */
   .game-container {
-    margin-top: 12px;
-    padding-bottom: 20px;
+    margin-top: 20px;
+    padding-bottom: 8px;
     flex-direction: column;
     align-items: center;
     gap: 12px;
@@ -7466,6 +7470,12 @@ function saveGameState() {
       trashEverPurchased: trashEverPurchased || false,
       pickaxeEverPurchased: pickaxeEverPurchased || false,
       swapEverPurchased: swapEverPurchased || false,
+      
+      // Save powerup discovery state
+      bombDiscoveredThisGame: bombDiscoveredThisGame || false,
+      trashDiscoveredThisGame: trashDiscoveredThisGame || false,
+      pickaxeDiscoveredThisGame: pickaxeDiscoveredThisGame || false,
+      swapDiscoveredThisGame: swapDiscoveredThisGame || false,
 
 
       soundVolumes: soundManager.getAllSoundVolumes(),
@@ -7586,6 +7596,12 @@ function restoreGameState(gameState) {
     trashEverPurchased = gameState.trashEverPurchased || false;
     pickaxeEverPurchased = gameState.pickaxeEverPurchased || false;
     swapEverPurchased = gameState.swapEverPurchased || false;
+    
+    // Restore powerup discovery state from saved state
+    bombDiscoveredThisGame = gameState.bombDiscoveredThisGame || false;
+    trashDiscoveredThisGame = gameState.trashDiscoveredThisGame || false;
+    pickaxeDiscoveredThisGame = gameState.pickaxeDiscoveredThisGame || false;
+    swapDiscoveredThisGame = gameState.swapDiscoveredThisGame || false;
 
     
     // Update powerup ownership badges
