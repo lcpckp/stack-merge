@@ -72,15 +72,13 @@
     }
     
     /* Disable modal hover effects */
-    .new-game-modal:hover,
-    .update-modal:hover {
+    .new-game-modal:hover {
       border-color: inherit !important;
       box-shadow: inherit !important;
     }
     
     /* Disable button hover effects */
     .new-game-btn:hover,
-    .update-got-it-btn:hover,
     .confirm-new-game-btn:hover,
     .cancel-new-game-btn:hover {
       background: inherit !important;
@@ -503,11 +501,12 @@
     }
     
     .powerup-btn {
-      min-width: 80px;
+      flex: 0 0 calc(25% - 9px); /* 25% minus 1/4 of the total gap space (36px / 4 = 9px) */
+      min-width: 0;
       min-height: clamp(60px, 15vw, 80px);
       max-height: clamp(60px, 15vw, 80px);
       padding: 0 12px;
-      flex: 0 0 80px;
+      max-width: none;
     }
     
 
@@ -2326,40 +2325,26 @@
     }
   }
   
-  /* Universal powerup button sizing - buttons maintain fixed size */
+  /* Universal powerup button sizing - buttons sized as if all 4 are visible */
   .powerup-btn {
-    flex: 0 0 80px;
-    min-width: 80px;
+    flex: 0 0 calc(25% - 12px); /* 25% minus 1/4 of the total gap space (48px / 4 = 12px) */
+    min-width: 0;
     min-height: 80px;
-    max-width: 80px;
+    max-width: none;
     padding: 0;
   }
   
-  /* When shop bypass is enabled, buttons expand to fill available width */
-  .shop-grid.bypass-enabled .powerup-btn {
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: none;
-    width: auto;
-  }
+
   
 
   
   /* Ensure buttons don't become too narrow on very small screens */
   @media (max-width: 480px) {
     .powerup-btn {
-      flex: 0 0 50px;
-      min-width: 50px;
-      min-height: 50px;
-      max-width: 50px;
-    }
-    
-    /* When shop bypass is enabled, buttons expand to fill available width */
-    .shop-grid.bypass-enabled .powerup-btn {
-      flex: 1 1 0;
+      flex: 0 0 calc(25% - 6px); /* 25% minus 1/4 of the total gap space (24px / 4 = 6px) */
       min-width: 0;
+      min-height: 50px;
       max-width: none;
-      width: auto;
     }
   }
   
@@ -2373,19 +2358,13 @@
     }
     
     .powerup-btn {
-      min-width: 70px;
+      flex: 0 0 calc(25% - 9px); /* 25% minus 1/4 of the total gap space (36px / 4 = 9px) */
+      min-width: 0;
       min-height: 70px;
-      max-width: 70px;
-      flex: 0 0 70px;
+      max-width: none;
     }
     
-    /* When shop bypass is enabled, buttons expand to fill available width */
-    .shop-grid.bypass-enabled .powerup-btn {
-      flex: 1 1 0;
-      min-width: 0;
-      max-width: none;
-      width: auto;
-    }
+
   }
   
 
@@ -2398,6 +2377,10 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
     min-width: 0;
     min-height: 80px;
+    /* Ensure buttons start hidden by default */
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
     /* Ensure badges can extend beyond button boundaries */
     overflow: visible;
     border-radius: 15px;
@@ -2439,12 +2422,14 @@
   }
   
   .powerup-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.6 !important;
     cursor: not-allowed;
     transform: none;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
     background: #374151;
     color: #9ca3af;
+    /* Disabled buttons should not be clickable */
+    pointer-events: none !important;
   }
   
 
@@ -2505,59 +2490,7 @@
     }
   }
   
-  /* Shop Button Text Styling */
-  .shop-btn .shop-text {
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1;
-    margin-left: 10px;
-    display: inline;
-  }
-  
-  /* Shop button positioning - keep it on the right, allow it to flex */
-  .shop-btn {
-    margin-left: auto !important;
-    min-width: 120px !important;
-    max-width: 180px !important;
-    flex: 0 1 180px !important;
-  }
-  
-  /* Mobile responsive shop button text */
-  @media (max-width: 768px) {
-    .shop-btn {
-      min-width: 100px !important;
-      max-width: 160px !important;
-      flex: 0 1 160px !important;
-    }
-    
-    .shop-btn .shop-text {
-      font-size: 18px;
-      font-weight: 700;
-      margin-left: 8px;
-    }
-  }
-  
-  @media (max-width: 600px) {
-    .shop-btn {
-      min-width: 90px !important;
-      max-width: 150px !important;
-      flex: 0 1 150px !important;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .shop-btn {
-      min-width: 80px !important;
-      max-width: 140px !important;
-      flex: 0 1 140px !important;
-    }
-    
-    .shop-btn .shop-text {
-      font-size: 16px;
-      font-weight: 700;
-      margin-left: 6px;
-    }
-  }
+
   
   .powerup-emoji {
     font-size: 32px;
@@ -2750,11 +2683,12 @@
     }
     
     .powerup-btn {
-      min-width: 80px;
+      flex: 0 0 calc(25% - 9px); /* 25% minus 1/4 of the total gap space (36px / 4 = 9px) */
+      min-width: 0;
       min-height: clamp(60px, 15vw, 80px);
       max-height: clamp(60px, 15vw, 80px);
       padding: 0 12px;
-      flex: 0 0 80px;
+      max-width: none;
     }
     
 
@@ -2786,12 +2720,12 @@
     }
     
     .powerup-btn {
-      min-width: clamp(50px, 12vw, 70px);
+      flex: 0 0 calc(25% - 6px); /* 25% minus 1/4 of the total gap space (24px / 4 = 6px) */
+      min-width: 0;
       min-height: clamp(50px, 12vw, 70px);
-      max-width: clamp(50px, 12vw, 70px);
       max-height: clamp(50px, 12vw, 70px);
       padding: 0;
-      flex: 0 0 clamp(50px, 12vw, 70px);
+      max-width: none;
     }
     
 
@@ -3617,92 +3551,101 @@
     color: var(--text);
   }
 
-  /* Update Modal Styling */
-  .update-modal {
+
+
+  /* Welcome Modal Styling */
+  .welcome-modal {
     max-width: 500px;
     text-align: center;
-    border: 2px solid rgba(59, 130, 246, 0.8); /* Blue border for updates */
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); /* Blue-tinted shadow */
-    background: rgba(30, 41, 59, 0.95); /* Semi-transparent panel background */
-    backdrop-filter: blur(8px); /* Add subtle blur effect */
-    transition: all 0.3s ease;
+    padding: 30px;
   }
 
-  .update-modal:hover {
-    border-color: rgba(59, 130, 246, 1); /* Solid blue on hover */
-    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); /* Enhanced shadow on hover */
+  .welcome-content {
+    margin-bottom: 30px;
   }
 
-  .update-modal h2 {
-    margin-bottom: 20px;
-    color: var(--text);
-    font-size: 24px;
-  }
-
-  .update-modal h3 {
-    margin: 0 0 12px 0;
-    color: #60a5fa; /* Light blue for the update title */
-    font-size: 20px;
-  }
-
-  .update-content {
-    margin-bottom: 24px;
-    text-align: left;
-  }
-
-  .update-content p {
-    margin: 8px 0;
+  .welcome-content p {
+    margin: 0 0 16px 0;
+    font-size: 16px;
     line-height: 1.5;
+    color: var(--text);
   }
 
-  .update-content em {
-    color: #94a3b8; /* Muted color for the "more updates" text */
-    font-size: 14px;
+  .welcome-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .update-got-it-btn {
-    background: #10B981;
-    color: white;
-    border: none;
+  .welcome-btn {
     padding: 12px 24px;
+    border: none;
     border-radius: 8px;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: var(--font-family);
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
+    min-width: 140px;
   }
 
-  .update-got-it-btn:hover {
+  .welcome-yes-btn {
+    background: #10B981;
+    color: white;
+    box-shadow: 0 3px 0 rgba(16, 185, 129, 0.3);
+  }
+
+  .welcome-yes-btn:hover {
     background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(16, 185, 129, 0.4);
   }
 
-  .update-got-it-btn:active {
+  .welcome-yes-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 rgba(16, 185, 129, 0.3);
+  }
+
+  .welcome-skip-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .welcome-skip-btn:hover {
+    background: #475569;
+    border-color: #64748b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .welcome-skip-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
   }
 
-  /* Mobile responsive for update modal */
+  /* Mobile responsive for welcome modal */
   @media (max-width: 768px) {
-    .update-modal {
+    .welcome-modal {
       max-width: 95vw;
       margin: 20px;
+      padding: 24px;
     }
     
-    .update-modal h2 {
-      font-size: 22px;
+    .welcome-content p {
+      font-size: 15px;
     }
     
-    .update-modal h3 {
-      font-size: 18px;
+    .welcome-actions {
+      flex-direction: column;
+      gap: 12px;
     }
     
-    .update-got-it-btn {
-      padding: 10px 20px;
+    .welcome-btn {
+      width: 100%;
+      padding: 14px 20px;
       font-size: 15px;
     }
   }
@@ -5387,34 +5330,31 @@
   <!-- Unified Powerup Shop - Below Game Area -->
   <div class="powerup-shop">
     <div class="shop-grid">
-      <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="" style="display: none;">
-        <span class="powerup-emoji">💣</span>
-        <div class="powerup-cost-badge" id="bombCostBadge" style="display: none;"></div>
-        <div class="powerup-ownership-badge" id="bombOwnershipBadge">0</div>
-      </button>
-      
-      <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="" style="display: none;">
+      <button id="trashButton" class="powerup-btn" title="Remove next block from queue" disabled="">
         <span class="powerup-emoji">🗑️</span>
         <div class="powerup-cost-badge" id="trashCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="trashOwnershipBadge">0</div>
       </button>
       
-      <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="" style="display: none;">
+      <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="">
         <span class="powerup-emoji">🔄</span>
         <div class="powerup-cost-badge" id="swapCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="swapOwnershipBadge">0</div>
       </button>
       
-      <button id="pickaxeButton" class="powerup-btn" title="Remove any block from stacks (press again to deactivate)" disabled="" style="display: none;">
+      <button id="bombConversionBtn" class="powerup-btn bomb-btn" title="Convert next block to bomb (press again to undo)" disabled="">
+        <span class="powerup-emoji">💣</span>
+        <div class="powerup-cost-badge" id="bombCostBadge" style="display: none;"></div>
+        <div class="powerup-ownership-badge" id="bombOwnershipBadge">0</div>
+      </button>
+      
+      <button id="pickaxeButton" class="powerup-btn" title="Remove any block from stacks (press again to deactivate)" disabled="">
         <span class="powerup-emoji">⛏️</span>
         <div class="powerup-cost-badge" id="pickaxeCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="pickaxeOwnershipBadge">0</div>
       </button>
       
-      <button id="shopButton" class="powerup-btn shop-btn" title="Open item shop">
-        <span class="powerup-emoji">🛒</span>
-        <span class="shop-text">Shop</span>
-      </button>
+
     </div>
   </div>
   
@@ -5807,6 +5747,20 @@
     </div>
   </div>
 
+  <!-- Welcome modal for first-time users (hidden by default) -->
+  <div id="welcomeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal welcome-modal">
+      <h2 id="welcomeTitle">Stack Merge</h2>
+      <div class="welcome-content">
+        <h3>Would you like to read the How to Play guide?</h3>
+      </div>
+      <div class="welcome-actions">
+        <button id="welcomeYesBtn" class="welcome-btn welcome-yes-btn">Yes</button>
+        <button id="welcomeSkipBtn" class="welcome-btn welcome-skip-btn">Skip</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Shop modal (hidden by default) -->
   <div id="shopModal" class="modal-backdrop shop-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
     <div class="modal shop-modal">
@@ -5826,21 +5780,6 @@
       <div class="shop-separator"></div>
       
       <div class="shop-items-grid">
-        <div class="shop-item-group">
-          <div class="shop-item-container">
-            <button class="powerup-btn" id="shopBombPowerupBtn" title="Bomb Powerup">
-              <span class="powerup-emoji">💣</span>
-              <span class="powerup-ownership-badge" id="shopBombOwnershipBadge">0</span>
-            </button>
-            <button class="shop-item-btn" id="shopBombBtn" title="Purchase Bomb">
-              <div class="shop-item-cost">
-                <span class="cost-emoji">💰</span>
-                <span class="cost-amount" id="shopBombCost">25</span>
-              </div>
-            </button>
-          </div>
-        </div>
-        
         <div class="shop-item-group">
           <div class="shop-item-container">
             <button class="powerup-btn" id="shopTrashPowerupBtn" title="Trash Can Powerup">
@@ -5865,8 +5804,23 @@
             <button class="shop-item-btn" id="shopSwapBtn" title="Purchase Swap">
               <div class="shop-item-cost">
                 <span class="cost-emoji">💰</span>
-                <span class="cost-amount" id="shopSwapCost">25</span>
+                <span class="cost-amount" id="shopSwapCost">50</span>
                 </div>
+            </button>
+          </div>
+        </div>
+        
+        <div class="shop-item-group">
+          <div class="shop-item-container">
+            <button class="powerup-btn" id="shopBombPowerupBtn" title="Bomb Powerup">
+              <span class="powerup-emoji">💣</span>
+              <span class="powerup-ownership-badge" id="shopBombOwnershipBadge">0</span>
+            </button>
+            <button class="shop-item-btn" id="shopBombBtn" title="Purchase Bomb">
+              <div class="shop-item-cost">
+                <span class="cost-emoji">💰</span>
+                <span class="cost-amount" id="shopBombCost">100</span>
+              </div>
             </button>
           </div>
         </div>
@@ -7458,9 +7412,9 @@ let probabilities = [0.5, 0.5]; // Equal chance for 1 and 2 initially
 // localStorage-based save system
 const SAVE_KEY = 'stackMerge_save';
 
-// Update notification system
-let lastSeenUpdateTimestamp = 0; // Track when user last saw updates
-let preventTimestampRestore = false; // Flag to prevent timestamp restoration after clearing
+// First-time user detection system
+let lastSeenUpdateTimestamp = 0; // Track when user first visited (used for first-time user detection)
+let preventGameStateSave = false; // Flag to prevent saving game state after clearing data
 
 // Help button state storage
 const HELP_BUTTON_KEY = 'stackMerge_helpClicked';
@@ -7468,6 +7422,11 @@ const HELP_BUTTON_KEY = 'stackMerge_helpClicked';
 // Save game state to localStorage
 function saveGameState() {
   try {
+    // Don't save if we're preventing saves after clear
+    if (preventGameStateSave) {
+      console.log('🚫 Prevented game state save due to clear operation');
+      return;
+    }
     
     const gameState = {
       poles: poles,
@@ -7487,10 +7446,10 @@ function saveGameState() {
       weights: weights || [1, 2],
       probabilities: probabilities || [0.5, 0.5],
       nextQueue: nextQueue || [getRandomPiece(), getRandomPiece(), getRandomPiece()],
-      bombConversionCost: bombConversionCost || 25,
+      bombConversionCost: bombConversionCost || 100,
       trashButtonCost: trashButtonCost || 25,
       pickaxeButtonCost: pickaxeButtonCost || 1000,
-      swapButtonCost: swapButtonCost || 25,
+      swapButtonCost: swapButtonCost || 50,
       bombConversionPresses: bombConversionPresses || 0,
       trashButtonPresses: trashButtonPresses || 0,
       pickaxeButtonPresses: pickaxeButtonPresses || 0,
@@ -7507,14 +7466,14 @@ function saveGameState() {
       trashEverPurchased: trashEverPurchased || false,
       pickaxeEverPurchased: pickaxeEverPurchased || false,
       swapEverPurchased: swapEverPurchased || false,
-      anyItemEverPurchased: anyItemEverPurchased || false,
+
 
       soundVolumes: soundManager.getAllSoundVolumes(),
       isMuted: soundManager.getMuteState(),
       currentTheme: themeManager.getCurrentTheme(),
       themeUnlocks: themeManager.themeUnlockRequirements,
       currentActiveDecayFactor: currentActiveDecayFactor,
-      lastSeenUpdateTimestamp: lastSeenUpdateTimestamp || 0,
+      lastSeenUpdateTimestamp: lastSeenUpdateTimestamp || 0, // Used for first-time user detection
       highScore: window.highScore || 0,
       totalGames: window.totalGames || 0,
       hasShownPersonalBest: hasShownPersonalBest || false,
@@ -7597,10 +7556,10 @@ function restoreGameState(gameState) {
     const oldTrashCost = trashButtonCost;
     const oldPickaxeCost = pickaxeButtonCost;
     const oldSwapCost = swapButtonCost;
-    bombConversionCost = gameState.bombConversionCost || 25;
+    bombConversionCost = gameState.bombConversionCost || 100;
     trashButtonCost = gameState.trashButtonCost || 25;
     pickaxeButtonCost = gameState.pickaxeButtonCost || 1000;
-    swapButtonCost = gameState.swapButtonCost || 25;
+    swapButtonCost = gameState.swapButtonCost || 50;
     bombConversionPresses = gameState.bombConversionPresses || 0;
     trashButtonPresses = gameState.trashButtonPresses || 0;
     pickaxeButtonPresses = gameState.pickaxeButtonPresses || 0;
@@ -7627,7 +7586,7 @@ function restoreGameState(gameState) {
     trashEverPurchased = gameState.trashEverPurchased || false;
     pickaxeEverPurchased = gameState.pickaxeEverPurchased || false;
     swapEverPurchased = gameState.swapEverPurchased || false;
-    anyItemEverPurchased = gameState.anyItemEverPurchased || false;
+
     
     // Update powerup ownership badges
     updatePowerupOwnershipBadges();
@@ -7635,8 +7594,7 @@ function restoreGameState(gameState) {
     // Update powerup button visibility based on purchase history
     updatePowerupButtonVisibility();
     
-    // Update shop button positioning based on purchase history
-    updateShopButtonPositioning();
+
 
     
     // Restore sound volumes from saved state
@@ -7670,12 +7628,9 @@ function restoreGameState(gameState) {
       updateThemeSelectors();
     }
     
-    // Restore last seen update timestamp (unless prevented by clear operation)
-    if (!preventTimestampRestore) {
-      lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
-    } else {
-      preventTimestampRestore = false; // Reset the flag
-    }
+    // Restore first-time user detection timestamp
+    lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
+    console.log('🔄 Restored lastSeenUpdateTimestamp from save:', lastSeenUpdateTimestamp);
     
 
     
@@ -7756,110 +7711,12 @@ function loadGameState() {
   }
 }
 
-// Update notification system functions
-async function fetchUpdates() {
-  try {
-    const response = await fetch('updates.txt?' + Date.now()); // Add cache-busting
-    if (!response.ok) {
-      return [];
-    }
-    
-    const text = await response.text();
-    const lines = text.split('\n');
-    const updates = [];
-    
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      // Skip empty lines and comments
-      if (!trimmedLine || trimmedLine.startsWith('#')) continue;
-      
-      const parts = trimmedLine.split('|');
-      if (parts.length === 3) {
-        const timestamp = parseInt(parts[0]);
-        const title = parts[1];
-        const message = parts[2];
-        
-        if (!isNaN(timestamp)) {
-          updates.push({ timestamp, title, message });
-        }
-      }
-    }
-    
-    // Sort updates by timestamp (newest first)
-    updates.sort((a, b) => b.timestamp - a.timestamp);
-    return updates;
-  } catch (error) {
-    return [];
-  }
-}
 
-function checkForNewUpdates(updates) {
-  // If this is a first-time user (lastSeenUpdateTimestamp is 0), only show the most recent update
-  if (lastSeenUpdateTimestamp === 0 && updates.length > 0) {
-    return [updates[0]]; // Only return the most recent update
-  }
-  
-  // Find updates newer than the last seen timestamp
-  const newUpdates = updates.filter(update => update.timestamp > lastSeenUpdateTimestamp);
-  
-  return newUpdates;
-}
 
-function showUpdateModal(updates) {
-  if (updates.length === 0) return;
-  
-  // Get the newest update to show
-  const latestUpdate = updates[0];
-  
-  // Create modal HTML
-  const modalHtml = `
-    <div class="modal-backdrop" id="updateModalBackdrop">
-      <div class="modal update-modal">
-        <h2>Stack Merge Updates</h2>
-        <div class="update-content">
-          <h3>${latestUpdate.title}</h3>
-          <p>${latestUpdate.message}</p>
-          ${updates.length > 1 ? `<p><em>+ ${updates.length - 1} more update${updates.length > 2 ? 's' : ''} since your last visit</em></p>` : ''}
-        </div>
-        <div class="actions">
-          <button onclick="closeUpdateModal()" class="update-got-it-btn">Got it!</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  // Update the last seen timestamp to the latest update's timestamp
-  lastSeenUpdateTimestamp = latestUpdate.timestamp;
-  
-  // Save the updated timestamp
-  saveGameState();
-}
-
-function closeUpdateModal() {
-  const backdrop = document.getElementById('updateModalBackdrop');
-  if (backdrop) {
-    backdrop.remove();
-  }
-}
-
-// Test function for debugging the update system
-async function testUpdateSystem() {
-  const updates = await fetchUpdates();
-  
-  const newUpdates = checkForNewUpdates(updates);
-  
-  if (newUpdates.length > 0) {
-    showUpdateModal(newUpdates);
-  }
-}
-
-// Function to reset update timestamp for testing
-function resetUpdateTimestamp() {
-  lastSeenUpdateTimestamp = 0;
-  saveGameState();
+// Function to manually trigger welcome modal for testing
+function testWelcomeModal() {
+  console.log('🧪 Manually triggering welcome modal');
+  showWelcomeModal();
 }
 
 // Function to completely clear all game data (cookies AND localStorage)
@@ -7915,11 +7772,13 @@ function clearAllGameData() {
   // Reset the useLocalStorage flag
   useLocalStorage = false;
   
-  // Reset the update timestamp variable
+  // Reset the first-time user detection timestamp
   lastSeenUpdateTimestamp = 0;
+  console.log('🧹 Clear data: Set lastSeenUpdateTimestamp to 0');
   
-  // Set flag to prevent timestamp restoration
-  preventTimestampRestore = true;
+  // Set flag to prevent any game state saving until page reload
+  preventGameStateSave = true;
+  console.log('🧹 Clear data: Set preventGameStateSave to true');
   
   // Reset the high score
   window.highScore = 0;
@@ -7950,16 +7809,16 @@ function clearAllGameData() {
   
   // Reset other important game state variables
   hasShownPersonalBest = false;
-  bombConversionCost = 25; // Reset to default cost
+  bombConversionCost = 100; // Reset to default cost
   trashButtonCost = 25; // Reset to default cost
   pickaxeButtonCost = 1000; // Reset to default cost
-  swapButtonCost = 25; // Reset to default cost
+  swapButtonCost = 50; // Reset to default cost
   bombConversionPresses = 0;
   trashButtonPresses = 0;
   pickaxeButtonPresses = 0;
   swapButtonPresses = 0;
   bombSelected = false;
-  previousBombCost = 25;
+  previousBombCost = 100;
   pickaxeMode = false; // Reset pickaxe mode
   currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR; // Reset to default decay factor
   
@@ -8336,6 +8195,9 @@ function updateGoldDisplay(shouldPulse = false) {
       <div class="gold-text">${formatNumber(gold)}</div>
       ${badgeHTML}
     `;
+    
+    // Update powerup button visibility when gold changes
+    updatePowerupButtonVisibility();
     // Re-add the label if it was removed
     if (goldLabel && !goldDisplay.querySelector('.gold-label')) {
       goldDisplay.insertBefore(goldLabel, goldDisplay.firstChild);
@@ -8475,8 +8337,13 @@ let trashEverPurchased = false;
 let pickaxeEverPurchased = false;
 let swapEverPurchased = false;
 
-// Track if any item has ever been purchased (for shop button positioning)
-let anyItemEverPurchased = false;
+// Track if each powerup has been discovered during current game session
+let bombDiscoveredThisGame = false;
+let trashDiscoveredThisGame = false;
+let pickaxeDiscoveredThisGame = false;
+let swapDiscoveredThisGame = false;
+
+
 
 // Initialize high score tracking
 window.highScore = window.highScore || 0;
@@ -8492,11 +8359,11 @@ let currentStackCapacity = MAX_HEIGHT; // Current maximum height for each stack 
 let currentStage = 1; // Current stage (1 = starting, 2 = after first stack unlock, etc.)
 
 // Bomb conversion button state
-let bombConversionCost = 25;
+let bombConversionCost = 100;
 let bombConversionPresses = 0; // Number of times button has been pressed
 let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
 let bombSelected = false; // Track if a bomb is currently selected but not yet placed
-let previousBombCost = 25; // Store the previous bomb cost before conversion
+let previousBombCost = 100; // Store the previous bomb cost before conversion
 
 // Trash button state
 let trashButtonCost = 25;
@@ -8508,7 +8375,7 @@ let pickaxeButtonPresses = 0; // Number of times button has been pressed
 let pickaxeMode = false; // Track if pickaxe mode is active
 
 // Swap button state
-let swapButtonCost = 25;
+let swapButtonCost = 50;
 let swapButtonPresses = 0; // Number of times button has been pressed
 
 // Initialize pickaxe enabled state
@@ -9436,8 +9303,7 @@ let debugMaxBlock = null;
   let debugBombStatus = null;
   let debugStage = null;
 
-// Debug option to bypass shop requirements
-let bypassShopRequirements = true;
+
 
 let customBlockMode = false;
 let customBlockSize = null;
@@ -9705,7 +9571,7 @@ if (helpClose) {
 
 // Shop modal functionality
 const shopModal = document.getElementById('shopModal');
-const shopBtn = document.getElementById('shopButton');
+
 const shopClose = document.getElementById('shopClose');
 
 
@@ -9714,12 +9580,61 @@ function closeShop() {
   shopModal.classList.add('hidden');
 }
 
-if (shopBtn) {
-  shopBtn.addEventListener('click', openShop);
-}
+
 
 if (shopClose) {
   shopClose.addEventListener('click', closeShop);
+}
+
+// Welcome modal functionality
+const welcomeModal = document.getElementById('welcomeModal');
+const welcomeYesBtn = document.getElementById('welcomeYesBtn');
+const welcomeSkipBtn = document.getElementById('welcomeSkipBtn');
+
+function showWelcomeModal() {
+  if (welcomeModal) {
+    welcomeModal.classList.remove('hidden');
+  }
+}
+
+function closeWelcomeModal() {
+  if (welcomeModal) {
+    welcomeModal.classList.add('hidden');
+  }
+}
+
+if (welcomeYesBtn) {
+  welcomeYesBtn.addEventListener('click', () => {
+    closeWelcomeModal();
+    // Mark that user has seen the welcome message
+    lastSeenUpdateTimestamp = 1;
+    saveGameState();
+    // Open the help modal to show the How to Play guide
+    if (typeof openHelp === 'function') {
+      openHelp();
+    }
+  });
+}
+
+if (welcomeSkipBtn) {
+  welcomeSkipBtn.addEventListener('click', () => {
+    closeWelcomeModal();
+    // Mark that user has seen the welcome message
+    lastSeenUpdateTimestamp = 1;
+    saveGameState();
+  });
+}
+
+// Close welcome modal when clicking outside of it
+if (welcomeModal) {
+  welcomeModal.addEventListener('click', (e) => {
+    if (e.target === welcomeModal) {
+      closeWelcomeModal();
+      // Mark that user has seen the welcome message
+      lastSeenUpdateTimestamp = 1;
+      saveGameState();
+    }
+  });
 }
 
 // Function to update all powerup button states
@@ -9952,61 +9867,94 @@ function updatePowerupOwnershipBadges() {
   }
 }
 
-// Function to update powerup button visibility based on purchase history
+// Function to update powerup button visibility based on purchase history and affordability
 function updatePowerupButtonVisibility() {
   const bombBtn = document.getElementById('bombConversionBtn');
   const trashBtn = document.getElementById('trashButton');
   const pickaxeBtn = document.getElementById('pickaxeButton');
   const swapBtn = document.getElementById('swapButton');
   
-  // Show/hide buttons based on whether they've ever been purchased
-  // If bypass is enabled, show all buttons regardless of purchase history
+  // Show/hide buttons based on whether they've ever been purchased OR if they're currently purchasable
+  // Use visibility instead of display to maintain layout positioning
   if (bombBtn) {
-    bombBtn.style.display = (bypassShopRequirements || bombEverPurchased) ? 'flex' : 'none';
+    const shouldShow = bombEverPurchased || bombDiscoveredThisGame || canAffordPowerup('bomb');
+    if (shouldShow) {
+      bombBtn.style.visibility = 'visible';
+      bombBtn.style.opacity = '1';
+      // Only set pointer-events to auto if button is not disabled
+      if (!bombBtn.disabled) {
+        bombBtn.style.pointerEvents = 'auto';
+      }
+      // Mark as discovered if it became visible due to affordability
+      if (canAffordPowerup('bomb') && !bombDiscoveredThisGame) {
+        bombDiscoveredThisGame = true;
+      }
+    } else {
+      bombBtn.style.visibility = 'hidden';
+      bombBtn.style.pointerEvents = 'none';
+      bombBtn.style.opacity = '0';
+    }
   }
   if (trashBtn) {
-    trashBtn.style.display = (bypassShopRequirements || trashEverPurchased) ? 'flex' : 'none';
+    const shouldShow = trashEverPurchased || trashDiscoveredThisGame || canAffordPowerup('trash');
+    if (shouldShow) {
+      trashBtn.style.visibility = 'visible';
+      trashBtn.style.opacity = '1';
+      // Only set pointer-events to auto if button is not disabled
+      if (!trashBtn.disabled) {
+        trashBtn.style.pointerEvents = 'auto';
+      }
+      // Mark as discovered if it became visible due to affordability
+      if (canAffordPowerup('trash') && !trashDiscoveredThisGame) {
+        trashDiscoveredThisGame = true;
+      }
+    } else {
+      trashBtn.style.visibility = 'hidden';
+      trashBtn.style.pointerEvents = 'none';
+      trashBtn.style.opacity = '0';
+    }
   }
   if (pickaxeBtn) {
-    pickaxeBtn.style.display = (bypassShopRequirements || pickaxeEverPurchased) ? 'flex' : 'none';
+    const shouldShow = pickaxeEverPurchased || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
+    if (shouldShow) {
+      pickaxeBtn.style.visibility = 'visible';
+      pickaxeBtn.style.opacity = '1';
+      // Only set pointer-events to auto if button is not disabled
+      if (!pickaxeBtn.disabled) {
+        pickaxeBtn.style.pointerEvents = 'auto';
+      }
+      // Mark as discovered if it became visible due to affordability
+      if (canAffordPowerup('pickaxe') && !pickaxeDiscoveredThisGame) {
+        pickaxeDiscoveredThisGame = true;
+      }
+    } else {
+      pickaxeBtn.style.visibility = 'hidden';
+      pickaxeBtn.style.pointerEvents = 'none';
+      pickaxeBtn.style.opacity = '0';
+    }
   }
   if (swapBtn) {
-    swapBtn.style.display = (bypassShopRequirements || swapEverPurchased) ? 'flex' : 'none';
-  }
-}
-
-// Function to update shop button positioning based on purchase history
-function updateShopButtonPositioning() {
-  const shopBtn = document.getElementById('shopButton');
-  const shopGrid = document.querySelector('.shop-grid');
-  
-  if (shopBtn && shopGrid) {
-    if (bypassShopRequirements) {
-      // Hide shop button when bypass is enabled
-      shopBtn.style.display = 'none';
-      shopGrid.style.justifyContent = 'flex-start';
-      // Add CSS class to enable button expansion
-      shopGrid.classList.add('bypass-enabled');
-    } else {
-      // Remove CSS class to restore normal button sizing
-      shopGrid.classList.remove('bypass-enabled');
-      
-      if (anyItemEverPurchased) {
-        // After first purchase, use normal positioning (right-aligned)
-        shopBtn.style.display = 'flex';
-        shopBtn.style.marginLeft = 'auto';
-        shopBtn.style.marginRight = '0';
-        shopGrid.style.justifyContent = 'space-between';
-      } else {
-        // Before first purchase, center the shop button
-        shopBtn.style.display = 'flex';
-        shopBtn.style.marginLeft = 'auto';
-        shopBtn.style.marginRight = 'auto';
-        shopGrid.style.justifyContent = 'center';
+    const shouldShow = swapEverPurchased || swapDiscoveredThisGame || canAffordPowerup('swap');
+    if (shouldShow) {
+      swapBtn.style.visibility = 'visible';
+      swapBtn.style.opacity = '1';
+      // Only set pointer-events to auto if button is not disabled
+      if (!swapBtn.disabled) {
+        swapBtn.style.pointerEvents = 'auto';
       }
+      // Mark as discovered if it became visible due to affordability
+      if (canAffordPowerup('swap') && !swapDiscoveredThisGame) {
+        swapDiscoveredThisGame = true;
+      }
+    } else {
+      swapBtn.style.visibility = 'hidden';
+      swapBtn.style.pointerEvents = 'none';
+      swapBtn.style.opacity = '0';
     }
   }
 }
+
+
 
 
 
@@ -10233,7 +10181,7 @@ function purchaseBomb(fromShop = true) {
     gold -= cost;
     bombOwned++;
     bombEverPurchased = true; // Mark as ever purchased
-    anyItemEverPurchased = true; // Mark that any item has been purchased
+
     lifetimeItemsPurchased++; // Track total items purchased
     bombConversionCost *= 2; // Double the cost
     updateGoldDisplay();
@@ -10242,7 +10190,7 @@ function purchaseBomb(fromShop = true) {
     updateBombConversionButtonState();
     updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
-    updateShopButtonPositioning();
+
     saveGameState();
     soundManager.playPurchaseSound();
     
@@ -10264,7 +10212,7 @@ function purchaseTrash(fromShop = true) {
     gold -= cost;
     trashOwned++;
     trashEverPurchased = true; // Mark as ever purchased
-    anyItemEverPurchased = true; // Mark that any item has been purchased
+
     lifetimeItemsPurchased++; // Track total items purchased
     trashButtonCost *= 2; // Double the cost
     updateGoldDisplay();
@@ -10273,7 +10221,7 @@ function purchaseTrash(fromShop = true) {
     updateTrashButtonState();
     updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
-    updateShopButtonPositioning();
+
     saveGameState();
     soundManager.playPurchaseSound();
     
@@ -10295,7 +10243,7 @@ function purchasePickaxe(fromShop = true) {
     gold -= cost;
     pickaxeOwned++;
     pickaxeEverPurchased = true; // Mark as ever purchased
-    anyItemEverPurchased = true; // Mark that any item has been purchased
+
     lifetimeItemsPurchased++; // Track total items purchased
     pickaxeButtonCost *= 1000; // Multiply cost by 1000x
     updateGoldDisplay();
@@ -10304,7 +10252,7 @@ function purchasePickaxe(fromShop = true) {
     updatePickaxeButtonState();
     updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
-    updateShopButtonPositioning();
+
     saveGameState();
     soundManager.playPurchaseSound();
     
@@ -10326,7 +10274,7 @@ function purchaseSwap(fromShop = true) {
     gold -= cost;
     swapOwned++;
     swapEverPurchased = true; // Mark as ever purchased
-    anyItemEverPurchased = true; // Mark that any item has been purchased
+
     lifetimeItemsPurchased++; // Track total items purchased
     swapButtonCost *= 2; // Double the cost
     updateGoldDisplay();
@@ -10335,7 +10283,7 @@ function purchaseSwap(fromShop = true) {
     updateSwapButtonState();
     updateAllPowerupButtonStates(); // Update all button states after gold change
     updatePowerupButtonVisibility(); // Show the button in the grid
-    updateShopButtonPositioning();
+
     saveGameState();
     soundManager.playPurchaseSound();
     
@@ -10484,10 +10432,7 @@ if (resetDataBtn) {
       clearAllGameData();
       closeHelp(); // Close the help modal
       
-      // Show update modal after a brief delay
-      setTimeout(() => {
-        testUpdateSystem();
-      }, 500);
+
     }
   });
 }
@@ -11657,10 +11602,10 @@ function handleDebugPowerupPricing() {
 
 function handleDebugResetPowerupPricing() {
   // Reset all powerup costs to default (25)
-  bombConversionCost = 25;
+  bombConversionCost = 100;
   trashButtonCost = 25;
   pickaxeButtonCost = 1000;
-  swapButtonCost = 25;
+  swapButtonCost = 50;
   
   // Update the display elements
   updatePowerupCostDisplays();
@@ -12944,11 +12889,11 @@ function resetGame(isFreshGame = true){
   // Only reset button costs if this is a fresh game (not a UI reset)
   if (isFreshGame) {
     // Reset bomb conversion button state
-    bombConversionCost = 25;
+    bombConversionCost = 100;
     bombConversionPresses = 0;
     lastGoldAmount = 0; // Reset tracked gold amount to force button state update
     bombSelected = false; // Reset bomb selection state
-    previousBombCost = 25; // Reset previous bomb cost
+    previousBombCost = 100; // Reset previous bomb cost
     
     // Reset trash button state
     trashButtonCost = 25;
@@ -12960,7 +12905,7 @@ function resetGame(isFreshGame = true){
   pickaxeMode = false;
   
   // Reset swap button state
-  swapButtonCost = 25;
+  swapButtonCost = 50;
   swapButtonPresses = 0;
   swapAnimating = false;
     
@@ -12975,7 +12920,13 @@ function resetGame(isFreshGame = true){
     trashEverPurchased = false;
     pickaxeEverPurchased = false;
     swapEverPurchased = false;
-    anyItemEverPurchased = false;
+    
+    // Reset discovery tracking for new game
+    bombDiscoveredThisGame = false;
+    trashDiscoveredThisGame = false;
+    pickaxeDiscoveredThisGame = false;
+    swapDiscoveredThisGame = false;
+
     
     // Update powerup ownership badges
     updatePowerupOwnershipBadges();
@@ -12983,8 +12934,8 @@ function resetGame(isFreshGame = true){
     // Update powerup button visibility (hide all since they're reset)
     updatePowerupButtonVisibility();
     
-    // Update shop button positioning (center it since no purchases have been made)
-    updateShopButtonPositioning();
+
+
     
     // Keep pickaxe enabled state for new game
     // window.pickaxeEnabled remains true
@@ -13622,6 +13573,9 @@ if (bombToggle && bombStatus) {
 // Initialize all powerup button states
 updateAllPowerupButtonStates();
 
+// Initialize powerup button visibility
+updatePowerupButtonVisibility();
+
 // Handle window resize for mobile responsiveness
 window.addEventListener('resize', () => {
   updateStackHeight();
@@ -13901,6 +13855,9 @@ try {
   // Set game initializing flag
   window.gameInitializing = true;
   
+  // Reset the prevent save flag (in case it was set from a previous clear operation)
+  preventGameStateSave = false;
+  
   // Now try to load saved game state
   const gameLoaded = loadGameState();
   
@@ -13922,8 +13879,7 @@ try {
   // Update shop display after loading game state
   updateShopDisplay();
   
-  // Update shop button positioning based on purchase history
-  updateShopButtonPositioning();
+
   
   // Update powerup button visibility based on purchase history
   updatePowerupButtonVisibility();
@@ -13948,17 +13904,19 @@ try {
     updateDebugBlockColors();
   }
   
-  // Check for game updates after everything is loaded and rendered
-  setTimeout(async () => {
+  // Check for first-time users and show welcome modal
+  setTimeout(() => {
     try {
-      const updates = await fetchUpdates();
-      const newUpdates = checkForNewUpdates(updates);
-      
-      if (newUpdates.length > 0) {
-        showUpdateModal(newUpdates);
+      console.log('🔍 Debug: lastSeenUpdateTimestamp =', lastSeenUpdateTimestamp);
+      // If this is a first-time user, show the welcome modal
+      if (lastSeenUpdateTimestamp === 0) {
+        console.log('👋 Showing welcome modal for first-time user');
+        showWelcomeModal();
+      } else {
+        console.log('👋 Returning user detected, no welcome modal needed');
       }
     } catch (error) {
-      console.error('❌ Failed to check for updates:', error);
+      console.error('❌ Failed to check for first-time user:', error);
     }
   }, 1000); // Delay to ensure UI is fully rendered
   
