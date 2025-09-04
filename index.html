@@ -7779,10 +7779,6 @@ function saveGameState() {
       trashOwned: trashOwned || 0,
       pickaxeOwned: pickaxeOwned || 0,
       swapOwned: swapOwned || 0,
-      bombEverPurchased: bombEverPurchased || false,
-      trashEverPurchased: trashEverPurchased || false,
-      pickaxeEverPurchased: pickaxeEverPurchased || false,
-      swapEverPurchased: swapEverPurchased || false,
       
       // Save powerup discovery state
       bombDiscoveredThisGame: bombDiscoveredThisGame || false,
@@ -7909,11 +7905,6 @@ function restoreGameState(gameState) {
     pickaxeOwned = gameState.pickaxeOwned || 0;
     swapOwned = gameState.swapOwned || 0;
     
-    // Restore purchase tracking from saved state
-    bombEverPurchased = gameState.bombEverPurchased || false;
-    trashEverPurchased = gameState.trashEverPurchased || false;
-    pickaxeEverPurchased = gameState.pickaxeEverPurchased || false;
-    swapEverPurchased = gameState.swapEverPurchased || false;
     
     // Restore powerup discovery state from saved state
     bombDiscoveredThisGame = gameState.bombDiscoveredThisGame || false;
@@ -8671,11 +8662,6 @@ let trashOwned = 0; // Track owned trash can powerups
 let pickaxeOwned = 0; // Track owned pickaxe powerups
 let swapOwned = 0; // Track owned swap powerups
 
-// Track if each powerup has ever been purchased (for showing in grid)
-let bombEverPurchased = false;
-let trashEverPurchased = false;
-let pickaxeEverPurchased = false;
-let swapEverPurchased = false;
 
 // Track if each powerup has been discovered during current game session
 let bombDiscoveredThisGame = false;
@@ -10348,10 +10334,10 @@ function updatePowerupButtonVisibility() {
   // Track if any powerup was discovered for the first time in this update
   let anyPowerupDiscovered = false;
   
-  // Show/hide buttons based on whether they've ever been purchased OR if they're currently purchasable OR if show items on start is enabled
+  // Show/hide buttons based on whether they've been discovered this game OR if they're currently purchasable OR if show items on start is enabled
   // Use visibility instead of display to maintain layout positioning
   if (bombBtn) {
-    const shouldShow = window.showItemsOnStart || bombEverPurchased || bombDiscoveredThisGame || canAffordPowerup('bomb');
+    const shouldShow = window.showItemsOnStart || bombDiscoveredThisGame || canAffordPowerup('bomb');
     if (shouldShow) {
       bombBtn.style.visibility = 'visible';
       bombBtn.style.opacity = '1';
@@ -10371,7 +10357,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (trashBtn) {
-    const shouldShow = window.showItemsOnStart || trashEverPurchased || trashDiscoveredThisGame || canAffordPowerup('trash');
+    const shouldShow = window.showItemsOnStart || trashDiscoveredThisGame || canAffordPowerup('trash');
     if (shouldShow) {
       trashBtn.style.visibility = 'visible';
       trashBtn.style.opacity = '1';
@@ -10391,7 +10377,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (pickaxeBtn) {
-    const shouldShow = window.showItemsOnStart || pickaxeEverPurchased || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
+    const shouldShow = window.showItemsOnStart || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
     if (shouldShow) {
       pickaxeBtn.style.visibility = 'visible';
       pickaxeBtn.style.opacity = '1';
@@ -10411,7 +10397,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (swapBtn) {
-    const shouldShow = window.showItemsOnStart || swapEverPurchased || swapDiscoveredThisGame || canAffordPowerup('swap');
+    const shouldShow = window.showItemsOnStart || swapDiscoveredThisGame || canAffordPowerup('swap');
     if (shouldShow) {
       swapBtn.style.visibility = 'visible';
       swapBtn.style.opacity = '1';
@@ -10663,7 +10649,6 @@ function purchaseBomb(fromShop = true) {
     const cost = bombConversionCost;
     gold -= cost;
     bombOwned++;
-    bombEverPurchased = true; // Mark as ever purchased
 
     lifetimeItemsPurchased++; // Track total items purchased
     bombConversionCost *= 2; // Double the cost
@@ -10694,7 +10679,6 @@ function purchaseTrash(fromShop = true) {
     const cost = trashButtonCost;
     gold -= cost;
     trashOwned++;
-    trashEverPurchased = true; // Mark as ever purchased
 
     lifetimeItemsPurchased++; // Track total items purchased
     trashButtonCost *= 2; // Double the cost
@@ -10725,7 +10709,6 @@ function purchasePickaxe(fromShop = true) {
     const cost = pickaxeButtonCost;
     gold -= cost;
     pickaxeOwned++;
-    pickaxeEverPurchased = true; // Mark as ever purchased
 
     lifetimeItemsPurchased++; // Track total items purchased
     pickaxeButtonCost *= 10; // Multiply cost by 10x
@@ -10756,7 +10739,6 @@ function purchaseSwap(fromShop = true) {
     const cost = swapButtonCost;
     gold -= cost;
     swapOwned++;
-    swapEverPurchased = true; // Mark as ever purchased
 
     lifetimeItemsPurchased++; // Track total items purchased
     swapButtonCost *= 2; // Double the cost
@@ -13473,11 +13455,6 @@ function resetGame(isFreshGame = true){
     pickaxeOwned = 0;
     swapOwned = 0;
     
-    // Reset purchase tracking
-    bombEverPurchased = false;
-    trashEverPurchased = false;
-    pickaxeEverPurchased = false;
-    swapEverPurchased = false;
     
     // Reset discovery tracking for new game
     bombDiscoveredThisGame = false;
