@@ -9238,6 +9238,7 @@ async function handleSwapButton() {
     swapMode = true;
     swapSelectedIndex = 1; // Start by selecting the second block
     renderNext(); // Update highlighting
+    render(); // Re-evaluate pole enabling/disabling for the new selected block
     updateAllPowerupButtonStates(); // Update button states
     saveGameState();
     logQueueState('swapButton-end');
@@ -9249,6 +9250,7 @@ async function handleSwapButton() {
     // Currently on second block, move to third block
     swapSelectedIndex = 2;
     renderNext(); // Update highlighting
+    render(); // Re-evaluate pole enabling/disabling for the new selected block
     saveGameState();
     logQueueState('swapButton-end');
     return;
@@ -9259,6 +9261,7 @@ async function handleSwapButton() {
     swapMode = false;
     swapSelectedIndex = 0;
     renderNext(); // Update highlighting
+    render(); // Re-evaluate pole enabling/disabling for the new selected block
     updateAllPowerupButtonStates(); // Update button states
     saveGameState();
     logQueueState('swapButton-end');
@@ -12259,6 +12262,9 @@ function render(){
     let pieceToCheck;
     if (customBlockMode && customBlockSize) {
       pieceToCheck = { w: customBlockSize, bomb: customBlockBomb };
+    } else if (swapMode) {
+      // In swap mode, check the selected block
+      pieceToCheck = nextQueue[swapSelectedIndex];
     } else {
       pieceToCheck = nextQueue[0];
     }
