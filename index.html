@@ -7705,9 +7705,9 @@ function saveGameState() {
       swapMode: swapMode || false,
       swapSelectedIndex: swapSelectedIndex || 0,
       bombSelected: bombSelected || false,
-      previousBombCost: previousBombCost || bombConversionCost,
       pickaxeEnabled: window.pickaxeEnabled || true,
       pickaxeMode: pickaxeMode || false,
+      trashMode: trashMode || false,
       bombOwned: bombOwned || 0,
       trashOwned: trashOwned || 0,
       pickaxeOwned: pickaxeOwned || 0,
@@ -7828,10 +7828,12 @@ function restoreGameState(gameState) {
     
     // Restore bomb selection state from saved state
     bombSelected = gameState.bombSelected || false;
-    previousBombCost = gameState.previousBombCost || bombConversionCost;
     
     // Restore pickaxe mode state from saved state
     pickaxeMode = gameState.pickaxeMode || false;
+    
+    // Restore trash mode state from saved state
+    trashMode = gameState.trashMode || false;
     
     // Restore owned quantities from saved state
     bombOwned = gameState.bombOwned || 0;
@@ -8631,7 +8633,6 @@ let bombConversionPresses = 0; // Number of times button has been pressed
 let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
 let bombSelected = false; // Track if a bomb is currently selected but not yet placed
 let trashMode = false; // Track if trash can mode is active
-let previousBombCost = 100; // Store the previous bomb cost before conversion
 
 // Trash button state
 let trashButtonCost = 25;
@@ -8958,7 +8959,6 @@ function handleBombConversion() {
     // Undo bomb selection
     currentBlock.bomb = false;
     // Note: No gold to refund since payment hasn't been made yet
-    bombConversionCost = previousBombCost; // Restore previous cost
     bombSelected = false;
     
     // Play bomb close sound effect
@@ -8976,6 +8976,9 @@ function handleBombConversion() {
     updatePickaxeButtonState();
     updateTrashButtonState();
     updateSwapButtonState();
+    
+    // Update button visibility to ensure pointer-events are properly set
+    updatePowerupButtonVisibility();
     
 
     
@@ -9001,8 +9004,6 @@ function handleBombConversion() {
     }
   }
   
-  // Store the current cost before converting
-  previousBombCost = bombConversionCost;
   
   // Convert the current next block to a bomb (don't deduct gold yet)
   // Gold will be deducted when the bomb block is actually placed
@@ -9071,6 +9072,7 @@ function handleTrashButton() {
     
     // Update all powerup button states
     updateAllPowerupButtonStates();
+    updatePowerupButtonVisibility(); // Update button visibility to ensure pointer-events are properly set
     renderNext(); // Re-render to remove X overlay
     render(); // Re-render the main game to re-enable stacks
     return;
@@ -9184,6 +9186,7 @@ function handlePickaxeButton() {
     
     // Update all powerup button states
     updateAllPowerupButtonStates();
+    updatePowerupButtonVisibility(); // Update button visibility to ensure pointer-events are properly set
     render(); // Re-render to remove pickaxe mode visual indicators
     return;
   }
@@ -9263,6 +9266,7 @@ async function handleSwapButton() {
     renderNext(); // Update highlighting
     render(); // Re-evaluate pole enabling/disabling for the new selected block
     updateAllPowerupButtonStates(); // Update button states
+    updatePowerupButtonVisibility(); // Update button visibility to ensure pointer-events are properly set
     saveGameState();
     logQueueState('swapButton-end');
     return;
@@ -12852,6 +12856,7 @@ function placeOnPole(idx){
         
         // Update button states
         updateAllPowerupButtonStates();
+        updatePowerupButtonVisibility(); // Update button visibility to ensure pointer-events are properly set
         
         // Save game state after using swap
         saveGameState();
@@ -13357,7 +13362,6 @@ function resetGame(isFreshGame = true){
     lastGoldAmount = 0; // Reset tracked gold amount to force button state update
     bombSelected = false; // Reset bomb selection state
     trashMode = false; // Reset trash mode
-    previousBombCost = 100; // Reset previous bomb cost
     
     // Reset trash button state
     trashButtonCost = 25;
