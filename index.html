@@ -2579,6 +2579,66 @@
     content: "↩️";
   }
   
+  /* Trash X overlay styling */
+  .next-disc {
+    position: relative; /* Ensure the block is a positioned ancestor for the overlay */
+  }
+  
+  .trash-x-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(0, 0, 0);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    cursor: pointer;
+    z-index: 10;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    animation: trashXOverlayPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(185, 28, 28, 0.6);
+  }
+  
+  /* Mobile responsive sizing for trash emoji */
+  @media (max-width: 768px) {
+    .trash-x-overlay {
+      font-size: 18px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .trash-x-overlay {
+      font-size: 16px;
+    }
+  }
+  
+  .trash-x-overlay:hover {
+    background: rgba(153, 23, 23, 1.0);
+    box-shadow: 0 0 25px rgba(185, 28, 28, 0.8);
+  }
+  
+  .trash-x-overlay:active {
+    background: rgba(120, 15, 15, 1.0);
+  }
+  
+  @keyframes trashXOverlayPulse {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(185, 28, 28, 0.6);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(185, 28, 28, 0.8);
+    }
+  }
+  
   /* Desktop-only hover effects for powerup buttons */
   @media (hover: hover) and (pointer: fine) {
     .powerup-btn:not(:disabled):not(.undo-mode):hover {
@@ -5459,7 +5519,7 @@
         <div class="powerup-ownership-badge" id="trashOwnershipBadge">0</div>
       </button>
       
-      <button id="swapButton" class="powerup-btn" title="Swap next two blocks in queue" disabled="">
+      <button id="swapButton" class="powerup-btn" title="Select block to drop from queue" disabled="">
         <span class="powerup-emoji">🔄</span>
         <div class="powerup-cost-badge" id="swapCostBadge" style="display: none;"></div>
         <div class="powerup-ownership-badge" id="swapOwnershipBadge">0</div>
@@ -5544,7 +5604,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
                   <span style="font-size: 24px;">🔄</span>
-                  <span style="font-size: 14px; font-weight: 500;">Swap the next two blocks in the queue</span>
+                  <span style="font-size: 14px; font-weight: 500;">Select which block to drop from the queue</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid #475569;">
                   <span style="font-size: 24px;">💣</span>
@@ -5685,14 +5745,14 @@
                 <span style="font-size: 20px;">🔄</span>
                 Swap
               </h4>
-              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Swap switches the next block in queue with the second block in queue.</p>
+              <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Swap lets you select which block to drop from the queue. Press once to select the second block, twice for the third block, or three times to return to normal mode.</p>
               <div style="display: flex; justify-content: center; margin: 16px 0 24px 0;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
                   <button class="powerup-btn" style="pointer-events: none; width: 120px; height: 80px; padding: 0; display: flex; align-items: center; justify-content: center; position: relative; visibility: visible !important; opacity: 1 !important;">
                     <span class="powerup-emoji" style="font-size: 28px;">🔄</span>
                     <div class="powerup-ownership-badge" style="position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; font-size: 11px; font-weight: 700; padding: 3px 5px; border-radius: 8px; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; font-family: var(--font-family); min-width: 18px; text-align: center; line-height: 1; box-sizing: border-box; white-space: nowrap;">1</div>
                   </button>
-                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Swaps next two blocks</span>
+                  <span style="color: #f8fafc; font-size: 14px; text-align: center;">Selects block to drop</span>
                 </div>
               </div>
             </div>
@@ -7642,6 +7702,8 @@ function saveGameState() {
       trashButtonPresses: trashButtonPresses || 0,
       pickaxeButtonPresses: pickaxeButtonPresses || 0,
       swapButtonPresses: swapButtonPresses || 0,
+      swapMode: swapMode || false,
+      swapSelectedIndex: swapSelectedIndex || 0,
       bombSelected: bombSelected || false,
       previousBombCost: previousBombCost || bombConversionCost,
       pickaxeEnabled: window.pickaxeEnabled || true,
@@ -7758,6 +7820,8 @@ function restoreGameState(gameState) {
     trashButtonPresses = gameState.trashButtonPresses || 0;
     pickaxeButtonPresses = gameState.pickaxeButtonPresses || 0;
     swapButtonPresses = gameState.swapButtonPresses || 0;
+    swapMode = gameState.swapMode || false;
+    swapSelectedIndex = gameState.swapSelectedIndex || 0;
     
     // Restore pickaxe enabled state from saved state
     window.pickaxeEnabled = gameState.pickaxeEnabled || true;
@@ -8017,7 +8081,10 @@ function clearAllGameData() {
   trashButtonPresses = 0;
   pickaxeButtonPresses = 0;
   swapButtonPresses = 0;
+  swapMode = false; // Reset swap mode
+  swapSelectedIndex = 0; // Reset swap selected index
   bombSelected = false;
+  trashMode = false; // Reset trash mode
   previousBombCost = 100;
   pickaxeMode = false; // Reset pickaxe mode
   currentActiveDecayFactor = PROBABILITY_DECAY_FACTOR; // Reset to default decay factor
@@ -8563,6 +8630,7 @@ let bombConversionCost = 100;
 let bombConversionPresses = 0; // Number of times button has been pressed
 let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
 let bombSelected = false; // Track if a bomb is currently selected but not yet placed
+let trashMode = false; // Track if trash can mode is active
 let previousBombCost = 100; // Store the previous bomb cost before conversion
 
 // Trash button state
@@ -8577,6 +8645,8 @@ let pickaxeMode = false; // Track if pickaxe mode is active
 // Swap button state
 let swapButtonCost = 50;
 let swapButtonPresses = 0; // Number of times button has been pressed
+let swapMode = false; // Track if swap mode is active
+let swapSelectedIndex = 0; // Track which block in queue is selected (0 = first, 1 = second, 2 = third)
 
 // Initialize pickaxe enabled state
 window.pickaxeEnabled = window.pickaxeEnabled || true;
@@ -8989,6 +9059,52 @@ function handleTrashButton() {
     return;
   }
   
+  // If trash mode is already active, allow undoing the selection
+  if (trashMode) {
+    // Undo trash mode
+    trashMode = false;
+    
+    // Play bomb close sound effect (reusing bomb close sound for trash mode)
+    if (soundManager && soundManager.canPlayAudio()) {
+      soundManager.playBombCloseSound();
+    }
+    
+    // Update all powerup button states
+    updateAllPowerupButtonStates();
+    renderNext(); // Re-render to remove X overlay
+    render(); // Re-render the main game to re-enable stacks
+    return;
+  }
+  
+  // Activate trash mode
+  trashMode = true;
+  
+  // Play bomb start sound effect (reusing bomb start sound for trash mode)
+  if (soundManager && soundManager.canPlayAudio()) {
+    soundManager.playBombStartSound();
+  }
+  
+  // Update all powerup button states
+  updateAllPowerupButtonStates();
+  
+  // Re-render to show trash mode visual indicators
+  renderNext();
+  render(); // Re-render the main game to show disabled stacks
+  
+  logQueueState('trashButton-end');
+}
+
+function handleTrashConfirmation() {
+  logQueueState('trashConfirmation-start');
+  
+  // Validate queue state before proceeding
+  validateQueueState();
+  
+  // Check if there's a next block to remove
+  if (nextQueue.length === 0) {
+    return;
+  }
+  
   // Decrease owned trash can count
   trashOwned--;
   updatePowerupOwnershipBadges();
@@ -9007,12 +9123,15 @@ function handleTrashButton() {
   // Add a new random block to the end of the queue to maintain 3 blocks
   nextQueue.push(getRandomPiece());
   
+  // Deactivate trash mode
+  trashMode = false;
+  
   // Play the same animation as placing a block, but don't place it
-  animateNextQueueAdvance(true).then(() => {
+  animateNextQueueAdvance(true, 0).then(() => {
     // After the queue animation completes, re-render to update pole placement logic
     // This ensures that the new next block can be properly evaluated for placement
     render();
-  }); // true = queue already modified
+  }); // true = queue already modified, 0 = remove first block
   
   // Update button cost display
   const trashCostEl = document.getElementById('trashCost');
@@ -9032,7 +9151,7 @@ function handleTrashButton() {
   // Save game state after using trash button and cost increase
   saveGameState();
   
-  logQueueState('trashButton-end');
+  logQueueState('trashConfirmation-end');
 }
 
 function handlePickaxeButton() {
@@ -9104,48 +9223,47 @@ async function handleSwapButton() {
     }
   }
   
-  // Check if there are at least 2 blocks in the queue to swap
+  // Check if there are at least 2 blocks in the queue
   if (nextQueue.length < 2) {
     return;
   }
   
-  // Decrease owned swap count
-  swapOwned--;
-  updatePowerupOwnershipBadges();
-  
-  // Track total swaps used
-  totalSwapsUsed++;
-  
-  // Play switch sound effect when swap ability is used
+  // Play switch sound effect for each button press
   if (soundManager && soundManager.canPlayAudio()) {
     soundManager.playSwitchSound();
   }
   
-  // Animate the swap
-  await animateSwapBlocks();
-  
-  // Swap the first and second blocks in the queue
-  const temp = nextQueue[0];
-  nextQueue[0] = nextQueue[1];
-  nextQueue[1] = temp;
-  
-  // Re-render to show the swapped blocks
-  render();
-  
-  // Update button cost display
-  const swapCostEl = document.getElementById('swapCost');
-  if (swapCostEl) {
-    swapCostEl.textContent = formatNumber(swapButtonCost);
+  // If not in swap mode, enter swap mode and select the second block
+  if (!swapMode) {
+    swapMode = true;
+    swapSelectedIndex = 1; // Start by selecting the second block
+    renderNext(); // Update highlighting
+    updateAllPowerupButtonStates(); // Update button states
+    saveGameState();
+    logQueueState('swapButton-end');
+    return;
   }
   
-  // Update all powerup button states to reflect new owned count
-  updateAllPowerupButtonStates();
-  if (swapCostElMobile) {
-    swapCostElMobile.textContent = formatNumber(swapButtonCost);
+  // If already in swap mode, cycle through the queue positions
+  if (swapSelectedIndex === 1) {
+    // Currently on second block, move to third block
+    swapSelectedIndex = 2;
+    renderNext(); // Update highlighting
+    saveGameState();
+    logQueueState('swapButton-end');
+    return;
   }
   
-  // Save game state after using swap button and cost increase
-  saveGameState();
+  if (swapSelectedIndex === 2) {
+    // Currently on third block, return to first block and exit swap mode
+    swapMode = false;
+    swapSelectedIndex = 0;
+    renderNext(); // Update highlighting
+    updateAllPowerupButtonStates(); // Update button states
+    saveGameState();
+    logQueueState('swapButton-end');
+    return;
+  }
   
   logQueueState('swapButton-end');
 }
@@ -9260,6 +9378,10 @@ function updateBombConversionButtonState() {
         pickaxeButton.disabled = true;
         pickaxeButton.title = "Bomb is active - complete or undo first";
       }
+      if (swapButton) {
+        swapButton.disabled = true;
+        swapButton.title = "Bomb is active - complete or undo first";
+      }
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
@@ -9283,7 +9405,23 @@ function updateBombConversionButtonState() {
       }
       
       // Re-enable other powerup buttons when bomb is not in undo mode
-      // Always re-enable them since we're not in bomb undo mode
+      // But check if other modes are active first
+      if (trashMode) {
+        // Trash mode is active, disable bomb button
+        bombConversionBtn.disabled = true;
+        bombConversionBtn.title = "Trash is active - complete or undo first";
+      } else if (swapMode) {
+        // Swap mode is active, disable bomb button
+        bombConversionBtn.disabled = true;
+        bombConversionBtn.title = "Swap is active - complete or cycle first";
+      } else {
+        // No other modes active, check if player has at least one bomb owned or can afford one
+        const hasBombOwned = bombOwned >= 1;
+        const canAffordBomb = canAffordPowerup('bomb');
+        bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
+        bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+      }
+      
       if (trashButton) {
         const hasTrashOwned = trashOwned >= 1;
         const canAffordTrash = canAffordPowerup('trash');
@@ -9309,23 +9447,54 @@ function updateTrashButtonState() {
   // Always update when called since we call this strategically
   
   if (trashButton) {
-    // Check if other powerups are in undo mode
-    const otherPowerupActive = bombSelected || pickaxeMode;
-    
-    if (otherPowerupActive) {
-      // Another powerup is active, disable trash button
-      trashButton.disabled = true;
-      if (bombSelected) {
-        trashButton.title = "Bomb is active - complete or undo first";
-      } else if (pickaxeMode) {
-        trashButton.title = "Pickaxe is active - complete or deactivate first";
+    // If trash mode is active, the button should always be enabled for undo
+    if (trashMode) {
+      trashButton.disabled = false;
+      trashButton.classList.add('undo-mode');
+      trashButton.title = "Press again to undo trash selection";
+      const emojiEl = trashButton.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "↩️";
+      
+      // Disable other powerup buttons when trash is in undo mode
+      if (bombConversionBtn) {
+        bombConversionBtn.disabled = true;
+        bombConversionBtn.title = "Trash is active - complete or undo first";
+      }
+      if (pickaxeButton) {
+        pickaxeButton.disabled = true;
+        pickaxeButton.title = "Trash is active - complete or undo first";
+      }
+      if (swapButton) {
+        swapButton.disabled = true;
+        swapButton.title = "Trash is active - complete or undo first";
       }
     } else {
-      // No other powerups active, check if player has at least one trash can owned or can afford one
-      const hasTrashOwned = trashOwned >= 1;
-      const canAffordTrash = canAffordPowerup('trash');
-      trashButton.disabled = !hasTrashOwned && !canAffordTrash;
-      trashButton.title = "Remove next block from queue";
+      // Check if other powerups are in undo mode
+      const otherPowerupActive = bombSelected || pickaxeMode || swapMode;
+      
+      if (otherPowerupActive) {
+        // Another powerup is active, disable trash button
+        trashButton.disabled = true;
+        trashButton.classList.remove('undo-mode');
+        if (bombSelected) {
+          trashButton.title = "Bomb is active - complete or undo first";
+        } else if (pickaxeMode) {
+          trashButton.title = "Pickaxe is active - complete or deactivate first";
+        } else if (swapMode) {
+          trashButton.title = "Swap is active - complete or cycle first";
+        }
+        const emojiEl = trashButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "🗑️";
+      } else {
+        // No other powerups active, check if player has at least one trash can owned or can afford one
+        const hasTrashOwned = trashOwned >= 1;
+        const canAffordTrash = canAffordPowerup('trash');
+        trashButton.disabled = !hasTrashOwned && !canAffordTrash;
+        trashButton.classList.remove('undo-mode');
+        trashButton.title = "Remove next block from queue";
+        const emojiEl = trashButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "🗑️";
+      }
     }
     
     // Update the tracked gold amount
@@ -9358,6 +9527,10 @@ function updatePickaxeButtonState() {
         trashButton.disabled = true;
         trashButton.title = "Pickaxe is active - complete or deactivate first";
       }
+      if (swapButton) {
+        swapButton.disabled = true;
+        swapButton.title = "Pickaxe is active - complete or deactivate first";
+      }
     } else {
       // Pickaxe mode is not active - check if other powerups are active first
       if (bombSelected) {
@@ -9365,6 +9538,20 @@ function updatePickaxeButtonState() {
         pickaxeButton.disabled = true;
         pickaxeButton.classList.remove('undo-mode');
         pickaxeButton.title = "Bomb is active - complete or undo first";
+        const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "⛏️";
+      } else if (trashMode) {
+        // Trash mode is active, disable pickaxe button
+        pickaxeButton.disabled = true;
+        pickaxeButton.classList.remove('undo-mode');
+        pickaxeButton.title = "Trash is active - complete or undo first";
+        const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "⛏️";
+      } else if (swapMode) {
+        // Swap mode is active, disable pickaxe button
+        pickaxeButton.disabled = true;
+        pickaxeButton.classList.remove('undo-mode');
+        pickaxeButton.title = "Swap is active - complete or cycle first";
         const emojiEl = pickaxeButton.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "⛏️";
       } else {
@@ -9385,13 +9572,13 @@ function updatePickaxeButtonState() {
       
       // Re-enable other powerup buttons when pickaxe is not in undo mode
       // But only if they're not in their own undo mode
-      if (bombConversionBtn && !bombSelected) {
+      if (bombConversionBtn && !bombSelected && !trashMode && !swapMode) {
         const hasBombOwned = bombOwned >= 1;
         const canAffordBomb = canAffordPowerup('bomb');
         bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
       }
-      if (trashButton && !bombSelected) {
+      if (trashButton && !bombSelected && !trashMode && !swapMode) {
         const hasTrashOwned = trashOwned >= 1;
         const canAffordTrash = canAffordPowerup('trash');
         trashButton.disabled = !hasTrashOwned && !canAffordTrash;
@@ -9409,15 +9596,20 @@ function updateSwapButtonState() {
   
   if (swapButton) {
     // Check if other powerups are in undo mode
-    const otherPowerupActive = bombSelected || pickaxeMode;
+    const otherPowerupActive = bombSelected || pickaxeMode || trashMode;
     
     if (otherPowerupActive) {
       // Another powerup is active, disable swap button
       swapButton.disabled = true;
+      swapButton.classList.remove('undo-mode');
+      const emojiEl = swapButton.querySelector('.powerup-emoji');
+      if (emojiEl) emojiEl.textContent = "🔄";
       if (bombSelected) {
         swapButton.title = "Bomb is active - complete or undo first";
       } else if (pickaxeMode) {
         swapButton.title = "Pickaxe is active - complete or deactivate first";
+      } else if (trashMode) {
+        swapButton.title = "Trash is active - complete or undo first";
       }
     } else {
       // No other powerups active, check if player has at least one swap owned or can afford one
@@ -9432,11 +9624,41 @@ function updateSwapButtonState() {
       swapButton.disabled = (!hasSwapOwned && !canAffordSwap) || nextTwoBlocksSame;
       
       if (!hasSwapOwned && !canAffordSwap) {
-        swapButton.title = "Swap next two blocks in queue";
+        swapButton.title = "Select block to drop from queue";
+        swapButton.classList.remove('undo-mode');
+        const emojiEl = swapButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "🔄";
       } else if (nextTwoBlocksSame) {
         swapButton.title = "Next two blocks are the same - swap would be wasteful";
+        swapButton.classList.remove('undo-mode');
+        const emojiEl = swapButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "🔄";
+      } else if (swapMode) {
+        // In swap mode, show current selection with undo styling
+        const positionNames = ['first', 'second', 'third'];
+        swapButton.title = `Selected: ${positionNames[swapSelectedIndex]} block - click to cycle or place block`;
+        swapButton.classList.add('undo-mode');
+        const emojiEl = swapButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "➡️";
+        
+        // Disable other powerup buttons when swap is in undo mode
+        if (bombConversionBtn) {
+          bombConversionBtn.disabled = true;
+          bombConversionBtn.title = "Swap is active - complete or cycle first";
+        }
+        if (trashButton) {
+          trashButton.disabled = true;
+          trashButton.title = "Swap is active - complete or cycle first";
+        }
+        if (pickaxeButton) {
+          pickaxeButton.disabled = true;
+          pickaxeButton.title = "Swap is active - complete or cycle first";
+        }
       } else {
-        swapButton.title = "Swap next two blocks in queue";
+        swapButton.title = "Select block to drop from queue";
+        swapButton.classList.remove('undo-mode');
+        const emojiEl = swapButton.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "🔄";
       }
     }
     
@@ -9839,43 +10061,11 @@ if (welcomeModal) {
 
 // Function to update all powerup button states
 function updateAllPowerupButtonStates() {
-  // Check if any powerup is active
-  const anyPowerupActive = bombSelected || pickaxeMode;
-  
-  if (anyPowerupActive) {
-    // If any powerup is active, disable all other buttons
-    if (bombConversionBtn) {
-      bombConversionBtn.disabled = !bombSelected; // Keep bomb enabled if it's the active one
-    }
-    if (trashButton) {
-      trashButton.disabled = true;
-    }
-    if (swapButton) {
-      swapButton.disabled = true;
-    }
-    if (pickaxeButton) {
-      pickaxeButton.disabled = !pickaxeMode; // Keep pickaxe enabled if it's the active one
-    }
-  } else {
-    // No powerups active, enable buttons based on ownership or affordability
-    if (bombConversionBtn) {
-      bombConversionBtn.disabled = bombOwned < 1 && !canAffordPowerup('bomb');
-    }
-    if (trashButton) {
-      trashButton.disabled = trashOwned < 1 && !canAffordPowerup('trash');
-    }
-    if (swapButton) {
-      // Use the proper swap button logic that checks if next two blocks are the same
-      const hasSwapOwned = swapOwned >= 1;
-      const canAffordSwap = canAffordPowerup('swap');
-      const nextTwoBlocksSame = nextQueue.length >= 2 && 
-                                nextQueue[0].w === nextQueue[1].w;
-      swapButton.disabled = (!hasSwapOwned && !canAffordSwap) || nextTwoBlocksSame;
-    }
-    if (pickaxeButton) {
-      pickaxeButton.disabled = pickaxeOwned < 1 && !canAffordPowerup('pickaxe');
-    }
-  }
+  // Call individual button state functions to ensure proper undo mode styling
+  updateBombConversionButtonState();
+  updateTrashButtonState();
+  updatePickaxeButtonState();
+  updateSwapButtonState();
 }
 
 // Function to check if player can afford a powerup
@@ -12074,7 +12264,12 @@ function render(){
     }
     
     const playable = canPlaceOnPole(pieceToCheck, pole);
-    const isDisabled = isAtCapacity && !playable;
+    const isDisabled = trashMode || (isAtCapacity && !playable);
+    
+    // Debug logging for trash mode
+    if (trashMode) {
+      console.log(`Trash mode active - pole ${idx}: isDisabled=${isDisabled}, playable=${playable}, isAtCapacity=${isAtCapacity}`);
+    }
     
     poleDiv.className = 'pole' + (isDisabled && !pickaxeMode ? ' full' : '');
     
@@ -12145,7 +12340,7 @@ function render(){
     
     // Add click handler if stack is not disabled OR if pickaxe mode is active
     if (!isDisabled || pickaxeMode) {
-      console.log('Adding click handler to pole', idx, 'isDisabled:', isDisabled, 'pickaxeMode:', pickaxeMode);
+      console.log('Adding click handler to pole', idx, 'isDisabled:', isDisabled, 'pickaxeMode:', pickaxeMode, 'trashMode:', trashMode);
       poleDiv.addEventListener('click', (e) => {
         // Ensure audio is unlocked on first click
         if (soundManager && !soundManager.audioUnlocked) {
@@ -12365,8 +12560,20 @@ function renderNext(){
   nextContainer.innerHTML = '';
   nextQueue.forEach((p, idx) => {
     const d = document.createElement('div');
-    // Disable highlighting of current piece when in pickaxe mode
-    d.className = 'next-disc' + (idx === 0 && !pickaxeMode ? ' current' : '');
+    // Highlight the current piece based on mode:
+    // - Normal mode: highlight first block (idx === 0)
+    // - Pickaxe mode: no highlighting
+    // - Swap mode: highlight the selected block
+    let shouldHighlight = false;
+    if (pickaxeMode) {
+      shouldHighlight = false; // No highlighting in pickaxe mode
+    } else if (swapMode) {
+      shouldHighlight = idx === swapSelectedIndex; // Highlight selected block in swap mode
+    } else {
+      shouldHighlight = idx === 0; // Normal mode - highlight first block
+    }
+    
+    d.className = 'next-disc' + (shouldHighlight ? ' current' : '');
     if (p.bomb) {
       d.innerHTML = labelForPiece(p);
     } else {
@@ -12391,6 +12598,15 @@ function renderNext(){
       d.style.setProperty('--border-width', Math.max(2, 2 * intensityMultiplier) + 'px');
       d.style.setProperty('--border-opacity', Math.min(1, 0.8 * intensityMultiplier).toString());
       d.style.setProperty('--inset-opacity', Math.min(1, 0.1 * intensityMultiplier).toString());
+    }
+    
+    // Add trash overlay for trash mode on the first block
+    if (idx === 0 && trashMode) {
+      const trashOverlay = document.createElement('div');
+      trashOverlay.className = 'trash-x-overlay';
+      trashOverlay.innerHTML = '🗑️';
+      trashOverlay.addEventListener('click', handleTrashConfirmation);
+      d.appendChild(trashOverlay);
     }
     
     nextContainer.appendChild(d);
@@ -12429,6 +12645,9 @@ function placeOnPole(idx){
     nextPiece = { w: customBlockSize, bomb: customBlockBomb };
     wasCustomBlock = true;
     // Custom block mode works when a block is selected, regardless of debug pane visibility
+  } else if (swapMode) {
+    // In swap mode, place the selected block
+    nextPiece = nextQueue[swapSelectedIndex];
   } else {
     nextPiece = nextQueue[0];
   }
@@ -12608,10 +12827,36 @@ function placeOnPole(idx){
         totalBlocksDropped++;
       }
       
+      // Capture swap mode values before they get reset
+      const wasInSwapMode = swapMode;
+      const selectedIndex = swapSelectedIndex;
+      
+      // Handle swap mode consumption
+      if (swapMode && !wasCustomBlock) {
+        // Decrease owned swap count
+        swapOwned--;
+        updatePowerupOwnershipBadges();
+        
+        // Track total swaps used
+        totalSwapsUsed++;
+        
+        // Exit swap mode
+        swapMode = false;
+        swapSelectedIndex = 0;
+        
+        // Update button states
+        updateAllPowerupButtonStates();
+        
+        // Save game state after using swap
+        saveGameState();
+      }
+      
       // Only advance the queue if we used a regular piece, not a custom one
       if (!wasCustomBlock) {
         // animate next queue: consume current, shift others, append new
-        await animateNextQueueAdvance(); // false = queue not yet modified
+        // Pass the selected index if we were in swap mode
+        const blockIndexToRemove = wasInSwapMode ? selectedIndex : 0;
+        await animateNextQueueAdvance(false, blockIndexToRemove); // false = queue not yet modified
       }
       
       render();
@@ -13001,6 +13246,7 @@ function showGameOver(){
   
   // Reset bomb selection state when game over is reached
   bombSelected = false;
+  trashMode = false; // Reset trash mode
   
   // Check if this is a new high score
   const previousHighScore = window.highScore || 0;
@@ -13104,6 +13350,7 @@ function resetGame(isFreshGame = true){
     bombConversionPresses = 0;
     lastGoldAmount = 0; // Reset tracked gold amount to force button state update
     bombSelected = false; // Reset bomb selection state
+    trashMode = false; // Reset trash mode
     previousBombCost = 100; // Reset previous bomb cost
     
     // Reset trash button state
@@ -13229,6 +13476,11 @@ function topOf(pole){
 }
 
 function canPlaceOnPole(pieceOrWeight, pole){
+  // If trash mode is active, no blocks can be placed on any stack
+  if (trashMode) {
+    return false;
+  }
+  
   const weight = typeof pieceOrWeight === 'number' ? pieceOrWeight : pieceOrWeight.w;
   const top = topOf(pole);
   return pole.length < currentStackCapacity || (top && top.w === weight);
@@ -13238,7 +13490,7 @@ function hasAnyMove(pieceOrWeight){
   return poles.some(p => canPlaceOnPole(pieceOrWeight, p));
 }
 
-async function animateNextQueueAdvance(queueAlreadyModified = false){
+async function animateNextQueueAdvance(queueAlreadyModified = false, blockIndexToRemove = 0){
   logQueueState('queueAdvance-start');
   
   // Validate queue state before proceeding
@@ -13250,23 +13502,49 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
     return;
   }
   
-  // add consume animation to current
+  // add consume animation to the block being removed
   const items = nextContainer.querySelectorAll('.next-disc');
   const current = items[0];
   const second = items[1];
   const third = items[2];
-  if (current) current.classList.add('consume-out');
-  if (second) second.classList.add('shift-left');
-  if (third) third.classList.add('shift-left');
+  
+  // Animate the block being consumed
+  if (blockIndexToRemove === 0 && current) {
+    current.classList.add('consume-out');
+  } else if (blockIndexToRemove === 1 && second) {
+    second.classList.add('consume-out');
+  } else if (blockIndexToRemove === 2 && third) {
+    third.classList.add('consume-out');
+  }
+  
+  // Shift remaining blocks left
+  if (blockIndexToRemove === 0) {
+    // First block removed, shift second and third left
+    if (second) second.classList.add('shift-left');
+    if (third) third.classList.add('shift-left');
+  } else if (blockIndexToRemove === 1) {
+    // Second block removed, shift third left
+    if (third) third.classList.add('shift-left');
+  }
+  // If third block removed, no shifting needed
 
   // wait for ALL animations to complete before proceeding
   // Small delay to ensure CSS classes are applied and animations start
   await new Promise(resolve => setTimeout(resolve, 10));
   
   const animations = [];
-  if (current) animations.push(waitForAnimation(current));
-  if (second) animations.push(waitForAnimation(second));
-  if (third) animations.push(waitForAnimation(third));
+  // Only wait for animations on blocks that are actually animating
+  if (blockIndexToRemove === 0 && current) animations.push(waitForAnimation(current));
+  if (blockIndexToRemove === 1 && second) animations.push(waitForAnimation(second));
+  if (blockIndexToRemove === 2 && third) animations.push(waitForAnimation(third));
+  
+  // Also wait for shift animations
+  if (blockIndexToRemove === 0) {
+    if (second) animations.push(waitForAnimation(second));
+    if (third) animations.push(waitForAnimation(third));
+  } else if (blockIndexToRemove === 1) {
+    if (third) animations.push(waitForAnimation(third));
+  }
   
   // Wait for all animations to complete
   await Promise.all(animations);
@@ -13275,10 +13553,13 @@ async function animateNextQueueAdvance(queueAlreadyModified = false){
   if (!queueAlreadyModified) {
     // Reset bomb selection state when the queue advances (bomb was placed)
     bombSelected = false;
+    // Reset trash mode when the queue advances
+    trashMode = false;
     
     // Validate before modifying
     if (nextQueue.length > 0) {
-      nextQueue.shift();
+      // Remove the specified block (0 for normal mode, 1 or 2 for swap mode)
+      nextQueue.splice(blockIndexToRemove, 1);
       nextQueue.push(getRandomPiece());
     }
   }
