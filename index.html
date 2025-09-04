@@ -5387,7 +5387,7 @@
         <div class="sound-control-row">
           <div class="sound-control-label">
             <span class="sound-control-emoji">💰</span>
-            <span>Gold Coins</span>
+            <span>Gold</span>
           </div>
           <div class="sound-control-controls">
             <input type="range" id="coinVolumeSlider" class="sound-control-slider" min="0" max="5" step="1">
@@ -7011,7 +7011,7 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('purchase', 'other').catch(error => {
+    this.playSound('purchase', 'coin').catch(error => {
       // Silent error handling
     });
   }
@@ -7047,7 +7047,7 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('bombStart', 'other').catch(error => {
+    this.playSound('bombStart', 'bomb').catch(error => {
       // Silent error handling
     });
   }
@@ -7065,7 +7065,7 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('bombClose', 'other').catch(error => {
+    this.playSound('bombClose', 'bomb').catch(error => {
       // Silent error handling
     });
   }
@@ -7083,7 +7083,7 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('bombLight', 'other').catch(error => {
+    this.playSound('bombLight', 'bomb').catch(error => {
       // Silent error handling
     });
   }
@@ -7101,7 +7101,7 @@ class SoundManager {
     }
     
     // Use the simple playSound method
-    this.playSound('break', 'other').catch(error => {
+    this.playSound('break', 'bomb').catch(error => {
       // Silent error handling
     });
   }
@@ -11240,8 +11240,7 @@ function testVolumeChange(soundType, volume) {
         soundManager.playBombSound();
         break;
       case 'other':
-        soundManager.playStageProgressionSound();
-        soundManager.playGameOverSound();
+        soundManager.playNewGameSound();
         break;
     }
   }
