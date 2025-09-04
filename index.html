@@ -4928,6 +4928,59 @@
   flex-shrink: 0;
 }
 
+/* Checkbox styling */
+.checkbox-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 20px;
+  width: 20px;
+  background-color: var(--panel);
+  border: 2px solid var(--text);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: block;
+  flex-shrink: 0;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--text);
+  border-color: var(--text);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--bg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
 
 
 .sound-control-mute {
@@ -5493,6 +5546,20 @@
           </div>
           <div class="sound-control-controls">
                     <select id="themeSelector" class="theme-selector"><option value="jellyfish">Jellyfish</option><option value="alternate">Earth</option></select>
+          </div>
+        </div>
+        
+        <!-- Always show items Setting -->
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">💣</span>
+            <span>Always show items</span>
+          </div>
+          <div class="sound-control-controls">
+            <label class="checkbox-container">
+              <input type="checkbox" id="showItemsOnStartCheckbox">
+              <span class="checkmark"></span>
+            </label>
           </div>
         </div>
         
@@ -7733,6 +7800,7 @@ function saveGameState() {
       highScore: window.highScore || 0,
       totalGames: window.totalGames || 0,
       hasShownPersonalBest: hasShownPersonalBest || false,
+      showItemsOnStart: window.showItemsOnStart || false,
       timestamp: Date.now()
     };
     
@@ -7897,6 +7965,9 @@ function restoreGameState(gameState) {
     // Restore first-time user detection timestamp
     lastSeenUpdateTimestamp = gameState.lastSeenUpdateTimestamp || 0;
     console.log('🔄 Restored lastSeenUpdateTimestamp from save:', lastSeenUpdateTimestamp);
+    
+    // Restore show items on start setting
+    window.showItemsOnStart = gameState.showItemsOnStart || false;
     
 
     
@@ -8619,6 +8690,9 @@ window.highScore = window.highScore || 0;
 // Initialize total games counter
 window.totalGames = window.totalGames || 0;
 let hasShownPersonalBest = false; // Track if we've shown personal best this game
+
+// Initialize show items on start setting
+window.showItemsOnStart = window.showItemsOnStart || false;
 let blocksDropped = 0; // Track total blocks dropped for bomb delay
 let placing = false; // block multiple rapid placements while animating
 let lastPlacementTime = 0; // track when placement started for timeout safety
@@ -10274,10 +10348,10 @@ function updatePowerupButtonVisibility() {
   // Track if any powerup was discovered for the first time in this update
   let anyPowerupDiscovered = false;
   
-  // Show/hide buttons based on whether they've ever been purchased OR if they're currently purchasable
+  // Show/hide buttons based on whether they've ever been purchased OR if they're currently purchasable OR if show items on start is enabled
   // Use visibility instead of display to maintain layout positioning
   if (bombBtn) {
-    const shouldShow = bombEverPurchased || bombDiscoveredThisGame || canAffordPowerup('bomb');
+    const shouldShow = window.showItemsOnStart || bombEverPurchased || bombDiscoveredThisGame || canAffordPowerup('bomb');
     if (shouldShow) {
       bombBtn.style.visibility = 'visible';
       bombBtn.style.opacity = '1';
@@ -10297,7 +10371,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (trashBtn) {
-    const shouldShow = trashEverPurchased || trashDiscoveredThisGame || canAffordPowerup('trash');
+    const shouldShow = window.showItemsOnStart || trashEverPurchased || trashDiscoveredThisGame || canAffordPowerup('trash');
     if (shouldShow) {
       trashBtn.style.visibility = 'visible';
       trashBtn.style.opacity = '1';
@@ -10317,7 +10391,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (pickaxeBtn) {
-    const shouldShow = pickaxeEverPurchased || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
+    const shouldShow = window.showItemsOnStart || pickaxeEverPurchased || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
     if (shouldShow) {
       pickaxeBtn.style.visibility = 'visible';
       pickaxeBtn.style.opacity = '1';
@@ -10337,7 +10411,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (swapBtn) {
-    const shouldShow = swapEverPurchased || swapDiscoveredThisGame || canAffordPowerup('swap');
+    const shouldShow = window.showItemsOnStart || swapEverPurchased || swapDiscoveredThisGame || canAffordPowerup('swap');
     if (shouldShow) {
       swapBtn.style.visibility = 'visible';
       swapBtn.style.opacity = '1';
@@ -11173,6 +11247,22 @@ function initializeSettingsModal() {
           updateHelpGuideColors();
         }
       }
+    });
+  }
+  
+  // Show items on start checkbox
+  const showItemsCheckbox = document.getElementById('showItemsOnStartCheckbox');
+  if (showItemsCheckbox) {
+    // Set initial value
+    showItemsCheckbox.checked = window.showItemsOnStart || false;
+    
+    // Add change event listener
+    showItemsCheckbox.addEventListener('change', (e) => {
+      window.showItemsOnStart = e.target.checked;
+      // Update powerup button visibility immediately
+      updatePowerupButtonVisibility();
+      // Save the setting
+      saveGameState();
     });
   }
   
