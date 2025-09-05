@@ -2098,6 +2098,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: inherit; /* Inherit border-radius from parent */
   }
   
   .merge-block.bomb-block .bomb-emoji {
@@ -2950,6 +2951,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: inherit; /* Inherit border-radius from parent disc */
   }
   
   .bomb-emoji {
@@ -2975,6 +2977,55 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+  }
+  
+  /* Special block styling */
+  .special-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: inherit; /* Inherit border-radius from parent disc */
+  }
+  
+  .special-emoji {
+    position: absolute;
+    top: -3px;
+    left: -21px;
+    font-size: 42px;
+    opacity: 1;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  .special-text {
+    position: relative;
+    z-index: 2;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-family);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  /* Gift block specific styling */
+  .special-gift {
+    background: linear-gradient(45deg, #db491c, #bd1616) !important;
+    color: white;
+  }
+  
+  /* Pumpkin block specific styling */
+  .special-pumpkin {
+    background: linear-gradient(45deg, #ff8c00, #ff4500) !important;
+    color: white;
   }
   
   /* remove extra gap at the very top of a full pole (topmost disc has no margin) */
@@ -4039,14 +4090,14 @@
     -ms-user-select: none;
   }
   
-  /* Adjust bomb blocks in next queue for mobile */
-  .next-disc .bomb-emoji {
+  /* Adjust bomb and special blocks for mobile - unified styling */
+  .bomb-emoji, .special-emoji {
     font-size: 32px;
     top: -2px;
     left: -18px;
   }
   
-  .next-disc .bomb-text {
+  .bomb-text, .special-text {
     font-size: 18px;
   }
   
@@ -4135,14 +4186,14 @@
     margin-top: 6px;
   }
   
-  /* Adjust bomb blocks for mobile to match disc sizing */
-  .disc .bomb-emoji {
+  /* Adjust bomb and special blocks for mobile to match disc sizing - unified */
+  .disc .bomb-emoji, .disc .special-emoji {
     font-size: 30px;
     top: -2px;
     left: -15px;
   }
   
-  .disc .bomb-text {
+  .disc .bomb-text, .disc .special-text {
     font-size: 18px;
   }
 }
@@ -4532,14 +4583,14 @@
     margin-top: 4px;
   }
   
-  /* Adjust bomb blocks for extra small mobile */
-  .disc .bomb-emoji {
+  /* Adjust bomb and special blocks for extra small mobile - unified */
+  .disc .bomb-emoji, .disc .special-emoji {
     font-size: 22px;
     top: -1px;
     left: -11px;
   }
   
-  .disc .bomb-text {
+  .disc .bomb-text, .disc .special-text {
     font-size: 16px;
   }
   
@@ -4557,14 +4608,14 @@
     min-width: 80px;
   }
   
-  /* Adjust bomb blocks in next queue for extra small mobile */
-  .next-disc .bomb-emoji {
+  /* Adjust bomb and special blocks in next queue for extra small mobile - unified */
+  .next-disc .bomb-emoji, .next-disc .special-emoji {
     font-size: 26px;
     top: -1px;
     left: -13px;
   }
   
-  .next-disc .bomb-text {
+  .next-disc .bomb-text, .next-disc .special-text {
     font-size: 16px;
   }
   
@@ -4653,25 +4704,14 @@
     height: 250px;
   }
   
-  /* Adjust bomb blocks for landscape mobile */
-  .disc .bomb-emoji {
+  /* Adjust bomb and special blocks for landscape mobile - unified */
+  .bomb-emoji, .special-emoji {
     font-size: 32px;
     top: -2px;
     left: -18px;
   }
   
-  .disc .bomb-text {
-    font-size: 20px;
-  }
-  
-  /* Adjust bomb blocks in next queue for landscape mobile */
-  .next-disc .bomb-emoji {
-    font-size: 32px;
-    top: -2px;
-    left: -18px;
-  }
-  
-  .next-disc .bomb-text {
+  .bomb-text, .special-text {
     font-size: 20px;
   }
 }
@@ -8575,9 +8615,13 @@ function updateGoldDisplay(shouldPulse = false) {
 }
 const MAX_HEIGHT = 10;
 const BOMB_CHANCE = 0.01; // 1% chance for bombs
-const BOMB_DELAY_BLOCKS = 50; // No bombs for first 50 blocks
+const BOMB_DELAY_BLOCKS = 50; // No bombs for first n blocks
+const GIFT_CHANCE = 0.0; // % chance for gifts
+const GIFT_DELAY_BLOCKS = 200; // No gifts for first n blocks
+const PUMPKIN_CHANCE = 0.0; // % chance for pumpkins
+const PUMPKIN_DELAY_BLOCKS = 5; // No pumpkins for first n blocks
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
-const PROBABILITY_DECAY_FACTOR = 0.7; // Each block is 70% as likely as the previous one
+const PROBABILITY_DECAY_FACTOR = 0.7; // Each block is % as likely as the previous one
 // 
 // PROBABILITY SYSTEM EXPLANATION:
 // 
@@ -8628,20 +8672,55 @@ function getRandomWeight(){
   }
 }
 
+// Special block helper functions
+function getSpecialEmoji(specialType) {
+  const emojis = {
+    'gift': '🎁',
+    'pumpkin': '🎃'
+  };
+  return emojis[specialType] || '?';
+}
+
+function isSpecialBlock(piece) {
+  return piece && piece.specialType;
+}
+
+function getSpecialType(piece) {
+  return piece && piece.specialType ? piece.specialType : null;
+}
+
 function getRandomPiece(){
-  // Prevent bombs from spawning for the first 50 blocks
+  // Prevent bombs from spawning for the first n blocks
   const canSpawnBomb = blocksDropped >= BOMB_DELAY_BLOCKS;
   const bombChance = canSpawnBomb ? BOMB_CHANCE : 0;
+  
+  // Prevent gifts from spawning for the first n blocks
+  const canSpawnGift = blocksDropped >= GIFT_DELAY_BLOCKS;
+  const giftChance = canSpawnGift ? GIFT_CHANCE : 0;
+  
+  // Prevent pumpkins from spawning for the first n blocks
+  const canSpawnPumpkin = blocksDropped >= PUMPKIN_DELAY_BLOCKS;
+  const pumpkinChance = canSpawnPumpkin ? PUMPKIN_CHANCE : 0;
   
   const weight = getRandomWeight();
   
   // Validate the weight before returning
   if (typeof weight !== 'number' || weight <= 0 || !isFinite(weight)) {
     console.error('Invalid weight generated:', weight, 'falling back to 1');
-    return { w: 1, bomb: false };
+    return { w: 1, bomb: false, specialType: null };
   }
   
-  return { w: weight, bomb: Math.random() < bombChance };
+  // Determine special type (bomb has highest priority, then gift, then pumpkin)
+  let specialType = null;
+  if (Math.random() < bombChance) {
+    specialType = 'bomb';
+  } else if (Math.random() < giftChance) {
+    specialType = 'gift';
+  } else if (Math.random() < pumpkinChance) {
+    specialType = 'pumpkin';
+  }
+  
+  return { w: weight, bomb: specialType === 'bomb', specialType: specialType };
 }
 
 let poles = [[],[],[],[]];
@@ -9683,20 +9762,11 @@ function updateSwapButtonState() {
       const hasSwapOwned = swapOwned >= 1;
       const canAffordSwap = canAffordPowerup('swap');
       
-      // Check if next two blocks in queue are the same (would be wasteful to swap)
-      const nextTwoBlocksSame = nextQueue.length >= 2 && 
-                                nextQueue[0].w === nextQueue[1].w;
-      
-      // Disable if no swap owned AND can't afford one OR if next two blocks are the same
-      swapButton.disabled = (!hasSwapOwned && !canAffordSwap) || nextTwoBlocksSame;
+      // Disable if no swap owned AND can't afford one
+      swapButton.disabled = (!hasSwapOwned && !canAffordSwap);
       
       if (!hasSwapOwned && !canAffordSwap) {
         swapButton.title = "Select block to drop from queue";
-        swapButton.classList.remove('undo-mode');
-        const emojiEl = swapButton.querySelector('.powerup-emoji');
-        if (emojiEl) emojiEl.textContent = "🔄";
-      } else if (nextTwoBlocksSame) {
-        swapButton.title = "Next two blocks are the same - swap would be wasteful";
         swapButton.classList.remove('undo-mode');
         const emojiEl = swapButton.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "🔄";
@@ -12291,6 +12361,12 @@ function labelForPiece(piece){
     const displayValue = piece.w >= 100000 ? formatNumber(piece.w) : piece.w;
     return `<div class="bomb-content"><div class="bomb-emoji">💣</div><div class="bomb-text">${displayValue}</div></div>`;
   }
+  if (piece && piece.specialType) {
+    // Format special block text for large numbers (6+ digits)
+    const displayValue = piece.w >= 100000 ? formatNumber(piece.w) : piece.w;
+    const emoji = getSpecialEmoji(piece.specialType);
+    return `<div class="special-content special-${piece.specialType}"><div class="special-emoji">${emoji}</div><div class="special-text">${displayValue}</div></div>`;
+  }
   // Format regular block text for large numbers (6+ digits)
   return piece.w >= 100000 ? formatNumber(piece.w) : String(piece.w);
 }
@@ -12391,16 +12467,26 @@ function render(){
     pole.forEach(p => {
       const d = document.createElement('div');
       d.className = 'disc';
-      if (p.bomb) {
+      if (p.bomb || p.specialType) {
         d.innerHTML = labelForPiece(p);
       } else {
         d.textContent = labelForPiece(p);
       }
-      d.style.background = p.bomb ? '#000' : colorFor(p.w);
-      d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+      
+      // Set background and color based on block type
+      if (p.bomb) {
+        d.style.background = '#000';
+        d.style.color = '#fff';
+      } else if (p.specialType) {
+        d.classList.add(`special-${p.specialType}`);
+        d.style.color = '#fff';
+      } else {
+        d.style.background = colorFor(p.w);
+        d.style.color = getTextColorFor(p.w);
+      }
       
       // Add dynamic gold glow effect for white blocks (16384+)
-      if (!p.bomb && p.w >= 16384) {
+      if (!p.bomb && !p.specialType && p.w >= 16384) {
         d.classList.add('white-block-glow');
         
         // Calculate glow intensity based on block value
@@ -12656,16 +12742,26 @@ function renderNext(){
     }
     
     d.className = 'next-disc' + (shouldHighlight ? ' current' : '');
-    if (p.bomb) {
+    if (p.bomb || p.specialType) {
       d.innerHTML = labelForPiece(p);
     } else {
       d.textContent = labelForPiece(p);
     }
-    d.style.background = p.bomb ? '#000' : colorFor(p.w);
-    d.style.color = p.bomb ? '#fff' : getTextColorFor(p.w);
+    
+    // Set background and color based on block type
+    if (p.bomb) {
+      d.style.background = '#000';
+      d.style.color = '#fff';
+    } else if (p.specialType) {
+      d.classList.add(`special-${p.specialType}`);
+      d.style.color = '#fff';
+    } else {
+      d.style.background = colorFor(p.w);
+      d.style.color = getTextColorFor(p.w);
+    }
     
     // Add dynamic gold glow effect for white blocks (16384+)
-    if (!p.bomb && p.w >= 16384) {
+    if (!p.bomb && !p.specialType && p.w >= 16384) {
       d.classList.add('white-block-glow');
       
       // Calculate glow intensity based on block value
@@ -12757,16 +12853,26 @@ function placeOnPole(idx){
   const poleDiv = gameDiv.children[idx];
   const animDisc = document.createElement('div');
   animDisc.className = 'disc animate';
-  if (nextPiece.bomb) {
+  if (nextPiece.bomb || nextPiece.specialType) {
     animDisc.innerHTML = labelForPiece(nextPiece);
   } else {
     animDisc.textContent = labelForPiece(nextPiece);
   }
-  animDisc.style.background = nextPiece.bomb ? '#000' : colorFor(nextPiece.w);
-  animDisc.style.color = nextPiece.bomb ? '#fff' : getTextColorFor(nextPiece.w);
+  
+  // Set background and color based on block type
+  if (nextPiece.bomb) {
+    animDisc.style.background = '#000';
+    animDisc.style.color = '#fff';
+  } else if (nextPiece.specialType) {
+    animDisc.classList.add(`special-${nextPiece.specialType}`);
+    animDisc.style.color = '#fff';
+  } else {
+    animDisc.style.background = colorFor(nextPiece.w);
+    animDisc.style.color = getTextColorFor(nextPiece.w);
+  }
   
   // Add dynamic gold glow effect for white blocks (16384+)
-  if (!nextPiece.bomb && nextPiece.w >= 16384) {
+  if (!nextPiece.bomb && !nextPiece.specialType && nextPiece.w >= 16384) {
     animDisc.classList.add('white-block-glow');
     
     // Calculate glow intensity based on block value
