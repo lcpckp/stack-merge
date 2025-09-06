@@ -386,7 +386,7 @@
     font-family: var(--font-family); 
     line-height: 1.0;
     white-space: normal;
-    overflow: hidden;
+    overflow: visible;
     max-height: none;
   }
   
@@ -406,8 +406,8 @@
     backface-visibility: hidden;
     perspective: 100px;
     padding: 0 24px;
-    /* Prevent any scrolling */
-    overflow: hidden;
+    /* Allow title text to overflow if needed */
+    overflow: visible;
     max-height: none;
   }
   
@@ -439,8 +439,8 @@
     touch-action: manipulation;
     /* Allow title text wrapping */
     white-space: normal;
-    overflow: hidden;
-    text-overflow: clip;
+    overflow: visible;
+    text-overflow: visible;
     min-width: 0;
     flex: 1;
     /* Ensure title is always centered on screen */
