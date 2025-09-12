@@ -2954,7 +2954,8 @@
   
   /* Gift block specific styling */
   .special-gift {
-    background: linear-gradient(45deg, #db491c, #bd1616) !important;
+    background: linear-gradient(45deg, #ff6c6c, #9c0000) !important;
+    
     color: white;
   }
   
@@ -2963,6 +2964,14 @@
     background: linear-gradient(45deg, #ff8c00, #ff4500) !important;
     color: white;
   }
+
+  /* Magic block specific styling */
+  .special-magic {
+    background: linear-gradient(145deg, #1e8000, #059e5e, #261bbb, #760094, #b80b93, #b80b0b) !important;
+    color: white;
+  }
+
+  
   
   /* remove extra gap at the very top of a full pole (topmost disc has no margin) */
   .pole .disc:last-child { margin-top: 0; }
@@ -8490,10 +8499,12 @@ function updateGoldDisplay(shouldPulse = false) {
 const MAX_HEIGHT = 10;
 const BOMB_CHANCE = 0.01; // 1% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first n blocks
-const GIFT_CHANCE = 0.0; // % chance for gifts
-const GIFT_DELAY_BLOCKS = 200; // No gifts for first n blocks
+const GIFT_CHANCE = 0.000; // % chance for gifts
+const GIFT_DELAY_BLOCKS = 50; // No gifts for first n blocks
 const PUMPKIN_CHANCE = 0.0; // % chance for pumpkins
-const PUMPKIN_DELAY_BLOCKS = 5; // No pumpkins for first n blocks
+const PUMPKIN_DELAY_BLOCKS = 0; // No pumpkins for first n blocks
+const MAGIC_CHANCE = 0.0; // % chance for magic blocks
+const MAGIC_DELAY_BLOCKS = 50; // No magic blocks for first n blocks
 const STARTING_BLOCK_SIZE = 512; // Starting block size to merge for new stacks
 const PROBABILITY_DECAY_FACTOR = 0.7; // Each block is % as likely as the previous one
 // 
@@ -8524,6 +8535,7 @@ function getRandomWeight(){
   // Validate probabilities before selecting
   if (!validateProbabilityDistribution()) {
     const randomIndex = Math.floor(Math.random() * weights.length);
+    console.error('Selected random weight', weights[randomIndex]);
     return weights[randomIndex];
   }
   
@@ -8550,7 +8562,8 @@ function getRandomWeight(){
 function getSpecialEmoji(specialType) {
   const emojis = {
     'gift': '🎁',
-    'pumpkin': '🎃'
+    'pumpkin': '🎃',
+    'magic': '🔮'
   };
   return emojis[specialType] || '?';
 }
@@ -8576,6 +8589,10 @@ function getRandomPiece(){
   const canSpawnPumpkin = blocksDropped >= PUMPKIN_DELAY_BLOCKS;
   const pumpkinChance = canSpawnPumpkin ? PUMPKIN_CHANCE : 0;
   
+  // Prevent magic blocks from spawning for the first n blocks
+  const canSpawnMagic = blocksDropped >= MAGIC_DELAY_BLOCKS;
+  const magicChance = canSpawnMagic ? MAGIC_CHANCE : 0;
+  
   const weight = getRandomWeight();
   
   // Validate the weight before returning
@@ -8584,12 +8601,14 @@ function getRandomPiece(){
     return { w: 1, bomb: false, specialType: null };
   }
   
-  // Determine special type (bomb has highest priority, then gift, then pumpkin)
+  // Determine special type (bomb has highest priority, then gift, then magic, then pumpkin)
   let specialType = null;
   if (Math.random() < bombChance) {
     specialType = 'bomb';
   } else if (Math.random() < giftChance) {
     specialType = 'gift';
+  } else if (Math.random() < magicChance) {
+    specialType = 'magic';
   } else if (Math.random() < pumpkinChance) {
     specialType = 'pumpkin';
   }
@@ -12963,71 +12982,31 @@ function placeOnPole(idx){
   animDisc.addEventListener('animationend', handlePlacement, { once: true });
 }
 
+function nextFrame(){
+  return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
 function waitForAnimation(element){
   return new Promise(resolve => {
-    const startTime = Date.now();
-    
-    // CRITICAL FIX: Check if animation is already running BEFORE setting up listeners
     const computedStyle = window.getComputedStyle(element);
     const animationName = computedStyle.animationName;
     const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
     const animationDelay = parseFloat(computedStyle.animationDelay) || 0;
-    const totalAnimationTime = (animationDuration + animationDelay) * 1000; // Convert to ms
+    const totalAnimationTime = (animationDuration + animationDelay) * 1000;
     
-    if (animationName === 'none') {
-      resolve();
+    if (animationName === 'none' || totalAnimationTime <= 0) {
+      // Ensure class application takes effect before resolving
+      nextFrame().then(resolve);
       return;
     }
     
-    // Check if animation has already completed by looking at animation state
-    // This prevents the race condition where animation finishes before we start listening
-    if (totalAnimationTime <= 100) {
-      setTimeout(resolve, totalAnimationTime + 10); // Wait for animation to complete + small buffer
-      return;
-    }
+    const handle = () => resolve();
+    element.addEventListener('animationend', handle, { once: true });
+    element.addEventListener('webkitAnimationEnd', handle, { once: true });
     
-    // Add multiple event listeners to catch different animation end events
-    const handleAnimationEnd = (event) => {
-      resolve();
-    };
-    
-    // Add more comprehensive event listeners
-    element.addEventListener('animationend', handleAnimationEnd, { once: true });
-    element.addEventListener('webkitAnimationEnd', handleAnimationEnd, { once: true });
-    element.addEventListener('mozAnimationEnd', handleAnimationEnd, { once: true });
-    element.addEventListener('MSAnimationEnd', handleAnimationEnd, { once: true });
-    
-    // Fallback timeout to prevent hanging - use actual animation duration + buffer
-    const timeoutDuration = Math.max(1500, totalAnimationTime + 500); // At least 1.5s, or animation time + 500ms buffer
-    
-    // Add a more robust fallback that checks animation state periodically
-    const checkAnimationState = () => {
-      const currentStyle = window.getComputedStyle(element);
-      const currentAnimationName = currentStyle.animationName;
-      
-      if (currentAnimationName === 'none') {
-        resolve();
-        return;
-      }
-      
-      // Check if we're past the expected animation time
-      const elapsed = Date.now() - startTime;
-      if (elapsed >= totalAnimationTime + 100) { // Add 100ms buffer
-        resolve();
-        return;
-      }
-      
-      // Continue checking
-      setTimeout(checkAnimationState, 50); // Check every 50ms
-    };
-    
-    // Start the periodic check
-    setTimeout(checkAnimationState, 50);
-    
-    // Traditional timeout fallback as backup
-    setTimeout(() => {
-      resolve();
-    }, timeoutDuration);
+    // Fallback only for safety based on computed duration
+    const timeoutDuration = Math.min(4000, Math.max(300, totalAnimationTime + 200));
+    setTimeout(() => resolve(), timeoutDuration);
   });
 }
 
@@ -13105,13 +13084,13 @@ async function animateMergeCascade(index){
       topEl.classList.add('merging');
       belowEl.classList.add('merging');
       
-      // Stagger the merge-out animations slightly for better visual flow
+      // Stagger via CSS animation-delay instead of timers
+      belowEl.style.animationDelay = '25ms';
       topEl.classList.add('merge-out');
-      await new Promise(resolve => setTimeout(resolve, 25)); // Reduced delay for snappier effect
       belowEl.classList.add('merge-out');
       
-      // Small delay to ensure CSS classes are applied and animations start
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // Ensure styles apply before waiting
+      await nextFrame();
       
       // Wait for both animations to complete with error handling
       await Promise.all([
@@ -13119,14 +13098,16 @@ async function animateMergeCascade(index){
         waitForAnimation(belowEl).catch(err => console.error('Bottom animation error:', err))
       ]);
       
-      // Remove glow effects
+      // Remove glow effects and inline delays
       topEl.classList.remove('merging');
       belowEl.classList.remove('merging');
+      belowEl.style.animationDelay = '';
     } catch (error) {
       console.error('Merge animation error:', error);
       // Clean up classes in case of error
       topEl.classList.remove('merging', 'merge-out');
       belowEl.classList.remove('merging', 'merge-out');
+      belowEl.style.animationDelay = '';
     }
 
     // commit merge to data model
@@ -13134,7 +13115,24 @@ async function animateMergeCascade(index){
     const b = poleArr[pairIndex - 1];
     const newW = a.w * 2; // weights are equal here
     const isBombMerge = a.bomb || b.bomb;
-    poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge });
+    
+    // Determine the special type for the merged block
+    let mergedSpecialType = null;
+    if (isBombMerge) {
+      // Bomb takes highest priority - bomb + anything = bomb
+      mergedSpecialType = 'bomb';
+    } else if (a.specialType === 'gift' || b.specialType === 'gift') {
+      // Gift + normal block = gift (gift + bomb already handled above)
+      mergedSpecialType = 'gift';
+    } else if (a.specialType === 'magic' || b.specialType === 'magic') {
+      // Magic + normal block = magic (magic + bomb already handled above)
+      mergedSpecialType = 'magic';
+    } else if (a.specialType || b.specialType) {
+      // Other special types (like pumpkin) - use the first one found
+      mergedSpecialType = a.specialType || b.specialType;
+    }
+    
+    poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge, specialType: mergedSpecialType });
     
     // Increment merge count for cascade sound effects
     mergeCount++;
@@ -13215,8 +13213,8 @@ async function animateMergeCascade(index){
         mergedEl.classList.add('merging');
         mergedEl.classList.add('merge-in');
         
-        // Small delay to ensure CSS class is applied and animation starts
-        await new Promise(resolve => setTimeout(resolve, 10));
+        // Ensure CSS class is applied and animation starts
+        await nextFrame();
         
         await waitForAnimation(mergedEl);
         mergedEl.classList.remove('merge-in');
@@ -13706,8 +13704,8 @@ async function animateStageProgression(index, mergedIndex, weight){
         // Let the new block behave like a normal merge result first
       mergedEl.classList.add('merge-in');
       
-      // Small delay to ensure CSS class is applied and animation starts
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // Ensure CSS class is applied and animation starts
+      await nextFrame();
       
       await waitForAnimation(mergedEl);
       mergedEl.classList.remove('merge-in');
@@ -13727,27 +13725,25 @@ async function animateStageProgression(index, mergedIndex, weight){
       soundManager.playStageProgressionSound();
     }
     
-    // Then apply the shockwave effect to other blocks with decreasing intensity
+    // Then apply the shockwave effect using CSS animation-delay for each disc
+    let maxDelayMs = 0;
     for (let i = 0; i < allDiscs.length; i++) {
       if (i === targetIndex) continue; // Skip the target block, it already has explosion effect
-      
       const disc = allDiscs[i];
-      // Calculate distance from target location for wave propagation
       const distanceFromTarget = Math.abs(i - targetIndex);
-      // Add a small delay to create the wave effect, starting from target location
-      const delay = distanceFromTarget * 40; // 40ms delay per block distance for the ripple effect (faster)
-      
-      setTimeout(() => {
-        disc.classList.add('bomb-ripple');
-        // No more individual sound effects - just visual ripple effect
-      }, delay);
+      const delayMs = distanceFromTarget * 40;
+      maxDelayMs = Math.max(maxDelayMs, delayMs);
+      disc.style.animationDelay = `${delayMs}ms`;
+      disc.classList.add('bomb-ripple');
     }
     
-    // Wait for the entire explosion animation to complete
-    const totalAnimationTime = Math.max(...Array.from({length: allDiscs.length}, (_, i) => 
-      Math.abs(i - targetIndex) * 40 + 350
-    )); // Max delay + 350ms animation duration (faster)
-    await new Promise(resolve => setTimeout(resolve, totalAnimationTime));
+    // Wait for the last delayed animation to finish (350ms base)
+    await new Promise(resolve => setTimeout(resolve, maxDelayMs + 350));
+    
+    // Clean up delay styles
+    for (let i = 0; i < allDiscs.length; i++) {
+      allDiscs[i].style.animationDelay = '';
+    }
     
     // Clean up the explosion and ripple classes
     allDiscs.forEach(d => {
@@ -13785,8 +13781,8 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   // Let the new block behave like a normal merge result first
   mergedEl.classList.add('merge-in');
   
-  // Small delay to ensure CSS class is applied and animation starts
-  await new Promise(resolve => setTimeout(resolve, 10));
+  // Ensure CSS class is applied and animation starts
+  await nextFrame();
   
   await waitForAnimation(mergedEl);
   mergedEl.classList.remove('merge-in');
@@ -13808,27 +13804,25 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
       soundManager.playBombSound();
     }
     
-    // Then apply the shockwave effect to other blocks with decreasing intensity
+    // Then apply the shockwave effect using CSS animation-delay for each disc
+    let maxDelayMs = 0;
     for (let i = 0; i < allDiscs.length; i++) {
       if (i === bombIndex) continue; // Skip the bomb block, it already has explosion effect
-      
       const disc = allDiscs[i];
-      // Calculate distance from bomb location for wave propagation
       const distanceFromBomb = Math.abs(i - bombIndex);
-      // Add a small delay to create the wave effect, starting from bomb location
-      const delay = distanceFromBomb * 40; // 40ms delay per block distance for the ripple effect (faster)
-      
-      setTimeout(() => {
-        disc.classList.add('bomb-ripple');
-        // No more individual sound effects - just visual ripple effect
-      }, delay);
+      const delayMs = distanceFromBomb * 40;
+      maxDelayMs = Math.max(maxDelayMs, delayMs);
+      disc.style.animationDelay = `${delayMs}ms`;
+      disc.classList.add('bomb-ripple');
     }
     
-    // Wait for the entire explosion animation to complete
-    const totalAnimationTime = Math.max(...Array.from({length: allDiscs.length}, (_, i) => 
-      Math.abs(i - bombIndex) * 40 + 350
-    )); // Max delay + 350ms animation duration (faster)
-    await new Promise(resolve => setTimeout(resolve, totalAnimationTime));
+    // Wait for the last delayed animation to finish (350ms base)
+    await new Promise(resolve => setTimeout(resolve, maxDelayMs + 350));
+    
+    // Clean up delay styles
+    for (let i = 0; i < allDiscs.length; i++) {
+      allDiscs[i].style.animationDelay = '';
+    }
     
     // Clean up the explosion and ripple classes
     allDiscs.forEach(d => {
