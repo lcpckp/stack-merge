@@ -5548,7 +5548,20 @@
           </div>
         </div>
         
-
+        <!-- Use item on purchase Setting -->
+        <div class="sound-control-row">
+          <div class="sound-control-label">
+            <span class="sound-control-emoji">⚡</span>
+            <span>Use item on purchase</span>
+          </div>
+          <div class="sound-control-controls">
+            <label class="checkbox-container">
+              <input type="checkbox" id="useItemOnPurchaseCheckbox">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+        
         
 
       </div>
@@ -7758,6 +7771,7 @@ function saveGameState() {
       swapMode: swapMode || false,
       swapSelectedIndex: swapSelectedIndex || 0,
       bombSelected: bombSelected || false,
+      bombMode: bombMode || false,
       pickaxeEnabled: window.pickaxeEnabled || true,
       pickaxeMode: pickaxeMode || false,
       trashMode: trashMode || false,
@@ -7783,6 +7797,7 @@ function saveGameState() {
       totalGames: window.totalGames || 0,
       hasShownPersonalBest: hasShownPersonalBest || false,
       showItemsOnStart: window.showItemsOnStart || false,
+      useItemOnPurchase: window.useItemOnPurchase || false,
       helpButtonClicked: helpButtonClicked || false,
       timestamp: Date.now()
     };
@@ -7882,6 +7897,7 @@ function restoreGameState(gameState) {
     
     // Restore bomb selection state from saved state
     bombSelected = gameState.bombSelected || false;
+    bombMode = gameState.bombMode || bombSelected || false;
     
     // Restore pickaxe mode state from saved state
     pickaxeMode = gameState.pickaxeMode || false;
@@ -7949,6 +7965,9 @@ function restoreGameState(gameState) {
     
     // Restore show items on start setting
     window.showItemsOnStart = gameState.showItemsOnStart || false;
+    
+    // Restore use item on purchase setting
+    window.useItemOnPurchase = gameState.useItemOnPurchase || false;
     
 
     
@@ -8118,6 +8137,7 @@ function clearAllGameData() {
   swapMode = false; // Reset swap mode
   swapSelectedIndex = 0; // Reset swap selected index
   bombSelected = false;
+  bombMode = false;
   trashMode = false; // Reset trash mode
   previousBombCost = 100;
   pickaxeMode = false; // Reset pickaxe mode
@@ -8663,7 +8683,8 @@ let currentStage = 1; // Current stage (1 = starting, 2 = after first stack unlo
 let bombConversionCost = 100;
 let bombConversionPresses = 0; // Number of times button has been pressed
 let lastGoldAmount = 0; // Track last gold amount to prevent unnecessary updates
-let bombSelected = false; // Track if a bomb is currently selected but not yet placed
+let bombSelected = false; // Legacy flag kept for save compatibility
+let bombMode = false; // Track if bomb mode is active (awaiting placement or cancel)
 let trashMode = false; // Track if trash can mode is active
 
 // Trash button state
@@ -8972,99 +8993,67 @@ function handleBombConversion() {
   // Validate queue state before proceeding
   validateQueueState();
   
-  // Check if there's a next block to work with
-  if (nextQueue.length === 0) {
-    console.warn('Attempted bomb conversion with empty queue');
-    return;
-  }
-  
   const currentBlock = nextQueue[0];
   
-  // Validate current block
-  if (!currentBlock || typeof currentBlock.w === 'undefined') {
-    console.error('Invalid block in queue:', currentBlock);
-    return;
-  }
-  
-  // If a bomb is already selected, allow undoing the selection
-  if (bombSelected && currentBlock.bomb) {
-    // Undo bomb selection
-    currentBlock.bomb = false;
-    // Note: No gold to refund since payment hasn't been made yet
+  // Toggle/cancel if already in bomb mode
+  if (bombMode) {
+    bombMode = false;
     bombSelected = false;
-    
-    // Play bomb close sound effect
+    if (currentBlock) {
+      currentBlock.bomb = !currentBlock.bomb; // invert back on cancel
+      // Keep specialType consistent with bomb flag
+      if (currentBlock.bomb) {
+        currentBlock.specialType = 'bomb';
+      } else if (currentBlock.specialType === 'bomb') {
+        currentBlock.specialType = null;
+      }
+      renderNext();
+    }
     if (soundManager && soundManager.canPlayAudio()) {
       soundManager.playBombCloseSound();
     }
-    
-    // No need to update gold display since no gold was deducted
-    
-    // Re-render to show the regular block
-    renderNext();
-    
-    // Update all button states
-    updateBombConversionButtonState();
-    updatePickaxeButtonState();
-    updateTrashButtonState();
-    updateSwapButtonState();
-    
-    // Update button visibility to ensure pointer-events are properly set
+    updateAllPowerupButtonStates();
     updatePowerupButtonVisibility();
-    
-
-    
-    // Save game state after undoing bomb selection
     saveGameState();
     return;
   }
   
-  // Check if the next block is already a bomb (either natural or from previous conversion)
-  if (currentBlock.bomb) {
-    return;
-  }
-  
-  // Check if player has at least one bomb owned or can afford to buy one
+  // If not owned, try to purchase and optionally enter mode based on setting
   if (bombOwned < 1) {
-    // If player can afford to buy a bomb, purchase it first
     if (canAffordPowerup('bomb')) {
-      purchaseBomb(false); // false = not from shop
-      // After purchasing, stop here - don't continue with bomb conversion
-      return;
+      purchaseBomb(false);
+      // If setting enabled, auto-activate bomb mode; otherwise stop here
+      if (window.useItemOnPurchase) {
+        // fall through to activation logic below by simulating ownership
+      } else {
+        updateAllPowerupButtonStates();
+        saveGameState();
+        return;
+      }
     } else {
       return;
     }
   }
   
-  
-  // Convert the current next block to a bomb (don't deduct gold yet)
-  // Gold will be deducted when the bomb block is actually placed
+  // Enter bomb mode and invert the next block's bomb state (no payment yet)
+  bombMode = true;
+  bombSelected = true;
   if (currentBlock) {
-    currentBlock.bomb = true;
-    bombSelected = true; // Mark that a bomb is selected
-    
-    // Play bomb start sound effect
-    if (soundManager && soundManager.canPlayAudio()) {
-      soundManager.playBombStartSound();
+    currentBlock.bomb = !currentBlock.bomb; // invert on activation
+    // Keep specialType consistent with bomb flag
+    if (currentBlock.bomb) {
+      currentBlock.specialType = 'bomb';
+    } else if (currentBlock.specialType === 'bomb') {
+      currentBlock.specialType = null;
     }
-    
-    // Update gold display
-    updateGoldDisplay();
-    
-    // Re-render to show the bomb
-    renderNext();
-    
-    // Also re-render the main game to ensure pole placement logic is updated
-    // This ensures that if bomb status affects any placement decisions, they're properly reflected
-    render();
-    
-    // Note: Cost will increase when the bomb block is actually placed, not when selected
-    // Update all button states
-    updateAllPowerupButtonStates();
-    
-    // Save game state after bomb conversion and cost increase
-    saveGameState();
   }
+  if (soundManager && soundManager.canPlayAudio()) {
+    soundManager.playBombStartSound();
+  }
+  renderNext();
+  render();
+  updateAllPowerupButtonStates();
+  saveGameState();
   
   logQueueState('bombConversion-end');
 }
@@ -9080,8 +9069,10 @@ function handleTrashButton() {
     // If player can afford to buy a trash can, purchase it first
     if (canAffordPowerup('trash')) {
       purchaseTrash(false); // false = not from shop
-      // After purchasing, stop here - don't continue with trash usage
-      return;
+      // If setting enabled, continue to activate mode; otherwise stop here
+      if (!window.useItemOnPurchase) {
+        return;
+      }
     } else {
       return;
     }
@@ -9199,8 +9190,10 @@ function handlePickaxeButton() {
     // If player can afford to buy a pickaxe, purchase it first
     if (canAffordPowerup('pickaxe')) {
       purchasePickaxe(false); // false = not from shop
-      // After purchasing, stop here - don't continue with pickaxe usage
-      return;
+      // If setting enabled, continue to activate mode; otherwise stop here
+      if (!window.useItemOnPurchase) {
+        return;
+      }
     } else {
       return;
     }
@@ -9251,8 +9244,10 @@ async function handleSwapButton() {
     // If player can afford to buy a swap, purchase it first
     if (canAffordPowerup('swap')) {
       purchaseSwap(false); // false = not from shop
-      // After purchasing, stop here - don't continue with swap usage
-      return;
+      // If setting enabled, continue to activate mode; otherwise stop here
+      if (!window.useItemOnPurchase) {
+        return;
+      }
     } else {
       return;
     }
@@ -9400,8 +9395,8 @@ function updateBombConversionButtonState() {
   // Always update when called since we call this strategically
   
   if (bombConversionBtn) {
-    // If a bomb is selected, the button should always be enabled for undo
-    if (bombSelected) {
+    // If bomb mode is active, enable undo UI
+    if (bombMode) {
       bombConversionBtn.disabled = false;
       bombConversionBtn.classList.add('undo-mode');
       bombConversionBtn.title = "Press again to undo bomb selection";
@@ -9509,13 +9504,13 @@ function updateTrashButtonState() {
       }
     } else {
       // Check if other powerups are in undo mode
-      const otherPowerupActive = bombSelected || pickaxeMode || swapMode;
+      const otherPowerupActive = bombMode || pickaxeMode || swapMode;
       
       if (otherPowerupActive) {
         // Another powerup is active, disable trash button
         trashButton.disabled = true;
         trashButton.classList.remove('undo-mode');
-        if (bombSelected) {
+        if (bombMode) {
           trashButton.title = "Bomb is active - complete or undo first";
         } else if (pickaxeMode) {
           trashButton.title = "Pickaxe is active - complete or deactivate first";
@@ -9572,7 +9567,7 @@ function updatePickaxeButtonState() {
       }
     } else {
       // Pickaxe mode is not active - check if other powerups are active first
-      if (bombSelected) {
+      if (bombMode) {
         // Bomb is active, disable pickaxe button
         pickaxeButton.disabled = true;
         pickaxeButton.classList.remove('undo-mode');
@@ -9611,13 +9606,13 @@ function updatePickaxeButtonState() {
       
       // Re-enable other powerup buttons when pickaxe is not in undo mode
       // But only if they're not in their own undo mode
-      if (bombConversionBtn && !bombSelected && !trashMode && !swapMode) {
+      if (bombConversionBtn && !bombMode && !trashMode && !swapMode) {
         const hasBombOwned = bombOwned >= 1;
         const canAffordBomb = canAffordPowerup('bomb');
         bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
       }
-      if (trashButton && !bombSelected && !trashMode && !swapMode) {
+      if (trashButton && !bombMode && !trashMode && !swapMode) {
         const hasTrashOwned = trashOwned >= 1;
         const canAffordTrash = canAffordPowerup('trash');
         trashButton.disabled = !hasTrashOwned && !canAffordTrash;
@@ -9635,7 +9630,7 @@ function updateSwapButtonState() {
   
   if (swapButton) {
     // Check if other powerups are in undo mode
-    const otherPowerupActive = bombSelected || pickaxeMode || trashMode;
+    const otherPowerupActive = bombMode || pickaxeMode || trashMode;
     
     if (otherPowerupActive) {
       // Another powerup is active, disable swap button
@@ -9643,7 +9638,7 @@ function updateSwapButtonState() {
       swapButton.classList.remove('undo-mode');
       const emojiEl = swapButton.querySelector('.powerup-emoji');
       if (emojiEl) emojiEl.textContent = "🔄";
-      if (bombSelected) {
+      if (bombMode) {
         swapButton.title = "Bomb is active - complete or undo first";
       } else if (pickaxeMode) {
         swapButton.title = "Pickaxe is active - complete or deactivate first";
@@ -11207,6 +11202,19 @@ function initializeSettingsModal() {
       // Update powerup button visibility immediately
       updatePowerupButtonVisibility();
       // Save the setting
+      saveGameState();
+    });
+  }
+  
+  // Use item on purchase checkbox
+  const useItemOnPurchaseCheckbox = document.getElementById('useItemOnPurchaseCheckbox');
+  if (useItemOnPurchaseCheckbox) {
+    // Set initial value
+    useItemOnPurchaseCheckbox.checked = window.useItemOnPurchase || false;
+    
+    // Add change event listener
+    useItemOnPurchaseCheckbox.addEventListener('change', (e) => {
+      window.useItemOnPurchase = e.target.checked;
       saveGameState();
     });
   }
@@ -12818,40 +12826,31 @@ function placeOnPole(idx){
     try {
       poles[idx].push(nextPiece);
       
-      // Check if this is a purchased bomb that needs payment
-      if (nextPiece.bomb && bombSelected) {
-        // Play bomb light sound effect when bomb is placed
-        if (soundManager && soundManager.canPlayAudio()) {
+      // Spend bomb if we placed while bomb mode was active, regardless of final block type
+      if (bombMode) {
+        // If the placed block is a bomb, play the light sound
+        if (nextPiece.bomb && soundManager && soundManager.canPlayAudio()) {
           soundManager.playBombLightSound();
         }
-        
         // Decrease owned bomb count
         bombOwned--;
         updatePowerupOwnershipBadges();
-        
         // Update button cost display
         if (bombCostEl) {
           bombCostEl.textContent = formatNumber(bombConversionCost);
         }
-        
         // Update powerup button states to reflect new owned count
-        updateBombConversionButtonState();
-        
-        // Update all button states to reflect new costs and ensure proper state
         updateBombConversionButtonState();
         updatePickaxeButtonState();
         updateTrashButtonState();
-        
-
-        
         // Save game state after bomb payment
         saveGameState();
       }
       
-      // RESET BOMB SELECTION AFTER PLACEMENT LOGIC IS COMPLETE
-      if (bombSelected && nextPiece.bomb) {
+      // RESET BOMB MODE AFTER PLACEMENT LOGIC IS COMPLETE, regardless of final block type
+      if (bombMode || bombSelected) {
+        bombMode = false;
         bombSelected = false;
-        // Update button state to remove undo mode and re-enable other powerups
         updateBombConversionButtonState();
         updatePickaxeButtonState();
         updateTrashButtonState();
@@ -13305,7 +13304,8 @@ function showGameOver(){
     addBtn.classList.add('game-over-glow');
   }
   
-  // Reset bomb selection state when game over is reached
+  // Reset bomb mode/selection state when game over is reached
+  bombMode = false;
   bombSelected = false;
   trashMode = false; // Reset trash mode
   
@@ -13410,6 +13410,7 @@ function resetGame(isFreshGame = true){
     bombConversionCost = 100;
     bombConversionPresses = 0;
     lastGoldAmount = 0; // Reset tracked gold amount to force button state update
+    bombMode = false; // Reset bomb mode state
     bombSelected = false; // Reset bomb selection state
     trashMode = false; // Reset trash mode
     
@@ -13606,7 +13607,8 @@ async function animateNextQueueAdvance(queueAlreadyModified = false, blockIndexT
 
   // Only update queue data if it hasn't already been modified
   if (!queueAlreadyModified) {
-    // Reset bomb selection state when the queue advances (bomb was placed)
+    // Reset bomb mode/selection state when the queue advances (bomb was placed)
+    bombMode = false;
     bombSelected = false;
     // Reset trash mode when the queue advances
     trashMode = false;
