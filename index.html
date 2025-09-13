@@ -8517,8 +8517,8 @@ function updateGoldDisplay(shouldPulse = false) {
   }
 }
 const MAX_HEIGHT = 10;
-const BOMB_CHANCE = 0.01; // 1% chance for bombs
-const BOMB_DELAY_BLOCKS = 50; // No bombs for first n blocks
+const BOMB_CHANCE = 0.5; // 1% chance for bombs
+const BOMB_DELAY_BLOCKS = 0; // No bombs for first n blocks
 const GIFT_CHANCE = 0.000; // % chance for gifts
 const GIFT_DELAY_BLOCKS = 50; // No gifts for first n blocks
 const PUMPKIN_CHANCE = 0.0; // % chance for pumpkins
@@ -9419,20 +9419,13 @@ function updateBombConversionButtonState() {
     } else {
       // Check if the next block is already a bomb (either natural or from previous conversion)
       const nextBlockIsBomb = nextQueue.length > 0 && nextQueue[0].bomb;
-      
+      // Update visual state only (emoji/title), not disabled here
+      bombConversionBtn.classList.remove('undo-mode');
       if (nextBlockIsBomb) {
-        // Next block is already a bomb, disable the button
-        bombConversionBtn.disabled = true;
-        bombConversionBtn.classList.remove('undo-mode');
-        bombConversionBtn.title = "Next block is already a bomb";
+        bombConversionBtn.title = "Defuse the bomb";
         const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
-        if (emojiEl) emojiEl.textContent = "💣";
+        if (emojiEl) emojiEl.textContent = "✂️";
       } else {
-        // Next block is not a bomb, check if player has at least one bomb owned or can afford one
-        const hasBombOwned = bombOwned >= 1;
-        const canAffordBomb = canAffordPowerup('bomb');
-        bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
-        bombConversionBtn.classList.remove('undo-mode');
         bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
         const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
         if (emojiEl) emojiEl.textContent = "💣";
@@ -9449,11 +9442,10 @@ function updateBombConversionButtonState() {
         bombConversionBtn.disabled = true;
         bombConversionBtn.title = "Swap is active - complete or cycle first";
       } else {
-        // No other modes active, check if player has at least one bomb owned or can afford one
+        // No other modes active: gate on ownership/affordability (applies to both convert and defuse)
         const hasBombOwned = bombOwned >= 1;
         const canAffordBomb = canAffordPowerup('bomb');
         bombConversionBtn.disabled = !hasBombOwned && !canAffordBomb;
-        bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
       }
       
       if (trashButton) {
