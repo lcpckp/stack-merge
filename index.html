@@ -649,7 +649,6 @@
     max-width: 100%;
     overflow: visible;
   }
-  
   .shop-grid {
     gap: 8px;
     flex-wrap: wrap;
@@ -1287,7 +1286,6 @@
     height: auto !important;
     width: auto !important;
   }
-
   /* Desktop-specific styling to override mobile styles */
   @media (min-width: 769px) {
     .help-modal .stats-btn,
@@ -1937,7 +1935,6 @@
     font-size: 24px; 
     opacity: 0.9; 
   }
-  
   .help-section h3 { 
     margin: 0; 
     font-size: 18px; 
@@ -2575,7 +2572,6 @@
       box-shadow: 0 0 30px rgba(185, 28, 28, 0.8);
     }
   }
-  
   /* Desktop-only hover effects for powerup buttons */
   @media (hover: hover) and (pointer: fine) {
     .powerup-btn:not(:disabled):not(.undo-mode):hover {
@@ -3224,7 +3220,6 @@
   .debug-pane.show {
     transform: translateX(0);
   }
-  
   /* Debug pane backdrop overlay */
   .debug-pane::before {
     content: '';
@@ -3876,7 +3871,6 @@
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
     white-space: nowrap;
   }
-
   .cancel-new-game-btn:hover {
     background: #b91c1c;
     transform: translateY(-2px);
@@ -4319,7 +4313,6 @@
     right: 0;
   }
 }
-
   /* Extra small mobile devices */
   @media (max-width: 480px) {
     .topbar {
@@ -4965,9 +4958,6 @@
 .checkbox-container input:checked ~ .checkmark:after {
   display: block;
 }
-
-
-
 .sound-control-mute {
   background: #334155;
   color: var(--text);
@@ -5956,7 +5946,6 @@
       </div>
     </div>
   </div>
-
   <!-- Player Statistics Modal (hidden by default) -->
   <div id="statsModal" class="modal-backdrop stats-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
     <div class="modal stats-modal">
@@ -6272,6 +6261,11 @@
         <button id="testUnlockThemeBtn" class="button primary">Test Theme Unlock</button>
         <button id="testLockThemeBtn" class="button primary">Test Theme Lock</button>
         </div>
+        <div class="control-row">
+          <label for="giftTestingCheckbox">Start testing gifts:</label>
+          <input type="checkbox" id="giftTestingCheckbox">
+          <div class="value-display" id="giftTestingStatus">No</div>
+        </div>
       </div>
     </div>
     
@@ -6361,7 +6355,6 @@ const isLocalhost = (() => {
   
   return isLocal;
 })();
-
 // Utility functions for environment detection
 const isDevelopment = () => isLocalhost;
 const isProduction = () => !isLocalhost;
@@ -6430,7 +6423,8 @@ class SoundManager {
         bombClose: 'sounds/bombclose.mp3',
         bombLight: 'sounds/bomblight.mp3',
         break: 'sounds/break.mp3',
-        switch: 'sounds/switch.mp3'
+        switch: 'sounds/switch.mp3',
+        giftOpen: 'sounds/giftopen.mp3'
       };
       
       // Cork sounds for merges
@@ -7007,9 +7001,6 @@ class SoundManager {
     // Save fresh default settings
     this.saveSoundSettings();
   }
-  
-
-  
   // Play a random coin sound effect when gold is earned
   playCoinSound() {
     if (!this.canPlayAudio()) {
@@ -7259,6 +7250,24 @@ class SoundManager {
     
     // Use the simple playSound method
     this.playSound('itemUnlock', 'other').catch(error => {
+      // Silent error handling
+    });
+  }
+  
+  // Play gift open sound effect
+  playGiftOpenSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playGiftOpenSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('giftOpen', 'other').catch(error => {
       // Silent error handling
     });
   }
@@ -7632,7 +7641,6 @@ function updateThemeSelectors() {
     }
   });
 }
-
 // Function to update debug custom dropper block colors based on current theme
 function updateDebugBlockColors() {
   const currentTheme = themeManager ? themeManager.getCurrentTheme() : 'jellyfish';
@@ -8055,7 +8063,6 @@ function testWelcomeModal() {
   console.log('🧪 Manually triggering welcome modal');
   showWelcomeModal();
 }
-
 // Function to completely clear all game data (localStorage only)
 function clearAllGameData() {
   // Reset the game to a fresh state before clearing data
@@ -8520,7 +8527,7 @@ const MAX_HEIGHT = 10;
 const BOMB_CHANCE = 0.01; // 1% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first n blocks
 const GIFT_CHANCE = 0.000; // % chance for gifts
-const GIFT_DELAY_BLOCKS = 50; // No gifts for first n blocks
+const GIFT_DELAY_BLOCKS = 100; // No gifts for first n blocks
 const PUMPKIN_CHANCE = 0.0; // % chance for pumpkins
 const PUMPKIN_DELAY_BLOCKS = 0; // No pumpkins for first n blocks
 const MAGIC_CHANCE = 0.0; // % chance for magic blocks
@@ -8602,8 +8609,9 @@ function getRandomPiece(){
   const bombChance = canSpawnBomb ? BOMB_CHANCE : 0;
   
   // Prevent gifts from spawning for the first n blocks
-  const canSpawnGift = blocksDropped >= GIFT_DELAY_BLOCKS;
-  const giftChance = canSpawnGift ? GIFT_CHANCE : 0;
+  const giftModeActive = !!window.giftTestingMode;
+  const canSpawnGift = giftModeActive || (blocksDropped >= GIFT_DELAY_BLOCKS);
+  const giftChance = canSpawnGift ? (giftModeActive ? 0.5 : GIFT_CHANCE) : 0;
   
   // Prevent pumpkins from spawning for the first n blocks
   const canSpawnPumpkin = blocksDropped >= PUMPKIN_DELAY_BLOCKS;
@@ -8625,7 +8633,7 @@ function getRandomPiece(){
   let specialType = null;
   if (Math.random() < bombChance) {
     specialType = 'bomb';
-  } else if (Math.random() < giftChance) {
+  } else if (Math.random() < giftChance && weight <= 512) {
     specialType = 'gift';
   } else if (Math.random() < magicChance) {
     specialType = 'magic';
@@ -8695,7 +8703,6 @@ let trashButtonPresses = 0; // Number of times button has been pressed
 let pickaxeButtonCost = 1000;
 let pickaxeButtonPresses = 0; // Number of times button has been pressed
 let pickaxeMode = false; // Track if pickaxe mode is active
-
 // Swap button state
 let swapButtonCost = 50;
 let swapButtonPresses = 0; // Number of times button has been pressed
@@ -8990,6 +8997,11 @@ function showPersonalBest() {
 function handleBombConversion() {
   logQueueState('bombConversion-start');
   
+  // Block interaction during block placement
+  if (placing) {
+    return;
+  }
+  
   // Validate queue state before proceeding
   validateQueueState();
   
@@ -9012,6 +9024,25 @@ function handleBombConversion() {
     if (soundManager && soundManager.canPlayAudio()) {
       soundManager.playBombCloseSound();
     }
+    
+    // After defusing, look ahead to what the next block will be and update button accordingly
+    const nextBlockAfterDefuse = nextQueue.length > 1 ? nextQueue[1] : null;
+    const willBeBombAfterDefuse = nextBlockAfterDefuse && nextBlockAfterDefuse.bomb;
+    
+    // Temporarily update the button state to show the correct emoji for the next block
+    if (bombConversionBtn) {
+      bombConversionBtn.classList.remove('undo-mode');
+      if (willBeBombAfterDefuse) {
+        bombConversionBtn.title = "Defuse the bomb";
+        const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "✂️";
+      } else {
+        bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+        const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+        if (emojiEl) emojiEl.textContent = "💣";
+      }
+    }
+    
     updateAllPowerupButtonStates();
     updatePowerupButtonVisibility();
     saveGameState();
@@ -9060,6 +9091,11 @@ function handleBombConversion() {
 
 function handleTrashButton() {
   logQueueState('trashButton-start');
+  
+  // Block interaction during block placement
+  if (placing) {
+    return;
+  }
   
   // Validate queue state before proceeding
   validateQueueState();
@@ -9182,6 +9218,11 @@ function handleTrashConfirmation() {
 function handlePickaxeButton() {
   logQueueState('pickaxeButton-start');
   
+  // Block interaction during block placement
+  if (placing) {
+    return;
+  }
+  
   // Validate queue state before proceeding
   validateQueueState();
   
@@ -9235,6 +9276,11 @@ function handlePickaxeButton() {
 
 async function handleSwapButton() {
   logQueueState('swapButton-start');
+  
+  // Block interaction during block placement
+  if (placing) {
+    return;
+  }
   
   // Validate queue state before proceeding
   validateQueueState();
@@ -9301,7 +9347,6 @@ async function handleSwapButton() {
   
   logQueueState('swapButton-end');
 }
-
 async function handlePickaxeBlockRemoval(poleIndex, blockIndex = null) {
   // Find the pole that was clicked
   const pole = poles[poleIndex];
@@ -9937,7 +9982,6 @@ function positionHelpModalMobile() {
   
   // Mobile help modal positioned
 }
-
 // Function to position help modal on desktop
 function positionHelpModalDesktop() {
   const helpModalContent = document.querySelector('.help-modal');
@@ -10284,10 +10328,10 @@ function updatePowerupButtonVisibility() {
   // Track if any powerup was discovered for the first time in this update
   let anyPowerupDiscovered = false;
   
-  // Show/hide buttons based on whether they've been discovered this game OR if they're currently purchasable OR if show items on start is enabled
+  // Show/hide buttons based on whether they've been discovered this game OR if they're currently purchasable OR if show items on start is enabled OR if player owns at least one
   // Use visibility instead of display to maintain layout positioning
   if (bombBtn) {
-    const shouldShow = window.showItemsOnStart || bombDiscoveredThisGame || canAffordPowerup('bomb');
+    const shouldShow = window.showItemsOnStart || bombDiscoveredThisGame || canAffordPowerup('bomb') || bombOwned > 0;
     if (shouldShow) {
       bombBtn.style.visibility = 'visible';
       bombBtn.style.opacity = '1';
@@ -10295,8 +10339,8 @@ function updatePowerupButtonVisibility() {
       if (!bombBtn.disabled) {
         bombBtn.style.pointerEvents = 'auto';
       }
-      // Mark as discovered if it became visible due to affordability
-      if (canAffordPowerup('bomb') && !bombDiscoveredThisGame) {
+      // Mark as discovered if it became visible due to affordability or ownership
+      if ((canAffordPowerup('bomb') || bombOwned > 0) && !bombDiscoveredThisGame) {
         bombDiscoveredThisGame = true;
         anyPowerupDiscovered = true;
       }
@@ -10307,7 +10351,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (trashBtn) {
-    const shouldShow = window.showItemsOnStart || trashDiscoveredThisGame || canAffordPowerup('trash');
+    const shouldShow = window.showItemsOnStart || trashDiscoveredThisGame || canAffordPowerup('trash') || trashOwned > 0;
     if (shouldShow) {
       trashBtn.style.visibility = 'visible';
       trashBtn.style.opacity = '1';
@@ -10315,8 +10359,8 @@ function updatePowerupButtonVisibility() {
       if (!trashBtn.disabled) {
         trashBtn.style.pointerEvents = 'auto';
       }
-      // Mark as discovered if it became visible due to affordability
-      if (canAffordPowerup('trash') && !trashDiscoveredThisGame) {
+      // Mark as discovered if it became visible due to affordability or ownership
+      if ((canAffordPowerup('trash') || trashOwned > 0) && !trashDiscoveredThisGame) {
         trashDiscoveredThisGame = true;
         anyPowerupDiscovered = true;
       }
@@ -10327,7 +10371,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (pickaxeBtn) {
-    const shouldShow = window.showItemsOnStart || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe');
+    const shouldShow = window.showItemsOnStart || pickaxeDiscoveredThisGame || canAffordPowerup('pickaxe') || pickaxeOwned > 0;
     if (shouldShow) {
       pickaxeBtn.style.visibility = 'visible';
       pickaxeBtn.style.opacity = '1';
@@ -10335,8 +10379,8 @@ function updatePowerupButtonVisibility() {
       if (!pickaxeBtn.disabled) {
         pickaxeBtn.style.pointerEvents = 'auto';
       }
-      // Mark as discovered if it became visible due to affordability
-      if (canAffordPowerup('pickaxe') && !pickaxeDiscoveredThisGame) {
+      // Mark as discovered if it became visible due to affordability or ownership
+      if ((canAffordPowerup('pickaxe') || pickaxeOwned > 0) && !pickaxeDiscoveredThisGame) {
         pickaxeDiscoveredThisGame = true;
         anyPowerupDiscovered = true;
       }
@@ -10347,7 +10391,7 @@ function updatePowerupButtonVisibility() {
     }
   }
   if (swapBtn) {
-    const shouldShow = window.showItemsOnStart || swapDiscoveredThisGame || canAffordPowerup('swap');
+    const shouldShow = window.showItemsOnStart || swapDiscoveredThisGame || canAffordPowerup('swap') || swapOwned > 0;
     if (shouldShow) {
       swapBtn.style.visibility = 'visible';
       swapBtn.style.opacity = '1';
@@ -10355,8 +10399,8 @@ function updatePowerupButtonVisibility() {
       if (!swapBtn.disabled) {
         swapBtn.style.pointerEvents = 'auto';
       }
-      // Mark as discovered if it became visible due to affordability
-      if (canAffordPowerup('swap') && !swapDiscoveredThisGame) {
+      // Mark as discovered if it became visible due to affordability or ownership
+      if ((canAffordPowerup('swap') || swapOwned > 0) && !swapDiscoveredThisGame) {
         swapDiscoveredThisGame = true;
         anyPowerupDiscovered = true;
       }
@@ -10540,7 +10584,6 @@ function showShopGoldLost(amount) {
     }
   }, 1200);
 }
-
 // Function to show gold lost animation relative to main gold display
 function showMainGoldLost(amount) {
   // Create the gold lost display element
@@ -11128,7 +11171,6 @@ function closeSettingsModal() {
   // Reset the flag
   window.themeJustUnlocked = false;
 }
-
 function initializeSettingsModal() {
   // Settings close button
   const closeBtn = document.getElementById('settingsClose');
@@ -11667,6 +11709,17 @@ function syncDebugControls() {
     debugUpdateProbBtn.addEventListener('click', handleUpdateProbabilities);
   }
   
+  // Gift testing toggle
+  const giftTestingCheckbox = document.getElementById('giftTestingCheckbox');
+  const giftTestingStatus = document.getElementById('giftTestingStatus');
+  if (giftTestingCheckbox && giftTestingStatus) {
+    giftTestingCheckbox.checked = !!window.giftTestingMode;
+    giftTestingStatus.textContent = giftTestingCheckbox.checked ? 'Yes' : 'No';
+    giftTestingCheckbox.onchange = (e) => {
+      window.giftTestingMode = e.target.checked;
+      giftTestingStatus.textContent = e.target.checked ? 'Yes' : 'No';
+    };
+  }
 
   
   // Set up test personal best button event listener
@@ -11776,7 +11829,6 @@ function handleVolumeChange(e) {
   soundManager.setVolume(volume);
   updateDebugVolumeLabel();
 }
-
 function handleDebugThemeChange(e) {
   const selectedTheme = e.target.value;
   
@@ -12277,7 +12329,6 @@ function getTextColorFor(w){
     return (w === 1 || w >= 16384) ? '#000000' : '#ffffff';
   }
 }
-
 function render(){
   // Prevent infinite render loops
   if (window.isRendering) {
@@ -12686,7 +12737,6 @@ function renderNext(){
     d.style.setProperty('--animation-speed', '1');
   });
 }
-
 function placeOnPole(idx){
   logQueueState('placeOnPole-start');
   
@@ -12832,7 +12882,24 @@ function placeOnPole(idx){
           bombCostEl.textContent = formatNumber(bombConversionCost);
         }
         // Update powerup button states to reflect new owned count
-        updateBombConversionButtonState();
+        // Look ahead to what the next block will be after queue advancement
+        const nextBlockAfterPlacement = nextQueue.length > 1 ? nextQueue[1] : null;
+        const willBeBombAfterPlacement = nextBlockAfterPlacement && nextBlockAfterPlacement.bomb;
+        
+        // Temporarily update the bomb button state to show the correct emoji for the next block
+        if (bombConversionBtn) {
+          bombConversionBtn.classList.remove('undo-mode');
+          if (willBeBombAfterPlacement) {
+            bombConversionBtn.title = "Defuse the bomb";
+            const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+            if (emojiEl) emojiEl.textContent = "✂️";
+          } else {
+            bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+            const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+            if (emojiEl) emojiEl.textContent = "💣";
+          }
+        }
+        
         updatePickaxeButtonState();
         updateTrashButtonState();
         // Save game state after bomb payment
@@ -12843,7 +12910,24 @@ function placeOnPole(idx){
       if (bombMode || bombSelected) {
         bombMode = false;
         bombSelected = false;
-        updateBombConversionButtonState();
+        // Look ahead to what the next block will be after queue advancement
+        const nextBlockAfterPlacement = nextQueue.length > 1 ? nextQueue[1] : null;
+        const willBeBombAfterPlacement = nextBlockAfterPlacement && nextBlockAfterPlacement.bomb;
+        
+        // Temporarily update the bomb button state to show the correct emoji for the next block
+        if (bombConversionBtn) {
+          bombConversionBtn.classList.remove('undo-mode');
+          if (willBeBombAfterPlacement) {
+            bombConversionBtn.title = "Defuse the bomb";
+            const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+            if (emojiEl) emojiEl.textContent = "✂️";
+          } else {
+            bombConversionBtn.title = "Convert next block to bomb (press again to undo)";
+            const emojiEl = bombConversionBtn.querySelector('.powerup-emoji');
+            if (emojiEl) emojiEl.textContent = "💣";
+          }
+        }
+        
         updatePickaxeButtonState();
         updateTrashButtonState();
       }
@@ -13178,6 +13262,14 @@ async function animateMergeCascade(index){
       continue;
     }
     
+    // Check for gift explosion: 512 gift + 512 gift = 1024 gift (explodes)
+    if (newW === 1024 && mergedSpecialType === 'gift' && (a.w === 512 || b.w === 512)) {
+      // Gift explosion - clear the entire stack and award powerups
+      await animateGiftExplosion(index, pairIndex - 1, newW);
+      // after animation, pole is cleared; continue which will break
+      continue;
+    }
+    
       // Check if this merge unlocks a new stack (stage progression)
   if (newW === currentTargetBlockSize * 2){
     // Check if this merge unlocks a new block size for future drops BEFORE stage progression
@@ -13335,9 +13427,6 @@ function showGameOver(){
   // Save final game state when game over is reached
   saveGameState();
 }
-
-
-
 function resetGame(isFreshGame = true){
   // Hide game over button overlay
   const gameOverButton = document.getElementById('gameOverButton');
@@ -13676,6 +13765,84 @@ async function animateSwapBlocks(){
   logQueueState('swapAnimation-end');
 }
 
+async function animateGiftExplosion(index, mergedIndex, weight){
+  // Render so the merged block exists in the DOM
+  render();
+  const poleDiv = gameDiv.children[index];
+  const discs = poleDiv.querySelectorAll('.disc');
+  const mergedEl = discs[mergedIndex];
+  if(!mergedEl){
+    poles[index] = [];
+    render();
+    return;
+  }
+
+  // Let the new block behave like a normal merge result first
+  mergedEl.classList.add('merge-in');
+  
+  // Ensure CSS class is applied and animation starts
+  await nextFrame();
+  
+  await waitForAnimation(mergedEl);
+  mergedEl.classList.remove('merge-in');
+
+  // Create a shockwave ripple effect that propagates through the stack
+  const allDiscs = Array.from(poleDiv.querySelectorAll('.disc'));
+  
+  // Start the explosion from the merged block (gift location) and propagate outward in both directions
+  const giftIndex = mergedIndex; // The gift merge location
+    
+  // First, apply the bomb explosion effect to the gift block itself
+  const giftDisc = allDiscs[giftIndex];
+  if (giftDisc) {
+    giftDisc.classList.add('bomb-explosion');
+    // Play gift open sound effect
+    soundManager.playGiftOpenSound();
+  }
+  
+  // Then apply the shockwave effect using CSS animation-delay for each disc
+  let maxDelayMs = 0;
+  for (let i = 0; i < allDiscs.length; i++) {
+    if (i === giftIndex) continue; // Skip the gift block, it already has explosion effect
+    const disc = allDiscs[i];
+    const distanceFromGift = Math.abs(i - giftIndex);
+    const delayMs = distanceFromGift * 40;
+    maxDelayMs = Math.max(maxDelayMs, delayMs);
+    disc.style.animationDelay = `${delayMs}ms`;
+    disc.classList.add('bomb-ripple');
+  }
+  
+  // Wait for the last delayed animation to finish (350ms base)
+  await new Promise(resolve => setTimeout(resolve, maxDelayMs + 350));
+  
+  // Clean up delay styles
+  for (let i = 0; i < allDiscs.length; i++) {
+    allDiscs[i].style.animationDelay = '';
+  }
+  
+  // Clean up the explosion and ripple classes
+  allDiscs.forEach(d => {
+    d.classList.remove('bomb-explosion');
+    d.classList.remove('bomb-ripple');
+  });
+
+  // Clear the entire pole
+  poles[index] = [];
+  
+  // Award specific powerups: 3 bombs, 1 trash, 1 swap
+  bombOwned += 3;
+  trashOwned += 1;
+  swapOwned += 1;
+  
+  // Update UI to reflect new powerup counts
+  updatePowerupOwnershipBadges();
+  updateAllPowerupButtonStates();
+  updatePowerupButtonVisibility();
+  
+  // Re-render to show the cleared stack
+  render();
+}
+
 function getElementPageRect(el){
   const r = el.getBoundingClientRect();
   return { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height };
@@ -13828,7 +13995,6 @@ async function animateClearPoleWithFallingBlock(index, mergedIndex, weight){
   poles[index] = [];
   render();
 }
-
 function choosePoleFor(pieceOrWeight){
   let avail = poles.map((p,i)=> ({p,i})).filter(x=> canPlaceOnPole(pieceOrWeight, x.p));
   if(avail.length === 0) {
@@ -14374,7 +14540,6 @@ window.addEventListener('keydown', (e) => {
     }
   }
 });
-
 // Initialize the game after all functions are defined
 
 try {
