@@ -8578,8 +8578,8 @@ function updateScoreDisplay() {
   // Check for new personal best during gameplay
   const previousHighScore = window.highScore || 0;
   
-  if (score > previousHighScore && score > 0) {
-    // Always update high score when current score exceeds it
+  if (score > previousHighScore && score > 0 && !HALLOWEEN_MODE) {
+    // Only update high score when current score exceeds it AND Halloween mode is disabled
     window.highScore = score;
     
     // Update statistics modal if it's open
@@ -13598,9 +13598,9 @@ function showGameOver(){
   bombSelected = false;
   trashMode = false; // Reset trash mode
   
-  // Check if this is a new high score
+  // Check if this is a new high score (only when Halloween mode is disabled)
   const previousHighScore = window.highScore || 0;
-  const isNewHighScore = score > previousHighScore;
+  const isNewHighScore = score > previousHighScore && !HALLOWEEN_MODE;
   if (isNewHighScore) {
     window.highScore = score;
     
