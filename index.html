@@ -29,7 +29,23 @@
     --text:#f8fafc; 
     --font-family: 'Quantico', monospace;
     
+    /* Halloween Mode Colors */
+    --halloween-bg:#000000;
+    --halloween-panel:#111111;
+    --halloween-text:#f8fafc;
+    
     /* Theme colors are now handled dynamically via JavaScript */
+  }
+
+  /* Halloween Mode Theme Override */
+  .halloween-mode {
+    --bg: var(--halloween-bg) !important;
+    --panel: var(--halloween-panel) !important;
+    --text: var(--halloween-text) !important;
+  }
+
+  .halloween-mode body {
+    background: var(--halloween-bg) !important;
   }
   
   /* Prevent double-tap zoom on all elements */
@@ -970,6 +986,33 @@
     -moz-user-select: none;
     -ms-user-select: none;
   }
+
+  /* Pumpkin multiplier badge styling centered on lower edge of score counter */
+  .pumpkin-multiplier-badge {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff8c00;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: 2px solid var(--bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+    font-family: var(--font-family);
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+    box-sizing: border-box;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
   
   /* Disabled gold cost badge styling */
   .powerup-cost-badge.disabled {
@@ -1055,6 +1098,17 @@
   }
   
   @keyframes stageBadgePulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.2); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  /* Pumpkin multiplier badge pulse animation */
+  .pumpkin-multiplier-badge.pulse {
+    animation: pumpkinBadgePulse 0.6s ease-out;
+  }
+  
+  @keyframes pumpkinBadgePulse {
     0% { transform: translateX(-50%) scale(1); }
     50% { transform: translateX(-50%) scale(1.2); }
     100% { transform: translateX(-50%) scale(1); }
@@ -3989,6 +4043,16 @@
     left: 50%;
     transform: translateX(-50%);
   }
+
+  /* Adjust pumpkin multiplier badge for mobile */
+  .pumpkin-multiplier-badge {
+    font-size: 10px;
+    padding: 3px 5px;
+    min-width: 18px;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
   
   .next {
     order: 2;
@@ -4615,6 +4679,16 @@
   
   /* Adjust stage multiplier badge for extra small mobile */
   .stage-multiplier-badge {
+    font-size: 9px;
+    padding: 2px 4px;
+    min-width: 16px;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Adjust pumpkin multiplier badge for extra small mobile */
+  .pumpkin-multiplier-badge {
     font-size: 9px;
     padding: 2px 4px;
     min-width: 16px;
@@ -5935,7 +6009,7 @@
             <p style="margin: 0 0 12px 0; font-size: 16px; line-height: 1.5;">• Access the sound controls by clicking the speaker icon in the top bar.</p>
           </div>
         </div>
-
+        
 
       </div>
 
@@ -6316,6 +6390,19 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Apply Halloween Theme
+document.addEventListener('DOMContentLoaded', function() {
+  // Apply Halloween theme if Halloween mode is active
+  if (typeof HALLOWEEN_MODE !== 'undefined' && HALLOWEEN_MODE) {
+    document.documentElement.classList.add('halloween-mode');
+  }
+  
+  // Also call the function to ensure theme is applied
+  if (typeof applyHalloweenTheme === 'function') {
+    applyHalloweenTheme();
+  }
+});
+
 // Environment Detection
 const isLocalhost = (() => {
   const hostname = window.location.hostname;
@@ -6374,6 +6461,7 @@ class SoundManager {
       merge: 3,     // Merge sounds
       coin: 3,      // Gold coin sounds
       bomb: 3,      // Bomb explosion sounds
+      pumpkin: 3,   // Pumpkin sounds
       other: 2      // Other sounds (stage progression, etc.)
     };
     
@@ -6424,7 +6512,9 @@ class SoundManager {
         bombLight: 'sounds/bomblight.mp3',
         break: 'sounds/break.mp3',
         switch: 'sounds/switch.mp3',
-        giftOpen: 'sounds/giftopen.mp3'
+        giftOpen: 'sounds/giftopen.mp3',
+        pumpkinMerge: 'sounds/pumpkinmerge.mp3',
+        pumpkinBreak: 'sounds/pumpkinbreak.mp3'
       };
       
       // Cork sounds for merges
@@ -7237,6 +7327,42 @@ class SoundManager {
     });
   }
 
+  // Play pumpkin merge sound effect (when two pumpkins merge)
+  playPumpkinMergeSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playPumpkinMergeSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('pumpkinMerge', 'pumpkin').catch(error => {
+      // Silent error handling
+    });
+  }
+
+  // Play pumpkin break sound effect (when pumpkin merges with regular block)
+  playPumpkinBreakSound() {
+    if (!this.canPlayAudio()) {
+      return;
+    }
+    
+    // Ensure audio is unlocked first
+    if (!this.audioUnlocked) {
+      this.unlockAudio().then(() => this.playPumpkinBreakSound());
+      return;
+    }
+    
+    // Use the simple playSound method
+    this.playSound('pumpkinBreak', 'pumpkin').catch(error => {
+      // Silent error handling
+    });
+  }
+
   playItemUnlockSound() {
     if (!this.canPlayAudio()) {
       return;
@@ -7806,6 +7932,7 @@ function saveGameState() {
       hasShownPersonalBest: hasShownPersonalBest || false,
       showItemsOnStart: window.showItemsOnStart || false,
       useItemOnPurchase: window.useItemOnPurchase || false,
+      halloweenMode: window.halloweenMode !== undefined ? window.halloweenMode : true,
       helpButtonClicked: helpButtonClicked || false,
       timestamp: Date.now()
     };
@@ -7977,7 +8104,16 @@ function restoreGameState(gameState) {
     // Restore use item on purchase setting
     window.useItemOnPurchase = gameState.useItemOnPurchase || false;
     
-
+    // Restore Halloween mode setting
+    window.halloweenMode = gameState.halloweenMode !== undefined ? gameState.halloweenMode : true;
+    
+    // Update the global HALLOWEEN_MODE variable
+    window.HALLOWEEN_MODE = window.halloweenMode;
+    
+    // Apply Halloween theme if needed
+    if (typeof applyHalloweenTheme === 'function') {
+      applyHalloweenTheme();
+    }
     
     // Update sound button to reflect restored mute state
     const soundBtn = document.getElementById('soundBtn');
@@ -8413,7 +8549,22 @@ function updateScoreDisplay() {
   if (scoreDisplay) {
     // Preserve the score label and update only the score content
     const scoreLabel = scoreDisplay.querySelector('.score-label');
-    scoreDisplay.innerHTML = `<div class="score-star">⭐</div><div class="score-text">${formatScore(score)}</div>`;
+    
+    // Halloween mode: show pumpkin emoji and add multiplier badge
+    if (HALLOWEEN_MODE) {
+      const pumpkinMultiplier = getPumpkinMultiplier();
+      const badgeHTML = `<div class="pumpkin-multiplier-badge" id="pumpkinMultiplierBadge">🎃 ×${pumpkinMultiplier}</div>`;
+      
+      scoreDisplay.innerHTML = `
+        <div class="score-star">🎃</div>
+        <div class="score-text">${formatScore(score)}</div>
+        ${badgeHTML}
+      `;
+    } else {
+      // Normal mode: show star emoji
+      scoreDisplay.innerHTML = `<div class="score-star">⭐</div><div class="score-text">${formatScore(score)}</div>`;
+    }
+    
     // Re-add the label if it was removed
     if (scoreLabel && !scoreDisplay.querySelector('.score-label')) {
       scoreDisplay.insertBefore(scoreLabel, scoreDisplay.firstChild);
@@ -8528,7 +8679,10 @@ const BOMB_CHANCE = 0.01; // 1% chance for bombs
 const BOMB_DELAY_BLOCKS = 50; // No bombs for first n blocks
 const GIFT_CHANCE = 0.000; // % chance for gifts
 const GIFT_DELAY_BLOCKS = 100; // No gifts for first n blocks
-const PUMPKIN_CHANCE = 0.0; // % chance for pumpkins
+// Halloween Mode Toggle - Set to false to disable Halloween features
+const HALLOWEEN_MODE = true;
+
+const PUMPKIN_CHANCE = HALLOWEEN_MODE ? 0.20 : 0.0; // % chance for pumpkins (5% when Halloween mode is on)
 const PUMPKIN_DELAY_BLOCKS = 0; // No pumpkins for first n blocks
 const MAGIC_CHANCE = 0.0; // % chance for magic blocks
 const MAGIC_DELAY_BLOCKS = 50; // No magic blocks for first n blocks
@@ -8603,6 +8757,36 @@ function getSpecialType(piece) {
   return piece && piece.specialType ? piece.specialType : null;
 }
 
+// Halloween Mode Functions
+function countPumpkinBlocks() {
+  if (!HALLOWEEN_MODE) return 0;
+  
+  let pumpkinValue = 0;
+  poles.forEach(pole => {
+    pole.forEach(block => {
+      if (block.specialType === 'pumpkin') {
+        pumpkinValue += block.w; // Sum the weight/value of pumpkin blocks
+      }
+    });
+  });
+  return pumpkinValue;
+}
+
+function getPumpkinMultiplier() {
+  if (!HALLOWEEN_MODE) return 1;
+  const pumpkinValue = countPumpkinBlocks();
+  return pumpkinValue; // Each pumpkin block's value contributes to the multiplier
+}
+
+// Apply or remove Halloween theme based on mode
+function applyHalloweenTheme() {
+  if (HALLOWEEN_MODE) {
+    document.documentElement.classList.add('halloween-mode');
+  } else {
+    document.documentElement.classList.remove('halloween-mode');
+  }
+}
+
 function getRandomPiece(){
   // Prevent bombs from spawning for the first n blocks
   const canSpawnBomb = blocksDropped >= BOMB_DELAY_BLOCKS;
@@ -8613,8 +8797,8 @@ function getRandomPiece(){
   const canSpawnGift = giftModeActive || (blocksDropped >= GIFT_DELAY_BLOCKS);
   const giftChance = canSpawnGift ? (giftModeActive ? 0.5 : GIFT_CHANCE) : 0;
   
-  // Prevent pumpkins from spawning for the first n blocks
-  const canSpawnPumpkin = blocksDropped >= PUMPKIN_DELAY_BLOCKS;
+  // Prevent pumpkins from spawning for the first n blocks (only in Halloween mode)
+  const canSpawnPumpkin = HALLOWEEN_MODE && blocksDropped >= PUMPKIN_DELAY_BLOCKS;
   const pumpkinChance = canSpawnPumpkin ? PUMPKIN_CHANCE : 0;
   
   // Prevent magic blocks from spawning for the first n blocks
@@ -11252,7 +11436,7 @@ function initializeSettingsModal() {
       saveGameState();
     });
   }
-  
+
 
 }
 
@@ -12649,11 +12833,11 @@ function render(){
   
 
   
-  // update score display in game info
-  updateScoreDisplay();
-  
   // update gold display in game info
   updateGoldDisplay();
+  
+  // Update score display (including pumpkin multiplier in Halloween mode)
+  updateScoreDisplay();
   
   // Update all powerup button states when gold changes
   updateAllPowerupButtonsIfGoldChanged();
@@ -12932,8 +13116,11 @@ function placeOnPole(idx){
         updateTrashButtonState();
       }
       
-      // scoring: add only the dropped piece's weight
-      score += nextPiece.w;
+      // scoring: add only the dropped piece's weight with pumpkin multiplier
+      const pumpkinMultiplier = getPumpkinMultiplier();
+      const baseScore = nextPiece.w;
+      const finalScore = HALLOWEEN_MODE ? baseScore * pumpkinMultiplier : baseScore;
+      score += finalScore;
       updateScoreDisplay();
       
       // Check for theme unlocks
@@ -13202,9 +13389,16 @@ async function animateMergeCascade(index){
     } else if (a.specialType === 'magic' || b.specialType === 'magic') {
       // Magic + normal block = magic (magic + bomb already handled above)
       mergedSpecialType = 'magic';
+    } else if (a.specialType === 'pumpkin' && b.specialType === 'pumpkin') {
+      // Pumpkin + pumpkin = pumpkin
+      mergedSpecialType = 'pumpkin';
     } else if (a.specialType || b.specialType) {
-      // Other special types (like pumpkin) - use the first one found
-      mergedSpecialType = a.specialType || b.specialType;
+      // Other special types (like pumpkin + regular) = regular block
+      // Only maintain special type if both blocks have the same special type
+      if (a.specialType === b.specialType && a.specialType !== 'pumpkin') {
+        mergedSpecialType = a.specialType;
+      }
+      // If one is pumpkin and the other is regular, result is regular (null)
     }
     
     poleArr.splice(pairIndex - 1, 2, { w: newW, bomb: isBombMerge, specialType: mergedSpecialType });
@@ -13217,6 +13411,17 @@ async function animateMergeCascade(index){
     
     // Play merge sound effect for the newly created block
     soundManager.playMergeSoundEnhanced(newW);
+    
+    // Play pumpkin-specific sound effects
+    if (HALLOWEEN_MODE) {
+      if (mergedSpecialType === 'pumpkin') {
+        // Two pumpkins merged - play pumpkin merge sound
+        soundManager.playPumpkinMergeSound();
+      } else if ((a.specialType === 'pumpkin' || b.specialType === 'pumpkin') && mergedSpecialType !== 'pumpkin') {
+        // Pumpkin merged with regular block - play pumpkin break sound
+        soundManager.playPumpkinBreakSound();
+      }
+    }
     
     // Earn gold for this merge (increases by 1 for each merge in the cascade, multiplied by current stage)
     const baseGoldEarned = mergeCount;
