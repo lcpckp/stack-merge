@@ -31,7 +31,7 @@
     
     /* Halloween Mode Colors */
     --halloween-bg:#000000;
-    --halloween-panel:#111111;
+    --halloween-panel:#1a1a1a;
     --halloween-text:#f8fafc;
     
     /* Theme colors are now handled dynamically via JavaScript */
@@ -4042,6 +4042,11 @@
     bottom: -14px;
     left: 50%;
     transform: translateX(-50%);
+    /* Fix mobile text centering by adjusting line-height and adding vertical centering */
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Adjust pumpkin multiplier badge for mobile */
@@ -4052,6 +4057,11 @@
     bottom: -14px;
     left: 50%;
     transform: translateX(-50%);
+    /* Fix mobile text centering by adjusting line-height and adding vertical centering */
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .next {
@@ -8534,12 +8544,12 @@ function formatScore(num) {
 // Multiplier formatting utility function
 function formatMultiplier(num) {
   if (num < 100000) {
-    return num.toString() + ' x';
+    return '×' + num.toString();
   } else {
     // Use scientific notation for 100,000 and above without + sign
     const exp = Math.floor(Math.log10(num));
     const mantissa = (num / Math.pow(10, exp)).toFixed(1);
-    return mantissa + 'e' + exp + ' x';
+    return '×' + mantissa + 'e' + exp;
   }
 }
 
